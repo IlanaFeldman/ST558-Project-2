@@ -1,0 +1,101 @@
+---
+title: "ST558 - Project 2 - Predictive Modeling"
+author: "Jasmine Wang & Ilana Feldman"
+date: "10/31/2021"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+# Introduction - done by Jasmine
+
+briefly describes the data 
+briefly describes the variables you have to work with (describe what you want to use)
+
+purpose of the analysis
+methods you will use to model the response (more details in modeling section)
+
+61 variables (only 58 predictive variables, 2 non-predictive), target response is "shares".
+
+# Data 
+
+```{r eval=TRUE}
+library(tidyverse)
+library(knitr)
+library(caret)
+
+allnews <- read_csv("C:/Users/peach/Documents/ST558/ST558_repos/ST558-Project-2/_Data/OnlineNewsPopularity.csv", 
+                 col_names = TRUE)
+dim(allnews)
+all_news <- allnews %>% mutate(class_shares = if_else(shares < 1400, 0, 1))
+news <- all_news %>% filter(data_channel_is_lifestyle == 1) %>% select(
+  -data_channel_is_lifestyle, -data_channel_is_entertainment, -data_channel_is_bus, -data_channel_is_socmed, 
+  -data_channel_is_tech, -data_channel_is_world, -url, -timedelta)
+#news <- allnews %>% filter(data_channel_is_lifestyle == 1) %>% select(
+#  n_tokens_title, n_tokens_content, num_hrefs, num_imgs, num_videos, kw_avg_min, kw_avg_max, avg_negative_polarity, 
+#  avg_positive_polarity, title_subjectivity, title_sentiment_polarity, shares)
+news
+
+set.seed(388588)
+sharesIndex <- createDataPartition(news$shares, p = 0.7, list = FALSE)
+train <- news[sharesIndex, ]
+test <- news[-sharesIndex, ]
+
+train1 <- train %>% select(-class_shares)
+test1 <- test %>% select(-class_shares)
+fit1 <- lm(shares ~ . , data = train1)
+summary(fit1)
+
+cv_fit1 <- train(shares ~ . , 
+                 data=train1,
+                 method = "lm",
+                 preProcess = c("center", "scale"),
+                 trControl = trainControl(method = "cv", number = 10))
+cv_fit1
+
+
+```
+
+
+```{r eval=TRUE}
+
+<- train %>% select(-shares)
+<- test %>% select(-shares)
+
+
+
+
+```
+# Summarizations
+
+## Numerical Summaries
+
+## Visualizations
+
+# Modeling
+
+## Linear Regression (2)
+
+one each
+
+## Random Forest 
+
+Ilana
+
+## Boosted Tree
+
+Jasmine
+
+# Comparison
+
+# Automation
+
+
+You can also embed plots, for example:
+
+```{r echo=FALSE}
+
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
