@@ -60,8 +60,8 @@ cv_fit1
 
 ```{r eval=TRUE}
 
-<- train %>% select(-shares)
-<- test %>% select(-shares)
+train2 <- train %>% select(-shares)
+test2 <- test %>% select(-shares)
 
 
 
