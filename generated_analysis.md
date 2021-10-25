@@ -121,20 +121,20 @@ sel_data
 ```
 
     ## # A tibble: 2,099 x 22
-    ##    class_shares shares dayweek kw_avg_avg kw_avg_max kw_avg_min kw_max_avg LDA_00 LDA_01 LDA_02 LDA_03 LDA_04 self_reference_~ self_reference_~
-    ##           <dbl>  <dbl> <fct>        <dbl>      <dbl>      <dbl>      <dbl>  <dbl>  <dbl>  <dbl>  <dbl>  <dbl>            <dbl>            <dbl>
-    ##  1            0    556 1               0          0          0          0  0.0201 0.115  0.0200 0.0200  0.825              545            3151.
-    ##  2            1   1900 1               0          0          0          0  0.0286 0.0286 0.0286 0.0287  0.885                0               0 
-    ##  3            1   5700 1               0          0          0          0  0.437  0.200  0.0335 0.0334  0.295             5000            5000 
-    ##  4            0    462 1               0          0          0          0  0.0200 0.0200 0.0200 0.0200  0.920                0               0 
-    ##  5            1   3600 1               0          0          0          0  0.211  0.0255 0.0251 0.0251  0.713                0               0 
-    ##  6            0    343 1               0          0          0          0  0.0201 0.0206 0.0205 0.121   0.818             6200            6200 
-    ##  7            0    507 1               0          0          0          0  0.0250 0.160  0.0250 0.0250  0.765              545            3151.
-    ##  8            0    552 1               0          0          0          0  0.207  0.146  0.276  0.0251  0.346                0               0 
-    ##  9            0   1200 2             885.      3460        581.      2193. 0.0202 0.133  0.120  0.0201  0.707             1300            1300 
-    ## 10            1   1900 3            1207.      4517.       748.      1953. 0.0335 0.217  0.0334 0.0335  0.683             6700           11700 
-    ## # ... with 2,089 more rows, and 8 more variables: n_non_stop_unique_tokens <dbl>, n_unique_tokens <dbl>, average_token_length <dbl>,
-    ## #   n_tokens_content <dbl>, n_tokens_title <dbl>, global_subjectivity <dbl>, num_imgs <dbl>, num_videos <dbl>
+    ##    class_shares shares dayweek kw_avg_avg kw_avg_max kw_avg_min kw_max_avg LDA_00 LDA_01 LDA_02 LDA_03 LDA_04 self_reference_min_shares
+    ##           <dbl>  <dbl> <fct>        <dbl>      <dbl>      <dbl>      <dbl>  <dbl>  <dbl>  <dbl>  <dbl>  <dbl>                     <dbl>
+    ##  1            0    556 1               0          0          0          0  0.0201 0.115  0.0200 0.0200  0.825                       545
+    ##  2            1   1900 1               0          0          0          0  0.0286 0.0286 0.0286 0.0287  0.885                         0
+    ##  3            1   5700 1               0          0          0          0  0.437  0.200  0.0335 0.0334  0.295                      5000
+    ##  4            0    462 1               0          0          0          0  0.0200 0.0200 0.0200 0.0200  0.920                         0
+    ##  5            1   3600 1               0          0          0          0  0.211  0.0255 0.0251 0.0251  0.713                         0
+    ##  6            0    343 1               0          0          0          0  0.0201 0.0206 0.0205 0.121   0.818                      6200
+    ##  7            0    507 1               0          0          0          0  0.0250 0.160  0.0250 0.0250  0.765                       545
+    ##  8            0    552 1               0          0          0          0  0.207  0.146  0.276  0.0251  0.346                         0
+    ##  9            0   1200 2             885.      3460        581.      2193. 0.0202 0.133  0.120  0.0201  0.707                      1300
+    ## 10            1   1900 3            1207.      4517.       748.      1953. 0.0335 0.217  0.0334 0.0335  0.683                      6700
+    ## # ... with 2,089 more rows, and 9 more variables: self_reference_avg_sharess <dbl>, n_non_stop_unique_tokens <dbl>, n_unique_tokens <dbl>,
+    ## #   average_token_length <dbl>, n_tokens_content <dbl>, n_tokens_title <dbl>, global_subjectivity <dbl>, num_imgs <dbl>, num_videos <dbl>
 
 ``` r
 set.seed(388588)
@@ -244,7 +244,7 @@ scatter + geom_point(size = 3) + #aes(shape = class_shares)
         title = element_text(size = 13))
 ```
 
-![](C:/Users/peach/documents/ST558/ST558_repos/ST558-Project-2/generated_analysis_files/figure-gfm/unnamed-chunk-32-1.png)<!-- -->
+![](C:/Users/peach/documents/ST558/ST558_repos/ST558-Project-2/generated_analysis_files/figure-gfm/unnamed-chunk-1-1.png)<!-- -->
 
 ``` r
 train$class_shares <- as.factor(train$class_shares)
@@ -260,7 +260,7 @@ lineplot1 + geom_line(aes(group=class_shares), lwd = 2) + geom_point() + #aes(gr
         title = element_text(size = 13))
 ```
 
-![](C:/Users/peach/documents/ST558/ST558_repos/ST558-Project-2/generated_analysis_files/figure-gfm/unnamed-chunk-32-2.png)<!-- -->
+![](C:/Users/peach/documents/ST558/ST558_repos/ST558-Project-2/generated_analysis_files/figure-gfm/unnamed-chunk-1-2.png)<!-- -->
 
 ``` r
 #g <- ggplot(data = barplot1, aes(x = Province, y = Avg_active, fill = vaccine))

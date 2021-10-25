@@ -5,7 +5,8 @@ date: "10/31/2021"
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+knitr::opts_chunk$set(fit.path = "../generated_analysis_files/figure-gfm/", echo = TRUE, message = FALSE, warning = FALSE)
+
 ```
 
 # Introduction - done by Jasmine
