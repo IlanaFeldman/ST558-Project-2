@@ -5,7 +5,7 @@ date: "10/31/2021"
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(fit.path = "../generated_analysis_files/figure-gfm/", echo = TRUE, message = FALSE, warning = FALSE)
+knitr::opts_chunk$set(fig.path = "../images/", echo = TRUE, message = FALSE, warning = FALSE)
 
 ```
 
@@ -32,6 +32,7 @@ library(knitr)
 library(caret)
 library(corrplot)
 library(ggplot2)
+library(gbm)
 
 allnews <- read_csv("C:/Users/peach/Documents/ST558/ST558_repos/ST558-Project-2/_Data/OnlineNewsPopularity.csv", 
                  col_names = TRUE)
@@ -40,10 +41,6 @@ all_news <- allnews %>% mutate(class_shares = if_else(shares < 1400, 0, 1))
 news <- all_news %>% filter(data_channel_is_lifestyle == 1) %>% select(
   -data_channel_is_lifestyle, -data_channel_is_entertainment, -data_channel_is_bus, -data_channel_is_socmed, 
   -data_channel_is_tech, -data_channel_is_world, -url, -timedelta)
-#news <- allnews %>% filter(data_channel_is_lifestyle == 1) %>% select(
-#  n_tokens_title, n_tokens_content, num_hrefs, num_imgs, num_videos, kw_avg_min, kw_avg_max, avg_negative_polarity, 
-#  avg_positive_polarity, title_subjectivity, title_sentiment_polarity, shares)
-news
 
 diffday <- news %>% mutate(tue = if_else(weekday_is_tuesday == 1, 2, 0), 
                            wed = if_else(weekday_is_wednesday == 1, 3, 0), 
@@ -51,8 +48,8 @@ diffday <- news %>% mutate(tue = if_else(weekday_is_tuesday == 1, 2, 0),
                            fri = if_else(weekday_is_friday == 1, 5, 0),
                            sat = if_else(weekday_is_saturday == 1, 6, 0), 
                            sun = if_else(weekday_is_sunday == 1, 7, 0),
-                           dayweek = as.factor(rowSums(data.frame(weekday_is_monday, tue, wed, thur, fri, sat, sun))))
-diffday
+                           dayweek = rowSums(data.frame(weekday_is_monday, tue, wed, thur, fri, sat, sun)))
+
 sel_data <- diffday %>% select(class_shares, shares, dayweek, kw_avg_avg, kw_avg_max, kw_avg_min, kw_max_avg, 
                                LDA_00, LDA_01, LDA_02, LDA_03, LDA_04, 
                                self_reference_min_shares, self_reference_avg_sharess, 
@@ -70,7 +67,7 @@ train1 <- train %>% select(-class_shares)
 test1 <- test %>% select(-class_shares)
 
 # contingency table
-table1 <- table(train$class_shares,train$dayweek)
+table1 <- table(train$class_shares, train$dayweek)
 colnames(table1) <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
 rownames(table1) <- c("Unpopular", "Popular")
 table1 %>% kable(caption = "Table 1. Popularity on Day of the Week")
@@ -88,17 +85,43 @@ train %>% group_by(class_shares, dayweek) %>% summarise(
   kable(digits = 4, caption = "Table 3. Closeness to LDA topic 3 on Day of the Week")
 
 #PLOTS
-#correlation <- cor(train[, -3], method="spearman")
+correlation <- cor(train[ , -1], method="spearman")
 
-#corrplot(correlation, type = "upper", tl.pos = "lt")
-#corrplot(correlation, type = "lower", method = "number", add = TRUE, diag = FALSE, tl.pos = "n")
+corrplot(correlation, type = "upper", tl.pos = "lt")
+corrplot(correlation, type = "lower", method = "number", add = TRUE, diag = FALSE, tl.pos = "n", 
+         title="Figure 1. Correlation Between the Variables")
 
-scatter <- ggplot(data = train, aes(x = kw_avg_avg, y = shares, color = class_shares)) #y=kw_avg_max
-scatter + geom_point(size = 3) + #aes(shape = class_shares)
+plotdata <- train
+plotdata$class.shares <- cut(plotdata$class_shares, 2, c("Unpopular","Popular"))
+plotdata$day.week <- cut(plotdata$dayweek, 7, c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))
+plotdata
+plot1 <- plotdata %>% group_by(day.week, class.shares) %>% 
+  summarise(Avg_keyword = mean(kw_avg_avg), 
+            LDA_0=mean(LDA_00), LDA_1=mean(LDA_01), LDA_2=mean(LDA_02), LDA_3=mean(LDA_03), LDA_4=mean(LDA_04))
+plot1
+
+plot2 <- plot1 %>% pivot_longer(cols = 4:8, names_to = "LDA.Topic", values_to = "avg.LDA")
+plot2
+
+boxplot1 <- ggplot(data = plotdata, aes(x = class.shares, y = kw_avg_avg))
+boxplot1 + geom_boxplot(fill = "white", outlier.shape = NA) + 
+  coord_cartesian(ylim = c(0, 10000)) + 
+  geom_jitter(aes(color = class.shares), size = 1) + 
+  labs(x = "Vaccine Timeline", y = "Active cases", title = "Figure 1. Active cases at each timeline in US") + 
+  theme(axis.text.x = element_text(size = 10), 
+        axis.text.y = element_text(size = 10), 
+        axis.title.x = element_text(size = 15), 
+        axis.title.y = element_text(size = 15), 
+        legend.key.size = unit(1, 'cm'), 
+        legend.text = element_text(size = 13), 
+        title = element_text(size = 14))
+
+scatter1 <- ggplot(data = plotdata, aes(x = kw_avg_avg, y = shares, color = class.shares)) #y=kw_avg_max
+scatter1 + geom_point(size = 2) + #aes(shape = class.shares)
   scale_shape_discrete(name = "Day of the Week") + 
-  coord_cartesian() +
+  coord_cartesian(ylim = c(0, 100000)) +
   geom_smooth(method = "lm", lwd = 2) + 
-  labs(x = "Average keyword", y = "Best Keyword", title = "Figure 1. Best vs Average keyword for shares") + 
+  labs(x = "Average keyword", y = "Best Keyword", title = "Figure 2. Best vs Average keyword for shares") + 
   theme(axis.text.x = element_text(size = 10), 
         axis.text.y = element_text(size = 10), 
         axis.title.x = element_text(size = 15), 
@@ -107,10 +130,18 @@ scatter + geom_point(size = 3) + #aes(shape = class_shares)
         legend.text = element_text(size = 13), 
         title = element_text(size = 13))
 
-train$class_shares <- as.factor(train$class_shares)
-lineplot1 <- ggplot(data = train, aes(x = dayweek, y = LDA_03, color = class_shares))
-lineplot1 + geom_line(aes(group=class_shares), lwd = 2) + geom_point() + #aes(group = State)
-  labs(y = "Active Cases", title = "Figure 2. Closeness to LDA Topic 3 on Day of the Week") + 
+l.plot1 <- plotdata %>% group_by(day.week) %>% 
+  summarise(Avg_keyword = mean(kw_avg_avg), 
+            LDA_0=mean(LDA_00), LDA_1=mean(LDA_01), LDA_2=mean(LDA_02), LDA_3=mean(LDA_03), LDA_4=mean(LDA_04))
+l.plot1
+
+l.plot2 <- l.plot1 %>% pivot_longer(cols = 3:7, names_to = "LDA.Topic", values_to = "avg.LDA")
+l.plot2
+
+lineplot1 <- ggplot(data = l.plot2, aes(x = day.week, y = avg.LDA, color = LDA.Topic))
+lineplot1 + geom_line(aes(group=LDA.Topic), lwd = 2) + geom_point() + 
+  labs(x = "Day of the Week", y = "Closeness to LDA Topic", 
+       title = "Figure 3. Closeness to LDA Topics on Day of the Week") + 
   theme(axis.text.x = element_text(size = 10), 
         axis.text.y = element_text(size = 10), 
         axis.title.x = element_text(size = 15), 
@@ -119,17 +150,41 @@ lineplot1 + geom_line(aes(group=class_shares), lwd = 2) + geom_point() + #aes(gr
         legend.text = element_text(size = 13), 
         title = element_text(size = 13))
 
-#g <- ggplot(data = barplot1, aes(x = Province, y = Avg_active, fill = vaccine))
-#g + geom_bar(stat = "identity", position = "dodge") + 
-#  labs(x = "State", y = "Average Active Cases", title = "Figure 3. ") + 
-#  scale_fill_discrete(name = "Vaccine timeline") + 
-#  theme(axis.text.x = element_text(angle = 45, size = 10), 
-#        axis.text.y = element_text(size = 10), 
-#        axis.title.x = element_text(size = 13), 
-#        axis.title.y = element_text(size = 13), 
-#        legend.key.size = unit(1, 'cm'), 
-#        legend.text = element_text(size = 13), 
-#        title = element_text(size = 13))
+b.plot1 <- plotdata %>% group_by(class.shares) %>% 
+  summarise(Avg_keyword = mean(kw_avg_avg), 
+            LDA_0=mean(LDA_00), LDA_1=mean(LDA_01), LDA_2=mean(LDA_02), LDA_3=mean(LDA_03), LDA_4=mean(LDA_04))
+b.plot1
+
+b.plot2 <- b.plot1 %>% pivot_longer(cols = 3:7, names_to = "LDA.Topic", values_to = "avg.LDA")
+b.plot2
+barplot1 <- ggplot(data = b.plot2, aes(x = class.shares, y = avg.LDA, fill = LDA.Topic))
+barplot1 + geom_bar(stat = "identity", position = "dodge") + 
+  labs(x = "Popularity", y = "Closeness to Top LDA Topic", title = "Figure 4. ") + 
+  scale_fill_discrete(name = "LDA Topics") + 
+  theme(axis.text.x = element_text(size = 10), 
+        axis.text.y = element_text(size = 10), 
+        axis.title.x = element_text(size = 13), 
+        axis.title.y = element_text(size = 13), 
+        legend.key.size = unit(1, 'cm'), 
+        legend.text = element_text(size = 13), 
+        title = element_text(size = 13))
+
+# using train1, dayweek is numeric, no class_shares
+preProcValues <- preProcess(train1, method = c("center", "scale"))
+trainTransformed <- predict(preProcValues, train1)
+testTransformed <- predict(preProcValues, test1)
+
+fit1 <- lm(shares ~ ., data = trainTransformed)
+summary(fit1)
+fit2 <- lm(shares ~ . + I(n_tokens_content^2) + I(num_imgs^2) + I(num_videos^2), 
+           data = trainTransformed)
+summary(fit2)
+
+#I(dayweek^2) + I(kw_avg_avg^2) + I(kw_max_avg^2) + I(LDA_00^2) + 
+#                   I(LDA_01^2) + I(LDA_02^2) + I(LDA_03^2) + I(self_reference_min_shares^2) + 
+#               I(self_reference_avg_sharess^2) + I(n_non_stop_unique_tokens^2) + I(n_unique_tokens^2) + 
+#               I(average_token_length^2) + I(n_tokens_content^2) + I(n_tokens_title^2) + 
+#               I(global_subjectivity^2) + I(num_imgs^2) + I(num_videos^2)
 
 cv_fit1 <- train(shares ~ . , 
                  data=train1,
@@ -137,6 +192,45 @@ cv_fit1 <- train(shares ~ . ,
                  preProcess = c("center", "scale"),
                  trControl = trainControl(method = "cv", number = 10))
 cv_fit1
+
+cv_fit2 <- train(shares ~ . + I(n_tokens_content^2) + I(num_imgs^2) + I(num_videos^2), 
+                 data=train1,
+                 method = "lm",
+                 preProcess = c("center", "scale"),
+                 trControl = trainControl(method = "cv", number = 10))
+cv_fit2
+
+result_tab <- data.frame(t(cv_fit1$results), t(cv_fit2$results))
+colnames(result_tab) <- c("Model 1", "Model 2")
+rownames(result_tab) <- c("intercept", "RMSE", "Rsquared", "MAE", "RMSESD", "RsquaredSD", "MAESD")
+
+kable(result_tab, digits = 4, caption = "Cross Validation - Comparisons of the models in training set")
+
+pred1 <- predict(cv_fit1, newdata = test1)
+pred2 <- predict(cv_fit2, newdata = test1)
+cv_rmse1 <- postResample(pred1, obs = test1$shares)
+cv_rmse2 <- postResample(pred2, obs = test1$shares)
+
+result2 <- rbind(cv_rmse1, cv_rmse2)
+row.names(result2) <- c("Model 1", "Model 2")
+kable(result2, digits = 4, caption = "Cross Validation - Comparisons of the models in test set")
+
+
+train2 <- train %>% select(-shares)
+test2 <- test %>% select(-shares)
+train2$class_shares <- as.factor(train2$class_shares)
+test2$class_shares <- as.factor(test2$class_shares)
+#expand.grid(n.trees = c(25, 50, 100, 150, 200), interaction.depth = 1:4, shrinkage = 0.1, n.minobsinnode = 10)
+boosted_tree <- train(class_shares ~ . , data = train2,
+      method = "gbm", 
+      trControl = trainControl(method = "repeatedcv", number = 10, repeats = 5),
+      preProcess = c("center", "scale"),
+      tuneGrid = expand.grid(n.trees = c(25, 50, 100, 150, 200), interaction.depth = 1:4, shrinkage = 0.1, n.minobsinnode = 10),
+      verbose = FALSE)
+boosted_tree
+boosted_tree_predict <- predict(boosted_tree, newdata = test2)
+confusionMatrix(boosted_tree_predict, test2$class_shares)
+
 
 
 ```
