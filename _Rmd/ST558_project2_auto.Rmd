@@ -4,7 +4,6 @@ author: "Jasmine Wang & Ilana Feldman"
 date: "10/31/2021"
 params:
   channel: "lifestyle"
-  
 ---
 
 ```{r setup, include=FALSE}
@@ -25,8 +24,11 @@ methods you will use to model the response (more details in modeling section)
 # Data 
 
 I created a binary response variable, 0 if shares < 1400, 1 if shares > 1400. "class_shares"
+
 I created a categorical variable grouped all binary variables, monday, tuesday, ..., sunday, together. "dayweek"
 if dayweek = 1, it's Monday, 2 is tuesday, 3 is wednesday, ..., 7 is sunday. 
+
+I created a log(shares) variable and use it as response instead of shares. In office hour, a lot of people say this improved fit a little better. 
 
 This analysis is based on the `r params$channel` channel popularity.
 
@@ -42,15 +44,12 @@ library(gbm)
 allnews <- read_csv("C:/Users/peach/Documents/ST558/ST558_repos/ST558-Project-2/_Data/OnlineNewsPopularity.csv", 
                  col_names = TRUE)
 
+########KNIT with parameters!!!!!!!!!channels is in quotes!!!!Need to use it with quotes!!!!!!!!!!!!!!!!!!!!!!!!
 
-########KNIT with parameters!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 channels <- paste0("data_channel_is_", params$channel)
-channels
-```
+subnews <- allnews[allnews[, channels] == 1, ]
 
-
-```{r eval=FALSE}
-news <- allnews %>% filter(channels == 1) %>% select(
+news <- subnews %>% select(
   -data_channel_is_lifestyle, -data_channel_is_entertainment, -data_channel_is_bus, -data_channel_is_socmed, 
   -data_channel_is_tech, -data_channel_is_world, -url, -timedelta)
 #################!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -68,6 +67,8 @@ diffday <- news %>% mutate(log.shares = log(shares),
 
 sel_data <- diffday %>% select(class_shares, shares, dayweek, kw_avg_avg, kw_avg_max, kw_avg_min, kw_max_avg, 
                                log.shares, LDA_00, LDA_01, LDA_02, LDA_03, LDA_04, 
+                               weekday_is_monday, weekday_is_tuesday, weekday_is_wednesday,
+                               weekday_is_thursday, weekday_is_friday, weekday_is_saturday, weekday_is_sunday,
                                self_reference_min_shares, self_reference_avg_sharess, 
                                n_non_stop_unique_tokens, n_unique_tokens, average_token_length, 
                                n_tokens_content, n_tokens_title, global_subjectivity, 
@@ -79,8 +80,12 @@ sharesIndex <- createDataPartition(sel_data$shares, p = 0.7, list = FALSE)
 train <- sel_data[sharesIndex, ]
 test <- sel_data[-sharesIndex, ]
 
-train1 <- train %>% select(-class_shares, -shares) #keep log.shares
-test1 <- test %>% select(-class_shares, -shares) #keep log.shares
+train1 <- train %>% select(-class_shares, -shares, 
+                           -weekday_is_monday, -weekday_is_tuesday, -weekday_is_wednesday, -weekday_is_thursday, 
+                           -weekday_is_friday, -weekday_is_saturday, -weekday_is_sunday) #keep log.shares
+test1 <- test %>% select(-class_shares, -shares, 
+                         -weekday_is_monday, -weekday_is_tuesday, -weekday_is_wednesday, -weekday_is_thursday, 
+                         -weekday_is_friday, -weekday_is_saturday, -weekday_is_sunday) #keep log.shares
 ```
 
 # Summarizations
@@ -89,7 +94,7 @@ test1 <- test %>% select(-class_shares, -shares) #keep log.shares
 
 
 
-```{r eval=FALSE}
+```{r eval=TRUE}
 # contingency table
 table1 <- table(train$class_shares, train$dayweek)
 colnames(table1) <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
@@ -111,10 +116,10 @@ train %>% group_by(class_shares, dayweek) %>% summarise(
 
 ## Visualizations
 
-```{r eval=FALSE}
+```{r eval=TRUE}
 #PLOTS
-train1 <- train %>% select(-class_shares) #keep log.shares
-test1 <- test %>% select(-class_shares) #keep log.shares
+#train1 <- train %>% select(-class_shares) #keep log.shares
+#test1 <- test %>% select(-class_shares) #keep log.shares
 
 correlation <- cor(train1, method="spearman")
 
@@ -207,10 +212,10 @@ barplot1 + geom_bar(stat = "identity", position = "dodge") +
 ## Linear Regression
 
 
-```{r eval=FALSE}
+```{r eval=TRUE}
 # using train1, dayweek is numeric, no class_shares
-train1 <- train %>% select(-class_shares, -shares) #keep log.shares
-test1 <- test %>% select(-class_shares, -shares) #keep log.shares
+#train1 <- train %>% select(-class_shares, -shares) #keep log.shares
+#test1 <- test %>% select(-class_shares, -shares) #keep log.shares
 
 preProcValues <- preProcess(train1, method = c("center", "scale"))
 trainTransformed <- predict(preProcValues, train1)
@@ -265,6 +270,26 @@ Ilana
 
 
 
+```{r eval=TRUE}
+#                        select(class_shares, shares, dayweek, kw_avg_avg, kw_avg_max, kw_avg_min, kw_max_avg, 
+#                               log.shares, LDA_00, LDA_01, LDA_02, LDA_03, LDA_04, 
+#                               weekday_is_monday, weekday_is_tuesday, weekday_is_wednesday,
+#                               weekday_is_thursday, weekday_is_friday, weekday_is_saturday, weekday_is_sunday,
+#                               self_reference_min_shares, self_reference_avg_sharess, 
+#                               n_non_stop_unique_tokens, n_unique_tokens, average_token_length, 
+#                               n_tokens_content, n_tokens_title, global_subjectivity, 
+#                               num_imgs, num_videos)
+
+train2 <- train %>% select(-class_shares, -shares, -dayweek)
+test2 <- test %>% select(-class_shares, -shares, -dayweek)
+
+preProcValues <- preProcess(train2, method = c("center", "scale"))
+trainTransformed <- predict(preProcValues, train2)
+testTransformed <- predict(preProcValues, test2)
+
+
+
+```
 
 
 ## Boosted Tree
@@ -273,7 +298,7 @@ Jasmine
 
 I need to import the weekdays as dummy variables
 
-```{r eval=FALSE}
+```{r eval=TRUE}
 #expand.grid(n.trees = c(25, 50, 100, 150, 200), interaction.depth = 1:4, shrinkage = 0.1, n.minobsinnode = 10)
 boosted_tree <- train(log.shares ~ . , data = trainTransformed,
       method = "gbm", 
