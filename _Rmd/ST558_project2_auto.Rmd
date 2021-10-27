@@ -28,7 +28,7 @@ I created a binary response variable, 0 if shares < 1400, 1 if shares > 1400. "c
 I created a categorical variable grouped all binary variables, monday, tuesday, ..., sunday, together. "dayweek"
 if dayweek = 1, it's Monday, 2 is tuesday, 3 is wednesday, ..., 7 is sunday. 
 
-This analysis is based on the `r channel` channel popularity.
+This analysis is based on the `r params$channel` channel popularity.
 
 
 ```{r eval=TRUE}
@@ -41,13 +41,23 @@ library(gbm)
 
 allnews <- read_csv("C:/Users/peach/Documents/ST558/ST558_repos/ST558-Project-2/_Data/OnlineNewsPopularity.csv", 
                  col_names = TRUE)
-dim(allnews)
-all_news <- allnews %>% mutate(class_shares = if_else(shares < 1400, 0, 1))
-news <- all_news %>% filter(data_channel_is_lifestyle == 1) %>% select(
+
+
+########KNIT with parameters!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+channels <- paste0("data_channel_is_", params$channel)
+channels
+```
+
+
+```{r eval=FALSE}
+news <- allnews %>% filter(channels == 1) %>% select(
   -data_channel_is_lifestyle, -data_channel_is_entertainment, -data_channel_is_bus, -data_channel_is_socmed, 
   -data_channel_is_tech, -data_channel_is_world, -url, -timedelta)
+#################!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+dim(news)
 
 diffday <- news %>% mutate(log.shares = log(shares),
+                           class_shares = if_else(shares < 1400, 0, 1),
                            tue = if_else(weekday_is_tuesday == 1, 2, 0), 
                            wed = if_else(weekday_is_wednesday == 1, 3, 0), 
                            thur = if_else(weekday_is_thursday == 1, 4, 0), 
@@ -79,7 +89,7 @@ test1 <- test %>% select(-class_shares, -shares) #keep log.shares
 
 
 
-```{r eval=TRUE}
+```{r eval=FALSE}
 # contingency table
 table1 <- table(train$class_shares, train$dayweek)
 colnames(table1) <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
@@ -101,7 +111,7 @@ train %>% group_by(class_shares, dayweek) %>% summarise(
 
 ## Visualizations
 
-```{r eval=TRUE}
+```{r eval=FALSE}
 #PLOTS
 train1 <- train %>% select(-class_shares) #keep log.shares
 test1 <- test %>% select(-class_shares) #keep log.shares
@@ -197,7 +207,7 @@ barplot1 + geom_bar(stat = "identity", position = "dodge") +
 ## Linear Regression
 
 
-```{r eval=TRUE}
+```{r eval=FALSE}
 # using train1, dayweek is numeric, no class_shares
 train1 <- train %>% select(-class_shares, -shares) #keep log.shares
 test1 <- test %>% select(-class_shares, -shares) #keep log.shares
@@ -261,9 +271,9 @@ Ilana
 
 Jasmine
 
+I need to import the weekdays as dummy variables
 
-
-```{r eval=TRUE}
+```{r eval=FALSE}
 #expand.grid(n.trees = c(25, 50, 100, 150, 200), interaction.depth = 1:4, shrinkage = 0.1, n.minobsinnode = 10)
 boosted_tree <- train(log.shares ~ . , data = trainTransformed,
       method = "gbm", 

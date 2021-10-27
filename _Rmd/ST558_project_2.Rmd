@@ -37,13 +37,15 @@ library(gbm)
 
 allnews <- read_csv("C:/Users/peach/Documents/ST558/ST558_repos/ST558-Project-2/_Data/OnlineNewsPopularity.csv", 
                  col_names = TRUE)
-dim(allnews)
-all_news <- allnews %>% mutate(class_shares = if_else(shares < 1400, 0, 1))
-news <- all_news %>% filter(data_channel_is_lifestyle == 1) %>% select(
+
+news <- allnews %>% filter(data_channel_is_lifestyle == 1) %>% select(
   -data_channel_is_lifestyle, -data_channel_is_entertainment, -data_channel_is_bus, -data_channel_is_socmed, 
   -data_channel_is_tech, -data_channel_is_world, -url, -timedelta)
+####################### Above is different in automating Rmd file !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+dim(news)
 
 diffday <- news %>% mutate(log.shares = log(shares),
+                           class_shares = if_else(shares < 1400, 0, 1),
                            tue = if_else(weekday_is_tuesday == 1, 2, 0), 
                            wed = if_else(weekday_is_wednesday == 1, 3, 0), 
                            thur = if_else(weekday_is_thursday == 1, 4, 0), 
