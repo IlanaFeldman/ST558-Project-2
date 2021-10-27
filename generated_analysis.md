@@ -202,7 +202,7 @@ corrplot(correlation, type = "lower", method = "number", add = TRUE, diag = FALS
          title="Figure 1. Correlation Between the Variables")
 ```
 
-![](/images/unnamed-chunk-22-1.png)<!-- -->
+![](../images/unnamed-chunk-3-1.png)<!-- -->
 
 ``` r
 plotdata <- train
@@ -288,7 +288,7 @@ boxplot1 + geom_boxplot(fill = "white", outlier.shape = NA) +
         title = element_text(size = 14))
 ```
 
-![](/images/unnamed-chunk-22-2.png)<!-- -->
+![](../images/unnamed-chunk-3-2.png)<!-- -->
 
 ``` r
 scatter1 <- ggplot(data = plotdata, aes(x = kw_avg_avg, y = shares, color = class.shares)) #y=kw_avg_max
@@ -306,7 +306,7 @@ scatter1 + geom_point(size = 2) + #aes(shape = class.shares)
         title = element_text(size = 13))
 ```
 
-![](/images/unnamed-chunk-22-3.png)<!-- -->
+![](../images/unnamed-chunk-3-3.png)<!-- -->
 
 ``` r
 l.plot1 <- plotdata %>% group_by(day.week) %>% 
@@ -360,7 +360,7 @@ lineplot1 + geom_line(aes(group=LDA.Topic), lwd = 2) + geom_point() +
         title = element_text(size = 13))
 ```
 
-![](/images/unnamed-chunk-22-4.png)<!-- -->
+![](../images/unnamed-chunk-3-4.png)<!-- -->
 
 ``` r
 b.plot1 <- plotdata %>% group_by(class.shares) %>% 
@@ -408,7 +408,7 @@ barplot1 + geom_bar(stat = "identity", position = "dodge") +
         title = element_text(size = 13))
 ```
 
-![](/images/unnamed-chunk-22-5.png)<!-- -->
+![](../images/unnamed-chunk-3-5.png)<!-- -->
 
 # Modeling
 

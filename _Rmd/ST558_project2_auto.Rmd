@@ -8,7 +8,7 @@ params:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(fig.path = "/images/", echo = TRUE, message = FALSE, warning = FALSE)
+knitr::opts_chunk$set(fig.path = "../images/", echo = TRUE, message = FALSE, warning = FALSE)
 
 ```
 
@@ -27,6 +27,8 @@ methods you will use to model the response (more details in modeling section)
 I created a binary response variable, 0 if shares < 1400, 1 if shares > 1400. "class_shares"
 I created a categorical variable grouped all binary variables, monday, tuesday, ..., sunday, together. "dayweek"
 if dayweek = 1, it's Monday, 2 is tuesday, 3 is wednesday, ..., 7 is sunday. 
+
+This analysis is based on the `r channel` channel popularity.
 
 
 ```{r eval=TRUE}
