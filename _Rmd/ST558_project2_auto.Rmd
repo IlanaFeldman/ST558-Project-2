@@ -2,6 +2,9 @@
 title: "ST558 - Project 2 - Predictive Modeling"
 author: "Jasmine Wang & Ilana Feldman"
 date: "10/31/2021"
+params:
+  channel: "lifestyle"
+  
 ---
 
 ```{r setup, include=FALSE}
@@ -26,6 +29,8 @@ I created a categorical variable grouped all binary variables, monday, tuesday, 
 if dayweek = 1, it's Monday, 2 is tuesday, 3 is wednesday, ..., 7 is sunday. 
 
 
+The channel for this analysis is `r channel`.
+
 ```{r eval=TRUE}
 library(tidyverse)
 library(knitr)
@@ -38,12 +43,12 @@ allnews <- read_csv("C:/Users/peach/Documents/ST558/ST558_repos/ST558-Project-2/
                  col_names = TRUE)
 dim(allnews)
 all_news <- allnews %>% mutate(class_shares = if_else(shares < 1400, 0, 1))
-news <- all_news %>% filter(data_channel_is_lifestyle == 1) %>% select(
+channels <- paste0("data_channel_is_", channel)
+news <- all_news %>% filter(channels == 1) %>% select(
   -data_channel_is_lifestyle, -data_channel_is_entertainment, -data_channel_is_bus, -data_channel_is_socmed, 
   -data_channel_is_tech, -data_channel_is_world, -url, -timedelta)
 
-diffday <- news %>% mutate(log.shares = log(shares),
-                           tue = if_else(weekday_is_tuesday == 1, 2, 0), 
+diffday <- news %>% mutate(tue = if_else(weekday_is_tuesday == 1, 2, 0), 
                            wed = if_else(weekday_is_wednesday == 1, 3, 0), 
                            thur = if_else(weekday_is_thursday == 1, 4, 0), 
                            fri = if_else(weekday_is_friday == 1, 5, 0),
@@ -52,7 +57,7 @@ diffday <- news %>% mutate(log.shares = log(shares),
                            dayweek = rowSums(data.frame(weekday_is_monday, tue, wed, thur, fri, sat, sun)))
 
 sel_data <- diffday %>% select(class_shares, shares, dayweek, kw_avg_avg, kw_avg_max, kw_avg_min, kw_max_avg, 
-                               log.shares, LDA_00, LDA_01, LDA_02, LDA_03, LDA_04, 
+                               LDA_00, LDA_01, LDA_02, LDA_03, LDA_04, 
                                self_reference_min_shares, self_reference_avg_sharess, 
                                n_non_stop_unique_tokens, n_unique_tokens, average_token_length, 
                                n_tokens_content, n_tokens_title, global_subjectivity, 
@@ -60,12 +65,12 @@ sel_data <- diffday %>% select(class_shares, shares, dayweek, kw_avg_avg, kw_avg
 sel_data
 
 set.seed(388588)
-sharesIndex <- createDataPartition(sel_data$shares, p = 0.7, list = FALSE)
+sharesIndex <- createDataPartition(sel_data$class_shares, p = 0.7, list = FALSE)
 train <- sel_data[sharesIndex, ]
 test <- sel_data[-sharesIndex, ]
 
-train1 <- train %>% select(-class_shares, -shares) #keep log.shares
-test1 <- test %>% select(-class_shares, -shares) #keep log.shares
+train1 <- train %>% select(-class_shares)
+test1 <- test %>% select(-class_shares)
 ```
 
 # Summarizations
@@ -98,10 +103,7 @@ train %>% group_by(class_shares, dayweek) %>% summarise(
 
 ```{r eval=TRUE}
 #PLOTS
-train1 <- train %>% select(-class_shares) #keep log.shares
-test1 <- test %>% select(-class_shares) #keep log.shares
-
-correlation <- cor(train1, method="spearman")
+correlation <- cor(train[ , -1], method="spearman")
 
 corrplot(correlation, type = "upper", tl.pos = "lt")
 corrplot(correlation, type = "lower", method = "number", add = TRUE, diag = FALSE, tl.pos = "n", 
@@ -194,16 +196,13 @@ barplot1 + geom_bar(stat = "identity", position = "dodge") +
 
 ```{r eval=TRUE}
 # using train1, dayweek is numeric, no class_shares
-train1 <- train %>% select(-class_shares, -shares) #keep log.shares
-test1 <- test %>% select(-class_shares, -shares) #keep log.shares
-
 preProcValues <- preProcess(train1, method = c("center", "scale"))
 trainTransformed <- predict(preProcValues, train1)
 testTransformed <- predict(preProcValues, test1)
 
-fit1 <- lm(log.shares ~ ., data = trainTransformed)
+fit1 <- lm(shares ~ ., data = trainTransformed)
 summary(fit1)
-fit2 <- lm(log.shares ~ . + I(n_tokens_content^2) + I(num_imgs^2) + I(num_videos^2), 
+fit2 <- lm(shares ~ . + I(n_tokens_content^2) + I(num_imgs^2) + I(num_videos^2), 
            data = trainTransformed)
 summary(fit2)
 
@@ -213,15 +212,17 @@ summary(fit2)
 #               I(average_token_length^2) + I(n_tokens_content^2) + I(n_tokens_title^2) + 
 #               I(global_subjectivity^2) + I(num_imgs^2) + I(num_videos^2)
 
-cv_fit1 <- train(log.shares ~ . , 
-                 data=trainTransformed,
+cv_fit1 <- train(shares ~ . , 
+                 data=train1,
                  method = "lm",
+                 preProcess = c("center", "scale"),
                  trControl = trainControl(method = "cv", number = 10))
 cv_fit1
 
-cv_fit2 <- train(log.shares ~ . + I(n_tokens_content^2) + I(num_imgs^2) + I(num_videos^2), 
-                 data=trainTransformed,
+cv_fit2 <- train(shares ~ . + I(n_tokens_content^2) + I(num_imgs^2) + I(num_videos^2), 
+                 data=train1,
                  method = "lm",
+                 preProcess = c("center", "scale"),
                  trControl = trainControl(method = "cv", number = 10))
 cv_fit2
 
@@ -231,10 +232,10 @@ rownames(result_tab) <- c("intercept", "RMSE", "Rsquared", "MAE", "RMSESD", "Rsq
 
 kable(result_tab, digits = 4, caption = "Cross Validation - Comparisons of the models in training set")
 
-pred1 <- predict(cv_fit1, newdata = testTransformed)
-pred2 <- predict(cv_fit2, newdata = testTransformed)
-cv_rmse1 <- postResample(pred1, obs = testTransformed$log.shares)
-cv_rmse2 <- postResample(pred2, obs = testTransformed$log.shares)
+pred1 <- predict(cv_fit1, newdata = test1)
+pred2 <- predict(cv_fit2, newdata = test1)
+cv_rmse1 <- postResample(pred1, obs = test1$shares)
+cv_rmse2 <- postResample(pred2, obs = test1$shares)
 
 result2 <- rbind(cv_rmse1, cv_rmse2)
 row.names(result2) <- c("Model 1", "Model 2")
@@ -259,20 +260,25 @@ Jasmine
 
 
 ```{r eval=TRUE}
+train2 <- train %>% select(-shares)
+test2 <- test %>% select(-shares)
+train2$class_shares <- as.factor(train2$class_shares)
+test2$class_shares <- as.factor(test2$class_shares)
 #expand.grid(n.trees = c(25, 50, 100, 150, 200), interaction.depth = 1:4, shrinkage = 0.1, n.minobsinnode = 10)
-boosted_tree <- train(log.shares ~ . , data = trainTransformed,
+boosted_tree <- train(class_shares ~ . , data = train2,
       method = "gbm", 
       trControl = trainControl(method = "repeatedcv", number = 10, repeats = 5),
+      preProcess = c("center", "scale"),
       tuneGrid = expand.grid(n.trees = c(25, 50, 100, 150, 200), interaction.depth = 1:4, shrinkage = 0.1, n.minobsinnode = 10),
       verbose = FALSE)
 boosted_tree
-boosted_tree_predict <- predict(boosted_tree, newdata = testTransformed)
+boosted_tree_predict <- predict(boosted_tree, newdata = test2)
+confus2 <- confusionMatrix(boosted_tree_predict, test2$class_shares)
+confus2$overall[2]
 
-boost_rmse <- postResample(boosted_tree_predict, obs = testTransformed$log.shares)
-
-result2 <- rbind(cv_rmse1, cv_rmse2, boost_rmse)
-row.names(result2) <- c("Linear Model 1", "Linear Model 2", "Boosted Model")
-kable(result2, digits = 4, caption = "Cross Validation - Comparisons of the models in test set")
+#accuracy_test <- rbind(confus1$overall[1], confus2$overall[1])
+#rownames(accuracy_test) <- c("Random Forest", "Boosted Tree")
+#kable(accuracy_test, digits = 4, caption = "Accuracy of the candidate models on test set") 
 
 ```
 
