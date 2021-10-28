@@ -23,6 +23,26 @@ methods you will use to model the response (more details in modeling section)
 
 # Data 
 
+
+Predictors                    | Attribute Information                              | Type   
+----------------------------- | -------------------------------------------------- | -------------------------
+`kw_avg_avg`                  | Average keyword (average shares)                   | number
+`LDA_02`                      | Closeness to LDA topic 2                           | ratio
+`weekday_is_monday`           | Was the article published on a Monday?             | boolean
+`weekday_is_tuesday`          | Was the article published on a Tuesday?            | boolean
+`weekday_is_wednesday`        | Was the article published on a Wednesday?          | boolean
+`weekday_is_thursday`         | Was the article published on a Thursday?           | boolean
+`weekday_is_friday`           | Was the article published on a Friday?             | boolean
+`weekday_is_saturday`         | Was the article published on a Saturday?           | boolean
+`weekday_is_sunday`           | Was the article published on a Sunday?             | boolean
+`self_reference_avg_sharess`  | Average shares of referenced articles in Mashable  | number
+`n_non_stop_unique_tokens`    | Rate of unique non-stop words in the content       | ratio
+`average_token_length`        | Average length of the words in the content         | number
+`n_tokens_content`            | Number of words in the content                     | number
+`n_tokens_title`              | Number of words in the title                       | number
+`global_subjectivity`         | Text subjectivity                                  | ratio
+`num_imgs`                    | Number of images                                   | number
+
 I created a binary response variable, 0 if shares < 1400, 1 if shares > 1400. "class_shares" (can use it in EDA)
 
 I created a categorical variable grouped all binary variables, monday, tuesday, ..., sunday, together. "dayweek"
@@ -124,10 +144,6 @@ edadata %>% group_by(day.week) %>% summarise(
   Avg.reference = mean(self_reference_avg_sharess), Sd.reference = sd(self_reference_avg_sharess), 
   Median.reference = median(self_reference_avg_sharess), IQR.reference = IQR(self_reference_avg_sharess)) %>% 
   kable(digits = 4, caption = "Table 4. Summary of Average shares of referenced articles in Mashable on Day of the Week")
-
-#edadata %>% group_by(day.week) %>% summarise(
-#  Avg = mean(LDA_03), Sd = sd(LDA_03), Median = median(LDA_03), IQR = IQR(LDA_03)) %>% 
-#  kable(digits = 4, caption = "Table 5. Closeness to LDA topic 3 on Day of the Week")
 
 ```
 
@@ -253,6 +269,7 @@ scatter1 + geom_point(size = 2) + #aes(shape = class.shares)
 
 ## Linear Regression
 
+a short but thorough explanation of the idea of a linear regression model.
 
 ```{r eval=TRUE}
 # using train1, dayweek is numeric, no class_shares
@@ -270,33 +287,35 @@ cv_fit1 <- train(log.shares ~ . ,
                  trControl = trainControl(method = "cv", number = 10))
 summary(cv_fit1)
 
-#cv_fit2 <- train(log.shares ~ . + I(self_reference_avg_sharess^2),
-#                 data=trainTransformed,
-#                 method = "lm",
-#                 trControl = trainControl(method = "cv", number = 10))
-#summary(cv_fit2)
+cv_fit2 <- train(log.shares ~ . +I(n_tokens_content^2)+ kw_avg_avg:num_imgs + 
+                   average_token_length:global_subjectivity + 
+                   dayweek:self_reference_avg_sharess ,
+                 data=trainTransformed,
+                 method = "lm",
+                 trControl = trainControl(method = "cv", number = 10))
+summary(cv_fit2)
 
-cv_fit3 <- train(log.shares ~ . + I(self_reference_avg_sharess^2) + 
-                 kw_avg_avg:num_imgs + self_reference_avg_sharess:num_imgs + average_token_length:global_subjectivity, 
+cv_fit3 <- train(log.shares ~ . + I(n_tokens_content^2) + I(self_reference_avg_sharess^2) + 
+                 kw_avg_avg:num_imgs + average_token_length:global_subjectivity, 
                  data=trainTransformed,
                  method = "lm",
                  trControl = trainControl(method = "cv", number = 10))
 summary(cv_fit3)
 
-result_tab <- data.frame(t(cv_fit1$results), t(cv_fit3$results))
-colnames(result_tab) <- c("Model 1", "Model 3")
+result_tab <- data.frame(t(cv_fit1$results),t(cv_fit2$results), t(cv_fit3$results))
+colnames(result_tab) <- c("Model 1","Model 2", "Model 3")
 rownames(result_tab) <- c("intercept", "RMSE", "Rsquared", "MAE", "RMSESD", "RsquaredSD", "MAESD")
 
 kable(result_tab, digits = 4, caption = "Cross Validation - Comparisons of the models in training set")
 
 pred1 <- predict(cv_fit1, newdata = testTransformed)
-#pred2 <- predict(cv_fit2, newdata = testTransformed)
+pred2 <- predict(cv_fit2, newdata = testTransformed)
 pred3 <- predict(cv_fit3, newdata = testTransformed)
 cv_rmse1 <- postResample(pred1, obs = testTransformed$log.shares)
-#cv_rmse2 <- postResample(pred2, obs = testTransformed$log.shares)
+cv_rmse2 <- postResample(pred2, obs = testTransformed$log.shares)
 cv_rmse3 <- postResample(pred3, obs = testTransformed$log.shares)
-result2 <- rbind(cv_rmse1, cv_rmse3)
-row.names(result2) <- c("Model 1", "Model 3")
+result2 <- rbind(cv_rmse1, cv_rmse2, cv_rmse3)
+row.names(result2) <- c("Model 1","Model 2", "Model 3")
 kable(result2, digits = 4, caption = "Table ###. Cross Validation - Model Predictions on Test Set")
 
 ```
@@ -305,6 +324,8 @@ kable(result2, digits = 4, caption = "Table ###. Cross Validation - Model Predic
 ## Random Forest 
 
 Ilana
+
+short but reasonably thorough explanation of the ensemble model you are using
 
 
 Categorical variables have to be divided their levels into dummy variables style.
@@ -323,6 +344,10 @@ testTransformed <- predict(preProcValues, test2)
 
 ## Boosted Tree
 
+
+
+
+short but reasonably thorough explanation of the ensemble model you are using
 
 
 Predictors                    | Attribute Information                              | Type   
@@ -349,7 +374,7 @@ Predictors                    | Attribute Information                           
 #expand.grid(n.trees = c(25, 50, 100, 150, 200), interaction.depth = 1:4, shrinkage = 0.1, n.minobsinnode = 10)
 boosted_tree <- train(log.shares ~ . , data = trainTransformed,
       method = "gbm", 
-      trControl = trainControl(method = "repeatedcv", number = 10, repeats = 5),
+      trControl = trainControl(method = "cv", number = 10), #method="repeatedcv", repeats=5
       tuneGrid = expand.grid(n.trees = c(25, 50, 75, 100), interaction.depth = 1:4, shrinkage = 0.1, n.minobsinnode = 10),
       verbose = FALSE)
 boosted_tree
@@ -365,8 +390,14 @@ kable(result2, digits = 4, caption = "Cross Validation - Comparisons of the mode
 
 # Model Comparisons
 
+The best model fit to predict the number of shares for the `r params$channel` channel is "need to automate this part".
 
 
+```{r eval=TRUE}
+
+```
+
+The best model fit to predict the number of shares
 
 
 # Automation
