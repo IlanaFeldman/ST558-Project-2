@@ -23,7 +23,7 @@ methods you will use to model the response (more details in modeling section)
 
 # Data 
 
-I created a binary response variable, 0 if shares < 1400, 1 if shares > 1400. "class_shares"
+I created a binary response variable, 0 if shares < 1400, 1 if shares > 1400. "class_shares" (can use it in EDA)
 
 I created a categorical variable grouped all binary variables, monday, tuesday, ..., sunday, together. "dayweek"
 if dayweek = 1, it's Monday, 2 is tuesday, 3 is wednesday, ..., 7 is sunday. 
@@ -65,14 +65,15 @@ diffday <- news %>% mutate(log.shares = log(shares),
                                     if_else(weekday_is_saturday == 1, 6, 7))))))
                            )
 
-sel_data <- diffday %>% select(class_shares, shares, dayweek, kw_avg_avg, kw_avg_max, kw_avg_min, kw_max_avg, 
-                               log.shares, LDA_00, LDA_01, LDA_02, LDA_03, LDA_04, 
+sel_data <- diffday %>% select(class_shares, shares, log.shares, dayweek, 
+                               kw_avg_avg, 
+                               LDA_00, LDA_01, LDA_02, LDA_03, LDA_04, 
                                weekday_is_monday, weekday_is_tuesday, weekday_is_wednesday,
                                weekday_is_thursday, weekday_is_friday, weekday_is_saturday, weekday_is_sunday,
-                               self_reference_min_shares, self_reference_avg_sharess, 
-                               n_non_stop_unique_tokens, n_unique_tokens, average_token_length, 
+                               self_reference_avg_sharess, 
+                               n_non_stop_unique_tokens, average_token_length, 
                                n_tokens_content, n_tokens_title, global_subjectivity, 
-                               num_imgs, num_videos)
+                               num_imgs)
 sel_data
 
 set.seed(388588)
@@ -82,125 +83,166 @@ test <- sel_data[-sharesIndex, ]
 
 train1 <- train %>% select(-class_shares, -shares, 
                            -weekday_is_monday, -weekday_is_tuesday, -weekday_is_wednesday, -weekday_is_thursday, 
-                           -weekday_is_friday, -weekday_is_saturday, -weekday_is_sunday) #keep log.shares
+                           -weekday_is_friday, -weekday_is_saturday, -weekday_is_sunday, -LDA_00, -LDA_01, -LDA_03, -LDA_04) #keep log.shares
 test1 <- test %>% select(-class_shares, -shares, 
                          -weekday_is_monday, -weekday_is_tuesday, -weekday_is_wednesday, -weekday_is_thursday, 
-                         -weekday_is_friday, -weekday_is_saturday, -weekday_is_sunday) #keep log.shares
+                         -weekday_is_friday, -weekday_is_saturday, -weekday_is_sunday, -LDA_00, -LDA_01, -LDA_03, -LDA_04) #keep log.shares
 ```
 
-# Summarizations
+# Exploratory Data Analysis
+
+Now let us take a look at the relationships between our response and the predictors with some numerical summaries and plots. 
 
 ## Numerical Summaries
 
+Table 1 shows the popularity of the news articles on different days of the week. I classified number of shares greater than 1400 in a day as "popular" and number of shares less than 1400 in a day as "unpopular". We can see the total number of articles from `r params$channel` channel falls into different categories on different days of the week for 709 days. 
 
+Table 2 shows the average shares of the articles on different days of the week. Here, we can see a potential problem for our analysis later. Median shares are all very different from the average shares on any day of the week. Recall that median is a robust measure for center. It is robust to outliers in the data. On the contrary, mean is also a measure of center but it is not robust to outliers. Mean measure can be influenced by potential outliers. 
+
+In addition, Table 2 also shows the standard deviation of shares is huge for any day of the week. They are potentially larger than the average shares. This tells us the variance of shares for any day is huge. We know a common variance stabilizing transformation to deal with increasing variance of the response variable, that is, the log-transformation, which could help us on this matter. Therefore, Table 2 again shows after the log-transformation of shares, the mean values are similar to their corresponding median values, and their standard deviations are much smaller than before relatively speaking.
+
+Table 3 shows the numerical summaries of average keywords from `r params$channel` channel in mashable.com on different days of the week. Table 4 shows the numerical summaries of average shares of referenced articles in mashable.com on different days of the week. 
 
 ```{r eval=TRUE}
 # contingency table
-table1 <- table(train$class_shares, train$dayweek)
-colnames(table1) <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
-rownames(table1) <- c("Unpopular", "Popular")
-table1 %>% kable(caption = "Table 1. Popularity on Day of the Week")
+edadata <- train
+edadata$class.shares <- cut(edadata$class_shares, 2, c("Unpopular","Popular"))
+edadata$day.week <- cut(edadata$dayweek, 7, c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))
+table(edadata$class.shares, edadata$day.week) %>% kable(caption = "Table 1. Popularity on Day of the Week")
 
-train %>% group_by(class_shares, dayweek) %>% summarise(
-  Avg = mean(kw_avg_avg), Sd = sd(kw_avg_avg), Median = median(kw_avg_avg), IQR = IQR(kw_avg_avg)) %>% 
-  kable(digits = 4, caption = "Table 2. Average keyword/Average shares on Day of the Week")
-  
-train %>% group_by(class_shares) %>% summarise(
-  Avg = mean(kw_avg_avg), Sd = sd(kw_avg_avg), Median = median(kw_avg_avg), IQR = IQR(kw_avg_avg)) %>% 
-  kable(digits = 4, caption = "Table 2. Average keyword/Average shares on Day of the Week")
+edadata %>% group_by(day.week) %>% summarise(
+  Avg.shares = mean(shares), Sd.shares = sd(shares), Median.shares = median(shares), 
+  Avg.logshares = mean(log.shares), Sd.logshares = sd(log.shares), Median.logshares = median(log.shares)) %>% 
+  kable(digits = 4, caption = "Table 2. Average Shares vs. Average Log(shares) on Day of the Week")
 
-train %>% group_by(class_shares, dayweek) %>% summarise(
-  Avg = mean(LDA_03), Sd = sd(LDA_03), Median = median(LDA_03), IQR = IQR(LDA_03)) %>% 
-  kable(digits = 4, caption = "Table 3. Closeness to LDA topic 3 on Day of the Week")
+edadata %>% group_by(day.week) %>% summarise(
+  Avg.keyword = mean(kw_avg_avg), Sd.keyword = sd(kw_avg_avg), Median.keyword = median(kw_avg_avg), 
+  IQR.keyword = IQR(kw_avg_avg)) %>% 
+  kable(digits = 4, caption = "Table 3. Summary of Average Keywords on Day of the Week")
+
+edadata %>% group_by(day.week) %>% summarise(
+  Avg.reference = mean(self_reference_avg_sharess), Sd.reference = sd(self_reference_avg_sharess), 
+  Median.reference = median(self_reference_avg_sharess), IQR.reference = IQR(self_reference_avg_sharess)) %>% 
+  kable(digits = 4, caption = "Table 4. Summary of Average shares of referenced articles in Mashable on Day of the Week")
+
+#edadata %>% group_by(day.week) %>% summarise(
+#  Avg = mean(LDA_03), Sd = sd(LDA_03), Median = median(LDA_03), IQR = IQR(LDA_03)) %>% 
+#  kable(digits = 4, caption = "Table 5. Closeness to LDA topic 3 on Day of the Week")
+
 ```
 
 ## Visualizations
 
-```{r eval=TRUE}
-#PLOTS
-#train1 <- train %>% select(-class_shares) #keep log.shares
-#test1 <- test %>% select(-class_shares) #keep log.shares
+Graphical presentation is a great tool used to visualize the relationships between the predictors and the number of shares (or log number of shares). Below we will see some plots that tell us stories between those variables.
 
+### Correlation Plot
+
+Figure 1 shows the correlations between the variables, both the response and the predictors, which will be used in the regression models as well as the ensemble models for predicting the number of shares. Notice that there may be some collinearity among the predictor variables. 
+
+```{r eval=TRUE}
+# keep log-shares
+#corplt <- train %>% select(-class_shares, -weekday_is_monday, -weekday_is_tuesday, -weekday_is_wednesday,
+#                           -weekday_is_thursday, -weekday_is_friday, -weekday_is_saturday, -weekday_is_sunday) 
 correlation <- cor(train1, method="spearman")
 
 corrplot(correlation, type = "upper", tl.pos = "lt")
 corrplot(correlation, type = "lower", method = "number", add = TRUE, diag = FALSE, tl.pos = "n", 
-         title="Figure 1. Correlation Between the Variables")
+         cex = 0.8,
+         title="Figure 1. Correlations Between the Variables")
+```
 
-plotdata <- train
-plotdata$class.shares <- cut(plotdata$class_shares, 2, c("Unpopular","Popular"))
-plotdata$day.week <- cut(plotdata$dayweek, 7, c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))
-plotdata
-plot1 <- plotdata %>% group_by(day.week, class.shares) %>% 
-  summarise(Avg_keyword = mean(kw_avg_avg), 
-            LDA_0=mean(LDA_00), LDA_1=mean(LDA_01), LDA_2=mean(LDA_02), LDA_3=mean(LDA_03), LDA_4=mean(LDA_04))
-plot1
+### Boxplot 
 
-plot2 <- plot1 %>% pivot_longer(cols = 4:8, names_to = "LDA.Topic", values_to = "avg.LDA")
-plot2
+Figure 2 shows the number of shares across different days of the week. Here, due to the huge number of large-valued outliers, I capped the number of shares to 10,000 so that we can see the medians and the interquartile ranges for different days of the week. Figure 2 coincides with the findings in Table 2 that the variance of shares is huge across days of the week, and the mean values of shares across different days are driven by larged-valued outliers. Therefore, those mean values of shares are not close to the median values of shares for each day of the week. The median number of shares seems to be bigger during weekend than weekdays.
 
-boxplot1 <- ggplot(data = plotdata, aes(x = class.shares, y = kw_avg_avg))
+```{r eval=TRUE}
+boxplot1 <- ggplot(data = edadata, aes(x = day.week, y = shares))
 boxplot1 + geom_boxplot(fill = "white", outlier.shape = NA) + 
-  coord_cartesian(ylim = c(0, 10000)) + 
-  geom_jitter(aes(color = class.shares), size = 1) + 
-  labs(x = "Vaccine Timeline", y = "Active cases", title = "Figure 1. Active cases at each timeline in US") + 
-  theme(axis.text.x = element_text(size = 10), 
+  coord_cartesian(ylim=c(0, 10000)) + 
+  geom_jitter(aes(color = day.week), size = 1) + 
+  labs(x = "Day of the Week", y = "Number of Shares", 
+       title = "Figure 2. Number of shares across different days of the week") + 
+  scale_color_discrete(name = "Day of the Week") +
+  theme(axis.text.x = element_text(angle = 45, size = 10), 
         axis.text.y = element_text(size = 10), 
         axis.title.x = element_text(size = 15), 
         axis.title.y = element_text(size = 15), 
         legend.key.size = unit(1, 'cm'), 
         legend.text = element_text(size = 13), 
         title = element_text(size = 14))
+```
 
-scatter1 <- ggplot(data = plotdata, aes(x = kw_avg_avg, y = shares, color = class.shares)) #y=kw_avg_max
-scatter1 + geom_point(size = 2) + #aes(shape = class.shares)
-  scale_shape_discrete(name = "Day of the Week") + 
-  coord_cartesian(ylim = c(0, 100000)) +
-  geom_smooth(method = "lm", lwd = 2) + 
-  labs(x = "Average keyword", y = "Best Keyword", title = "Figure 2. Best vs Average keyword for shares") + 
-  theme(axis.text.x = element_text(size = 10), 
+### Barplot
+
+Figure 3 shows the popularity of the closeness to a top LDA topic for the `r params$channel` channel on mashable.com on any day of the week. The measurements of the different LDA topics are in ratios, and these are the mean ratios calculated for the specific day of thte week for that topic across 709 days of collections of data in mashable.com. These mean ratios are further classified into a "popular" group and an "unpopular" group according to their number of shares. 
+
+Some mean ratios of a LDA topic do not seem to vary over the days of a week while other mean ratios of LDA topics vary across different days of the week. Note, when we dicotomize a continuous variable into different groups, we lose information about that variable. Here, I just want to show you whether or not the mean ratios of a LDA topic differ across time for different levels of shares. The classified version of number of shares will not be used to fit in a model later.
+
+```{r eval=TRUE}
+b.plot1 <- edadata %>% group_by(day.week, class.shares) %>% 
+  summarise(LDA_0=mean(LDA_00), LDA_1=mean(LDA_01), LDA_2=mean(LDA_02), LDA_3=mean(LDA_03), LDA_4=mean(LDA_04))
+b.plot1
+
+b.plot2 <- b.plot1 %>% pivot_longer(cols = 3:7, names_to = "LDA.Topic", values_to = "avg.LDA")
+b.plot2
+barplot1 <- ggplot(data = b.plot2, aes(x = day.week, y = avg.LDA, fill = LDA.Topic))
+barplot1 + geom_bar(stat = "identity", position = "stack") + 
+  labs(x = "Day of the Week", y = "Closeness to Top LDA Topic", 
+       title = "Figure 3. Popularity of Top LDA Topic on Day of the Week") + 
+  scale_fill_discrete(name = "LDA Topic") + 
+  theme(axis.text.x = element_text(angle = 45, size = 10), 
         axis.text.y = element_text(size = 10), 
-        axis.title.x = element_text(size = 15), 
-        axis.title.y = element_text(size = 15), 
+        axis.title.x = element_text(size = 13), 
+        axis.title.y = element_text(size = 13), 
         legend.key.size = unit(1, 'cm'), 
         legend.text = element_text(size = 13), 
-        title = element_text(size = 13))
+        title = element_text(size = 13)) + 
+  facet_wrap(~ class.shares)
+```
 
-l.plot1 <- plotdata %>% group_by(day.week) %>% 
-  summarise(Avg_keyword = mean(kw_avg_avg), 
-            LDA_0=mean(LDA_00), LDA_1=mean(LDA_01), LDA_2=mean(LDA_02), LDA_3=mean(LDA_03), LDA_4=mean(LDA_04))
+### Line Plot
+
+Here, Figure 4 shows the same measurements as in Figure 3 but in line plot which we can see how the patterns of the mean ratios of a LDA topic vary or not vary across time in different popularity groups more clearly. Again, some mean ratios do not seem to vary across time and across popularity groups while some other mean ratios vary across time and popularity groups for articles in the `r params$channel` channel.
+
+```{r eval=TRUE}
+l.plot1 <- edadata %>% group_by(day.week, class.shares) %>% 
+  summarise(LDA_0=mean(LDA_00), LDA_1=mean(LDA_01), LDA_2=mean(LDA_02), LDA_3=mean(LDA_03), LDA_4=mean(LDA_04))
 l.plot1
 
 l.plot2 <- l.plot1 %>% pivot_longer(cols = 3:7, names_to = "LDA.Topic", values_to = "avg.LDA")
 l.plot2
 
-lineplot1 <- ggplot(data = l.plot2, aes(x = day.week, y = avg.LDA, color = LDA.Topic))
-lineplot1 + geom_line(aes(group=LDA.Topic), lwd = 2) + geom_point() + 
+lineplot1 <- ggplot(data = l.plot2, aes(x = day.week, y = avg.LDA, group = LDA.Topic))
+lineplot1 + geom_line(aes(color = LDA.Topic), lwd = 2) + 
   labs(x = "Day of the Week", y = "Closeness to LDA Topic", 
-       title = "Figure 3. Closeness to LDA Topics on Day of the Week") + 
-  theme(axis.text.x = element_text(size = 10), 
+       title = "Figure 4. Popularity of LDA Topic on Day of the Week") + 
+  scale_color_discrete(name = "LDA Topic") +
+  theme(axis.text.x = element_text(angle = 45, size = 10), 
         axis.text.y = element_text(size = 10), 
         axis.title.x = element_text(size = 15), 
         axis.title.y = element_text(size = 15), 
         legend.key.size = unit(1, 'cm'), 
         legend.text = element_text(size = 13), 
-        title = element_text(size = 13))
+        title = element_text(size = 13)) +
+  facet_wrap(~ class.shares)
+```
 
-b.plot1 <- plotdata %>% group_by(class.shares) %>% 
-  summarise(Avg_keyword = mean(kw_avg_avg), 
-            LDA_0=mean(LDA_00), LDA_1=mean(LDA_01), LDA_2=mean(LDA_02), LDA_3=mean(LDA_03), LDA_4=mean(LDA_04))
-b.plot1
+### Scatterplot
 
-b.plot2 <- b.plot1 %>% pivot_longer(cols = 3:7, names_to = "LDA.Topic", values_to = "avg.LDA")
-b.plot2
-barplot1 <- ggplot(data = b.plot2, aes(x = class.shares, y = avg.LDA, fill = LDA.Topic))
-barplot1 + geom_bar(stat = "identity", position = "dodge") + 
-  labs(x = "Popularity", y = "Closeness to Top LDA Topic", title = "Figure 4. ") + 
-  scale_fill_discrete(name = "LDA Topics") + 
+Figure 5 shows the relationship between average keyword and log-transformed number of shares for articles in the `r params$channel` channel across different days of the week. In the news popularity study, it says average keyword is the most important predictor in the models they used which accounted for the most variation in the data. Therefore, we are interested to see how average keyword is correlated with log shares. The different colored linear regression lines indicate different days of the week. If it is an upward trend, it shows positive linear relationship. If it is a downward trend, it shows a negative linear relationship. More tilted the line is, much stronger the relationship is regardless of positive or negative.
+
+```{r eval=TRUE}
+scatter1 <- ggplot(data = edadata, aes(x = kw_avg_avg, y = log.shares, color = day.week)) #y=kw_avg_max
+scatter1 + geom_point(size = 2) + #aes(shape = class.shares)
+  scale_color_discrete(name = "Day of the Week") + 
+  coord_cartesian(xlim=c(0, 10000)) +
+  geom_smooth(method = "lm", lwd = 2) + 
+  labs(x = "Average Keywords", y = "log(number of shares)", 
+       title = "Figure 5. Average Keywords vs Log Number of Shares") + 
   theme(axis.text.x = element_text(size = 10), 
         axis.text.y = element_text(size = 10), 
-        axis.title.x = element_text(size = 13), 
-        axis.title.y = element_text(size = 13), 
+        axis.title.x = element_text(size = 15), 
+        axis.title.y = element_text(size = 15), 
         legend.key.size = unit(1, 'cm'), 
         legend.text = element_text(size = 13), 
         title = element_text(size = 13))
@@ -216,49 +258,46 @@ barplot1 + geom_bar(stat = "identity", position = "dodge") +
 # using train1, dayweek is numeric, no class_shares
 #train1 <- train %>% select(-class_shares, -shares) #keep log.shares
 #test1 <- test %>% select(-class_shares, -shares) #keep log.shares
-
+train1$dayweek <- as.factor(train1$dayweek)
+test1$dayweek <- as.factor(test1$dayweek)
 preProcValues <- preProcess(train1, method = c("center", "scale"))
 trainTransformed <- predict(preProcValues, train1)
 testTransformed <- predict(preProcValues, test1)
-
-fit1 <- lm(log.shares ~ ., data = trainTransformed)
-summary(fit1)
-fit2 <- lm(log.shares ~ . + I(n_tokens_content^2) + I(num_imgs^2) + I(num_videos^2), 
-           data = trainTransformed)
-summary(fit2)
-
-#I(dayweek^2) + I(kw_avg_avg^2) + I(kw_max_avg^2) + I(LDA_00^2) + 
-#                   I(LDA_01^2) + I(LDA_02^2) + I(LDA_03^2) + I(self_reference_min_shares^2) + 
-#               I(self_reference_avg_sharess^2) + I(n_non_stop_unique_tokens^2) + I(n_unique_tokens^2) + 
-#               I(average_token_length^2) + I(n_tokens_content^2) + I(n_tokens_title^2) + 
-#               I(global_subjectivity^2) + I(num_imgs^2) + I(num_videos^2)
 
 cv_fit1 <- train(log.shares ~ . , 
                  data=trainTransformed,
                  method = "lm",
                  trControl = trainControl(method = "cv", number = 10))
-cv_fit1
+summary(cv_fit1)
 
-cv_fit2 <- train(log.shares ~ . + I(n_tokens_content^2) + I(num_imgs^2) + I(num_videos^2), 
+#cv_fit2 <- train(log.shares ~ . + I(self_reference_avg_sharess^2),
+#                 data=trainTransformed,
+#                 method = "lm",
+#                 trControl = trainControl(method = "cv", number = 10))
+#summary(cv_fit2)
+
+cv_fit3 <- train(log.shares ~ . + I(self_reference_avg_sharess^2) + 
+                 kw_avg_avg:num_imgs + self_reference_avg_sharess:num_imgs + average_token_length:global_subjectivity, 
                  data=trainTransformed,
                  method = "lm",
                  trControl = trainControl(method = "cv", number = 10))
-cv_fit2
+summary(cv_fit3)
 
-result_tab <- data.frame(t(cv_fit1$results), t(cv_fit2$results))
-colnames(result_tab) <- c("Model 1", "Model 2")
+result_tab <- data.frame(t(cv_fit1$results), t(cv_fit3$results))
+colnames(result_tab) <- c("Model 1", "Model 3")
 rownames(result_tab) <- c("intercept", "RMSE", "Rsquared", "MAE", "RMSESD", "RsquaredSD", "MAESD")
 
 kable(result_tab, digits = 4, caption = "Cross Validation - Comparisons of the models in training set")
 
 pred1 <- predict(cv_fit1, newdata = testTransformed)
-pred2 <- predict(cv_fit2, newdata = testTransformed)
+#pred2 <- predict(cv_fit2, newdata = testTransformed)
+pred3 <- predict(cv_fit3, newdata = testTransformed)
 cv_rmse1 <- postResample(pred1, obs = testTransformed$log.shares)
-cv_rmse2 <- postResample(pred2, obs = testTransformed$log.shares)
-
-result2 <- rbind(cv_rmse1, cv_rmse2)
-row.names(result2) <- c("Model 1", "Model 2")
-kable(result2, digits = 4, caption = "Cross Validation - Comparisons of the models in test set")
+#cv_rmse2 <- postResample(pred2, obs = testTransformed$log.shares)
+cv_rmse3 <- postResample(pred3, obs = testTransformed$log.shares)
+result2 <- rbind(cv_rmse1, cv_rmse3)
+row.names(result2) <- c("Model 1", "Model 3")
+kable(result2, digits = 4, caption = "Table ###. Cross Validation - Model Predictions on Test Set")
 
 ```
 
@@ -268,21 +307,12 @@ kable(result2, digits = 4, caption = "Cross Validation - Comparisons of the mode
 Ilana
 
 
-
+Categorical variables have to be divided their levels into dummy variables style.
 
 ```{r eval=TRUE}
-#                        select(class_shares, shares, dayweek, kw_avg_avg, kw_avg_max, kw_avg_min, kw_max_avg, 
-#                               log.shares, LDA_00, LDA_01, LDA_02, LDA_03, LDA_04, 
-#                               weekday_is_monday, weekday_is_tuesday, weekday_is_wednesday,
-#                               weekday_is_thursday, weekday_is_friday, weekday_is_saturday, weekday_is_sunday,
-#                               self_reference_min_shares, self_reference_avg_sharess, 
-#                               n_non_stop_unique_tokens, n_unique_tokens, average_token_length, 
-#                               n_tokens_content, n_tokens_title, global_subjectivity, 
-#                               num_imgs, num_videos)
-
-train2 <- train %>% select(-class_shares, -shares, -dayweek)
-test2 <- test %>% select(-class_shares, -shares, -dayweek)
-
+train2 <- train %>% select(-class_shares, -shares, -dayweek, -LDA_00, -LDA_01, -LDA_03, -LDA_04)
+test2 <- test %>% select(-class_shares, -shares, -dayweek, -LDA_00, -LDA_01, -LDA_03, -LDA_04)
+train2
 preProcValues <- preProcess(train2, method = c("center", "scale"))
 trainTransformed <- predict(preProcValues, train2)
 testTransformed <- predict(preProcValues, test2)
@@ -291,26 +321,43 @@ testTransformed <- predict(preProcValues, test2)
 
 ```
 
-
 ## Boosted Tree
 
-Jasmine
 
-I need to import the weekdays as dummy variables
+
+Predictors                    | Attribute Information                              | Type   
+----------------------------- | -------------------------------------------------- | -------------------------
+`kw_avg_avg`                  | Average keyword (average shares)                   | number
+`LDA_02`                      | Closeness to LDA topic 2                           | ratio
+`weekday_is_monday`           | Was the article published on a Monday?             | boolean
+`weekday_is_tuesday`          | Was the article published on a Tuesday?            | boolean
+`weekday_is_wednesday`        | Was the article published on a Wednesday?          | boolean
+`weekday_is_thursday`         | Was the article published on a Thursday?           | boolean
+`weekday_is_friday`           | Was the article published on a Friday?             | boolean
+`weekday_is_saturday`         | Was the article published on a Saturday?           | boolean
+`weekday_is_sunday`           | Was the article published on a Sunday?             | boolean
+`self_reference_avg_sharess`  | Average shares of referenced articles in Mashable  | number
+`n_non_stop_unique_tokens`    | Rate of unique non-stop words in the content       | ratio
+`average_token_length`        | Average length of the words in the content         | number
+`n_tokens_content`            | Number of words in the content                     | number
+`n_tokens_title`              | Number of words in the title                       | number
+`global_subjectivity`         | Text subjectivity                                  | ratio
+`num_imgs`                    | Number of images                                   | number
+
 
 ```{r eval=TRUE}
 #expand.grid(n.trees = c(25, 50, 100, 150, 200), interaction.depth = 1:4, shrinkage = 0.1, n.minobsinnode = 10)
 boosted_tree <- train(log.shares ~ . , data = trainTransformed,
       method = "gbm", 
       trControl = trainControl(method = "repeatedcv", number = 10, repeats = 5),
-      tuneGrid = expand.grid(n.trees = c(25, 50, 100, 150, 200), interaction.depth = 1:4, shrinkage = 0.1, n.minobsinnode = 10),
+      tuneGrid = expand.grid(n.trees = c(25, 50, 75, 100), interaction.depth = 1:4, shrinkage = 0.1, n.minobsinnode = 10),
       verbose = FALSE)
 boosted_tree
 boosted_tree_predict <- predict(boosted_tree, newdata = testTransformed)
 
 boost_rmse <- postResample(boosted_tree_predict, obs = testTransformed$log.shares)
 
-result2 <- rbind(cv_rmse1, cv_rmse2, boost_rmse)
+result2 <- rbind(cv_rmse1, cv_rmse3, boost_rmse)
 row.names(result2) <- c("Linear Model 1", "Linear Model 2", "Boosted Model")
 kable(result2, digits = 4, caption = "Cross Validation - Comparisons of the models in test set")
 
@@ -324,38 +371,6 @@ kable(result2, digits = 4, caption = "Cross Validation - Comparisons of the mode
 
 # Automation
 
-
-```{r eval=TRUE}
-
-
-
-
-
-
-```
-# Summarizations
-
-## Numerical Summaries
-
-## Visualizations
-3
-# Modeling
-
-## Linear Regression
-
-
-
-## Random Forest 
-
-Ilana
-
-## Boosted Tree
-
-Jasmine
-
-# Comparison
-
-# Automation
-
+Automation is done with the modifications of the YAML header and the render function. 
 
 
