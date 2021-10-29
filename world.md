@@ -63,7 +63,7 @@ I created a log(shares) variable and use it as response instead of
 shares. In office hour, a lot of people say this improved fit a little
 better.
 
-This analysis is based on the entertainment channel popularity.
+This analysis is based on the world channel popularity.
 
 ``` r
 library(tidyverse)
@@ -88,7 +88,7 @@ news <- subnews %>% select(
 dim(news)
 ```
 
-    ## [1] 7057   53
+    ## [1] 8427   53
 
 ``` r
 diffday <- news %>% mutate(log.shares = log(shares),
@@ -113,20 +113,20 @@ sel_data <- diffday %>% select(class_shares, shares, log.shares, dayweek,
 sel_data
 ```
 
-    ## # A tibble: 7,057 x 24
+    ## # A tibble: 8,427 x 24
     ##    class_shares shares log.shares dayweek kw_avg_avg LDA_00 LDA_01 LDA_02 LDA_03 LDA_04 weekday_is_monday weekday_is_tuesd~ weekday_is_wedn~
     ##           <dbl>  <dbl>      <dbl>   <dbl>      <dbl>  <dbl>  <dbl>  <dbl>  <dbl>  <dbl>             <dbl>             <dbl>            <dbl>
-    ##  1            0    593       6.39       1         0  0.500  0.378  0.0400 0.0413 0.0401                 1                 0                0
-    ##  2            0   1200       7.09       1         0  0.0286 0.419  0.495  0.0289 0.0286                 1                 0                0
-    ##  3            1   2100       7.65       1         0  0.0334 0.0345 0.215  0.684  0.0333                 1                 0                0
-    ##  4            0   1200       7.09       1         0  0.126  0.0203 0.0200 0.814  0.0200                 1                 0                0
-    ##  5            1   4600       8.43       1         0  0.200  0.340  0.0333 0.393  0.0333                 1                 0                0
-    ##  6            0   1200       7.09       1         0  0.0240 0.665  0.0225 0.266  0.0223                 1                 0                0
-    ##  7            0    631       6.45       1         0  0.456  0.482  0.0200 0.0213 0.0200                 1                 0                0
-    ##  8            0   1300       7.17       2      1114. 0.0500 0.525  0.324  0.0510 0.0500                 0                 1                0
-    ##  9            1   1700       7.44       2       714. 0.0400 0.840  0.0400 0.0401 0.0400                 0                 1                0
-    ## 10            0    455       6.12       3       707. 0.0334 0.409  0.0333 0.491  0.0333                 0                 0                1
-    ## # ... with 7,047 more rows, and 11 more variables: weekday_is_thursday <dbl>, weekday_is_friday <dbl>, weekday_is_saturday <dbl>,
+    ##  1            0    710       6.57       1         0  0.0400 0.0400  0.840 0.0400 0.0400                 1                 0                0
+    ##  2            1   2200       7.70       1         0  0.0250 0.287   0.401 0.262  0.0250                 1                 0                0
+    ##  3            1   1600       7.38       1         0  0.0333 0.0333  0.867 0.0333 0.0333                 1                 0                0
+    ##  4            0    598       6.39       1         0  0.0288 0.0286  0.681 0.0286 0.233                  1                 0                0
+    ##  5            1   1500       7.31       1         0  0.0333 0.0333  0.700 0.200  0.0333                 1                 0                0
+    ##  6            0    504       6.22       1         0  0.0333 0.0335  0.866 0.0333 0.0334                 1                 0                0
+    ##  7            1   1800       7.50       1         0  0.0400 0.0400  0.840 0.0400 0.0400                 1                 0                0
+    ##  8            0   1200       7.09       1         0  0.0286 0.0287  0.485 0.0286 0.429                  1                 0                0
+    ##  9            0    495       6.20       1         0  0.0333 0.0333  0.702 0.198  0.0333                 1                 0                0
+    ## 10            0    755       6.63       2       804. 0.0338 0.0344  0.862 0.0334 0.0365                 0                 1                0
+    ## # ... with 8,417 more rows, and 11 more variables: weekday_is_thursday <dbl>, weekday_is_friday <dbl>, weekday_is_saturday <dbl>,
     ## #   weekday_is_sunday <dbl>, self_reference_avg_sharess <dbl>, n_non_stop_unique_tokens <dbl>, average_token_length <dbl>,
     ## #   n_tokens_content <dbl>, n_tokens_title <dbl>, global_subjectivity <dbl>, num_imgs <dbl>
 
@@ -154,8 +154,8 @@ predictors with some numerical summaries and plots.
 Table 1 shows the popularity of the news articles on different days of
 the week. I classified number of shares greater than 1400 in a day as
 “popular” and number of shares less than 1400 in a day as “unpopular”.
-We can see the total number of articles from entertainment channel falls
-into different categories on different days of the week for 709 days.
+We can see the total number of articles from world channel falls into
+different categories on different days of the week for 709 days.
 
 Table 2 shows the average shares of the articles on different days of
 the week. Here, we can see a potential problem for our analysis later.
@@ -175,10 +175,10 @@ log-transformation, which could help us on this matter. Therefore, Table
 are similar to their corresponding median values, and their standard
 deviations are much smaller than before relatively speaking.
 
-Table 3 shows the numerical summaries of average keywords from
-entertainment channel in mashable.com on different days of the week.
-Table 4 shows the numerical summaries of average shares of referenced
-articles in mashable.com on different days of the week.
+Table 3 shows the numerical summaries of average keywords from world
+channel in mashable.com on different days of the week. Table 4 shows the
+numerical summaries of average shares of referenced articles in
+mashable.com on different days of the week.
 
 ``` r
 # contingency table
@@ -190,8 +190,8 @@ table(edadata$class.shares, edadata$day.week) %>% kable(caption = "Table 1. Popu
 
 |           | Monday | Tuesday | Wednesday | Thursday | Friday | Saturday | Sunday |
 |:----------|-------:|--------:|----------:|---------:|-------:|---------:|-------:|
-| Unpopular |    614 |     566 |       576 |      536 |    392 |       97 |    134 |
-| Popular   |    355 |     345 |       325 |      323 |    269 |      172 |    237 |
+| Unpopular |    601 |     723 |       726 |      695 |    538 |      157 |    189 |
+| Popular   |    372 |     378 |       366 |      376 |    352 |      216 |    211 |
 
 Table 1. Popularity on Day of the Week
 
@@ -204,13 +204,13 @@ edadata %>% group_by(day.week) %>% summarise(
 
 | day.week  | Avg.shares | Sd.shares | Median.shares | Avg.logshares | Sd.logshares | Median.logshares |
 |:----------|-----------:|----------:|--------------:|--------------:|-------------:|-----------------:|
-| Monday    |   2889.597 |  7029.259 |          1100 |        7.2639 |       0.9370 |           7.0031 |
-| Tuesday   |   2877.996 |  7099.666 |          1100 |        7.2498 |       0.9504 |           7.0031 |
-| Wednesday |   2693.796 |  6957.247 |          1100 |        7.2173 |       0.9289 |           7.0031 |
-| Thursday  |   2654.277 |  5501.523 |          1100 |        7.2530 |       0.9217 |           7.0031 |
-| Friday    |   2763.859 |  6564.225 |          1200 |        7.3003 |       0.8834 |           7.0901 |
-| Saturday  |   3196.398 |  4899.815 |          1600 |        7.5907 |       0.8478 |           7.3778 |
-| Sunday    |   3928.189 |  6540.015 |          1700 |        7.7251 |       0.9212 |           7.4384 |
+| Monday    |   2337.043 |  6543.355 |          1100 |        7.1990 |       0.8232 |           7.0031 |
+| Tuesday   |   2426.688 |  6565.391 |          1100 |        7.1584 |       0.8682 |           7.0031 |
+| Wednesday |   1925.386 |  3406.646 |          1100 |        7.1317 |       0.7749 |           7.0031 |
+| Thursday  |   2133.721 |  4561.754 |          1100 |        7.1459 |       0.8352 |           7.0031 |
+| Friday    |   2296.185 |  6716.310 |          1100 |        7.2045 |       0.8052 |           7.0031 |
+| Saturday  |   2557.188 |  3558.843 |          1600 |        7.4388 |       0.8664 |           7.3778 |
+| Sunday    |   2463.262 |  3821.872 |          1400 |        7.4483 |       0.7235 |           7.2442 |
 
 Table 2. Average Shares vs. Average Log(shares) on Day of the Week
 
@@ -223,13 +223,13 @@ edadata %>% group_by(day.week) %>% summarise(
 
 | day.week  | Avg.keyword | Sd.keyword | Median.keyword | IQR.keyword |
 |:----------|------------:|-----------:|---------------:|------------:|
-| Monday    |    3138.246 |  1000.8555 |       2986.230 |    964.4435 |
-| Tuesday   |    3196.072 |  1047.9397 |       2948.443 |   1092.8238 |
-| Wednesday |    3095.430 |   919.6049 |       2924.109 |    977.7699 |
-| Thursday  |    3131.609 |   978.9344 |       2946.254 |    983.3106 |
-| Friday    |    3149.342 |   888.7727 |       3025.972 |   1010.1086 |
-| Saturday  |    3250.077 |  1072.2700 |       3021.647 |   1069.6917 |
-| Sunday    |    3212.291 |  1050.1105 |       3028.401 |    906.0124 |
+| Monday    |    2473.181 |   751.0025 |       2385.787 |    745.9407 |
+| Tuesday   |    2498.915 |   912.8466 |       2377.593 |    709.0243 |
+| Wednesday |    2524.790 |  1086.8147 |       2394.104 |    666.2618 |
+| Thursday  |    2553.265 |   866.3338 |       2432.320 |    744.0002 |
+| Friday    |    2540.271 |   809.9252 |       2412.769 |    721.8967 |
+| Saturday  |    2543.164 |   789.7911 |       2404.729 |    669.8686 |
+| Sunday    |    2551.390 |   741.6412 |       2436.715 |    649.0045 |
 
 Table 3. Summary of Average Keywords on Day of the Week
 
@@ -242,13 +242,13 @@ edadata %>% group_by(day.week) %>% summarise(
 
 | day.week  | Avg.reference | Sd.reference | Median.reference | IQR.reference |
 |:----------|--------------:|-------------:|-----------------:|--------------:|
-| Monday    |      5005.183 |    10446.460 |             2000 |      3800.000 |
-| Tuesday   |      5252.047 |     9066.755 |             2100 |      4292.298 |
-| Wednesday |      4972.436 |     9763.866 |             2000 |      3776.500 |
-| Thursday  |      4859.891 |    10757.457 |             2000 |      3773.750 |
-| Friday    |      4483.275 |     8536.953 |             1980 |      3733.333 |
-| Saturday  |      5377.535 |    19079.956 |             1850 |      3015.667 |
-| Sunday    |      5213.800 |    11704.089 |             2200 |      3868.667 |
+| Monday    |      3916.641 |     9109.592 |         1500.000 |      2471.000 |
+| Tuesday   |      3650.512 |    12051.108 |         1400.000 |      3100.000 |
+| Wednesday |      3860.214 |    15032.993 |         1400.000 |      2458.000 |
+| Thursday  |      3638.208 |     9786.237 |         1392.571 |      2377.000 |
+| Friday    |      5484.440 |    29458.710 |         1489.196 |      2756.583 |
+| Saturday  |      3208.286 |     6186.295 |         1300.000 |      2162.000 |
+| Sunday    |      3337.209 |     8687.275 |         1500.000 |      2050.125 |
 
 Table 4. Summary of Average shares of referenced articles in Mashable on
 Day of the Week
@@ -316,7 +316,7 @@ boxplot1 + geom_boxplot(fill = "white", outlier.shape = NA) +
 ### Barplot
 
 Figure 3 shows the popularity of the closeness to a top LDA topic for
-the entertainment channel on mashable.com on any day of the week. The
+the world channel on mashable.com on any day of the week. The
 measurements of the different LDA topics are in ratios, and these are
 the mean ratios calculated for the specific day of thte week for that
 topic across 709 days of collections of data in mashable.com. These mean
@@ -338,22 +338,22 @@ b.plot1
 ```
 
     ## # A tibble: 14 x 7
-    ##    day.week  class.shares  LDA_0 LDA_1  LDA_2 LDA_3  LDA_4
-    ##    <fct>     <fct>         <dbl> <dbl>  <dbl> <dbl>  <dbl>
-    ##  1 Monday    Unpopular    0.0648 0.433 0.0890 0.348 0.0649
-    ##  2 Monday    Popular      0.0603 0.437 0.0757 0.366 0.0610
-    ##  3 Tuesday   Unpopular    0.0642 0.449 0.0922 0.333 0.0619
-    ##  4 Tuesday   Popular      0.0706 0.400 0.0695 0.389 0.0681
-    ##  5 Wednesday Unpopular    0.0636 0.431 0.0900 0.349 0.0660
-    ##  6 Wednesday Popular      0.0696 0.428 0.0846 0.352 0.0659
-    ##  7 Thursday  Unpopular    0.0713 0.450 0.0944 0.318 0.0659
-    ##  8 Thursday  Popular      0.0609 0.419 0.0863 0.374 0.0592
-    ##  9 Friday    Unpopular    0.0605 0.441 0.0990 0.340 0.0599
-    ## 10 Friday    Popular      0.0690 0.400 0.0861 0.381 0.0646
-    ## 11 Saturday  Unpopular    0.0733 0.367 0.154  0.354 0.0518
-    ## 12 Saturday  Popular      0.0650 0.425 0.0919 0.347 0.0713
-    ## 13 Sunday    Unpopular    0.0662 0.331 0.0919 0.440 0.0708
-    ## 14 Sunday    Popular      0.0847 0.351 0.0918 0.413 0.0592
+    ##    day.week  class.shares  LDA_0  LDA_1 LDA_2  LDA_3 LDA_4
+    ##    <fct>     <fct>         <dbl>  <dbl> <dbl>  <dbl> <dbl>
+    ##  1 Monday    Unpopular    0.0552 0.0526 0.692 0.0665 0.134
+    ##  2 Monday    Popular      0.0788 0.0591 0.607 0.0883 0.166
+    ##  3 Tuesday   Unpopular    0.0635 0.0497 0.694 0.0543 0.138
+    ##  4 Tuesday   Popular      0.0826 0.0555 0.615 0.0888 0.158
+    ##  5 Wednesday Unpopular    0.0628 0.0530 0.692 0.0685 0.124
+    ##  6 Wednesday Popular      0.0740 0.0516 0.632 0.0776 0.165
+    ##  7 Thursday  Unpopular    0.0633 0.0509 0.691 0.0615 0.133
+    ##  8 Thursday  Popular      0.0766 0.0575 0.621 0.0884 0.156
+    ##  9 Friday    Unpopular    0.0594 0.0549 0.706 0.0679 0.112
+    ## 10 Friday    Popular      0.0771 0.0485 0.648 0.0795 0.147
+    ## 11 Saturday  Unpopular    0.0526 0.0606 0.714 0.0635 0.109
+    ## 12 Saturday  Popular      0.0892 0.0559 0.649 0.0768 0.129
+    ## 13 Sunday    Unpopular    0.0575 0.0579 0.695 0.0644 0.125
+    ## 14 Sunday    Popular      0.0757 0.0658 0.625 0.0796 0.154
 
 ``` r
 b.plot2 <- b.plot1 %>% pivot_longer(cols = 3:7, names_to = "LDA.Topic", values_to = "avg.LDA")
@@ -363,16 +363,16 @@ b.plot2
     ## # A tibble: 70 x 4
     ##    day.week class.shares LDA.Topic avg.LDA
     ##    <fct>    <fct>        <chr>       <dbl>
-    ##  1 Monday   Unpopular    LDA_0      0.0648
-    ##  2 Monday   Unpopular    LDA_1      0.433 
-    ##  3 Monday   Unpopular    LDA_2      0.0890
-    ##  4 Monday   Unpopular    LDA_3      0.348 
-    ##  5 Monday   Unpopular    LDA_4      0.0649
-    ##  6 Monday   Popular      LDA_0      0.0603
-    ##  7 Monday   Popular      LDA_1      0.437 
-    ##  8 Monday   Popular      LDA_2      0.0757
-    ##  9 Monday   Popular      LDA_3      0.366 
-    ## 10 Monday   Popular      LDA_4      0.0610
+    ##  1 Monday   Unpopular    LDA_0      0.0552
+    ##  2 Monday   Unpopular    LDA_1      0.0526
+    ##  3 Monday   Unpopular    LDA_2      0.692 
+    ##  4 Monday   Unpopular    LDA_3      0.0665
+    ##  5 Monday   Unpopular    LDA_4      0.134 
+    ##  6 Monday   Popular      LDA_0      0.0788
+    ##  7 Monday   Popular      LDA_1      0.0591
+    ##  8 Monday   Popular      LDA_2      0.607 
+    ##  9 Monday   Popular      LDA_3      0.0883
+    ## 10 Monday   Popular      LDA_4      0.166 
     ## # ... with 60 more rows
 
 ``` r
@@ -400,7 +400,7 @@ plot which we can see how the patterns of the mean ratios of a LDA topic
 vary or not vary across time in different popularity groups more
 clearly. Again, some mean ratios do not seem to vary across time and
 across popularity groups while some other mean ratios vary across time
-and popularity groups for articles in the entertainment channel.
+and popularity groups for articles in the world channel.
 
 ``` r
 l.plot1 <- edadata %>% group_by(day.week, class.shares) %>% 
@@ -409,22 +409,22 @@ l.plot1
 ```
 
     ## # A tibble: 14 x 7
-    ##    day.week  class.shares  LDA_0 LDA_1  LDA_2 LDA_3  LDA_4
-    ##    <fct>     <fct>         <dbl> <dbl>  <dbl> <dbl>  <dbl>
-    ##  1 Monday    Unpopular    0.0648 0.433 0.0890 0.348 0.0649
-    ##  2 Monday    Popular      0.0603 0.437 0.0757 0.366 0.0610
-    ##  3 Tuesday   Unpopular    0.0642 0.449 0.0922 0.333 0.0619
-    ##  4 Tuesday   Popular      0.0706 0.400 0.0695 0.389 0.0681
-    ##  5 Wednesday Unpopular    0.0636 0.431 0.0900 0.349 0.0660
-    ##  6 Wednesday Popular      0.0696 0.428 0.0846 0.352 0.0659
-    ##  7 Thursday  Unpopular    0.0713 0.450 0.0944 0.318 0.0659
-    ##  8 Thursday  Popular      0.0609 0.419 0.0863 0.374 0.0592
-    ##  9 Friday    Unpopular    0.0605 0.441 0.0990 0.340 0.0599
-    ## 10 Friday    Popular      0.0690 0.400 0.0861 0.381 0.0646
-    ## 11 Saturday  Unpopular    0.0733 0.367 0.154  0.354 0.0518
-    ## 12 Saturday  Popular      0.0650 0.425 0.0919 0.347 0.0713
-    ## 13 Sunday    Unpopular    0.0662 0.331 0.0919 0.440 0.0708
-    ## 14 Sunday    Popular      0.0847 0.351 0.0918 0.413 0.0592
+    ##    day.week  class.shares  LDA_0  LDA_1 LDA_2  LDA_3 LDA_4
+    ##    <fct>     <fct>         <dbl>  <dbl> <dbl>  <dbl> <dbl>
+    ##  1 Monday    Unpopular    0.0552 0.0526 0.692 0.0665 0.134
+    ##  2 Monday    Popular      0.0788 0.0591 0.607 0.0883 0.166
+    ##  3 Tuesday   Unpopular    0.0635 0.0497 0.694 0.0543 0.138
+    ##  4 Tuesday   Popular      0.0826 0.0555 0.615 0.0888 0.158
+    ##  5 Wednesday Unpopular    0.0628 0.0530 0.692 0.0685 0.124
+    ##  6 Wednesday Popular      0.0740 0.0516 0.632 0.0776 0.165
+    ##  7 Thursday  Unpopular    0.0633 0.0509 0.691 0.0615 0.133
+    ##  8 Thursday  Popular      0.0766 0.0575 0.621 0.0884 0.156
+    ##  9 Friday    Unpopular    0.0594 0.0549 0.706 0.0679 0.112
+    ## 10 Friday    Popular      0.0771 0.0485 0.648 0.0795 0.147
+    ## 11 Saturday  Unpopular    0.0526 0.0606 0.714 0.0635 0.109
+    ## 12 Saturday  Popular      0.0892 0.0559 0.649 0.0768 0.129
+    ## 13 Sunday    Unpopular    0.0575 0.0579 0.695 0.0644 0.125
+    ## 14 Sunday    Popular      0.0757 0.0658 0.625 0.0796 0.154
 
 ``` r
 l.plot2 <- l.plot1 %>% pivot_longer(cols = 3:7, names_to = "LDA.Topic", values_to = "avg.LDA")
@@ -434,16 +434,16 @@ l.plot2
     ## # A tibble: 70 x 4
     ##    day.week class.shares LDA.Topic avg.LDA
     ##    <fct>    <fct>        <chr>       <dbl>
-    ##  1 Monday   Unpopular    LDA_0      0.0648
-    ##  2 Monday   Unpopular    LDA_1      0.433 
-    ##  3 Monday   Unpopular    LDA_2      0.0890
-    ##  4 Monday   Unpopular    LDA_3      0.348 
-    ##  5 Monday   Unpopular    LDA_4      0.0649
-    ##  6 Monday   Popular      LDA_0      0.0603
-    ##  7 Monday   Popular      LDA_1      0.437 
-    ##  8 Monday   Popular      LDA_2      0.0757
-    ##  9 Monday   Popular      LDA_3      0.366 
-    ## 10 Monday   Popular      LDA_4      0.0610
+    ##  1 Monday   Unpopular    LDA_0      0.0552
+    ##  2 Monday   Unpopular    LDA_1      0.0526
+    ##  3 Monday   Unpopular    LDA_2      0.692 
+    ##  4 Monday   Unpopular    LDA_3      0.0665
+    ##  5 Monday   Unpopular    LDA_4      0.134 
+    ##  6 Monday   Popular      LDA_0      0.0788
+    ##  7 Monday   Popular      LDA_1      0.0591
+    ##  8 Monday   Popular      LDA_2      0.607 
+    ##  9 Monday   Popular      LDA_3      0.0883
+    ## 10 Monday   Popular      LDA_4      0.166 
     ## # ... with 60 more rows
 
 ``` r
@@ -467,16 +467,16 @@ lineplot1 + geom_line(aes(color = LDA.Topic), lwd = 2) +
 ### Scatterplot
 
 Figure 5 shows the relationship between average keyword and
-log-transformed number of shares for articles in the entertainment
-channel across different days of the week. In the news popularity study,
-it says average keyword is the most important predictor in the models
-they used which accounted for the most variation in the data. Therefore,
-we are interested to see how average keyword is correlated with log
-shares. The different colored linear regression lines indicate different
-days of the week. If it is an upward trend, it shows positive linear
-relationship. If it is a downward trend, it shows a negative linear
-relationship. More tilted the line is, much stronger the relationship is
-regardless of positive or negative.
+log-transformed number of shares for articles in the world channel
+across different days of the week. In the news popularity study, it says
+average keyword is the most important predictor in the models they used
+which accounted for the most variation in the data. Therefore, we are
+interested to see how average keyword is correlated with log shares. The
+different colored linear regression lines indicate different days of the
+week. If it is an upward trend, it shows positive linear relationship.
+If it is a downward trend, it shows a negative linear relationship. More
+tilted the line is, much stronger the relationship is regardless of
+positive or negative.
 
 ``` r
 scatter1 <- ggplot(data = edadata, aes(x = kw_avg_avg, y = log.shares, color = day.week)) #y=kw_avg_max
@@ -527,32 +527,32 @@ summary(cv_fit1)
     ## 
     ## Residuals:
     ##     Min      1Q  Median      3Q     Max 
-    ## -3.9193 -0.6003 -0.2370  0.3643  4.4995 
+    ## -4.4554 -0.5457 -0.1652  0.3702  5.5236 
     ## 
     ## Coefficients:
-    ##                            Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)                -0.04436    0.03090  -1.436  0.15111    
-    ## dayweek2                   -0.03221    0.04440  -0.726  0.46817    
-    ## dayweek3                   -0.04062    0.04453  -0.912  0.36171    
-    ## dayweek4                   -0.01017    0.04508  -0.226  0.82151    
-    ## dayweek5                    0.04336    0.04852   0.894  0.37148    
-    ## dayweek6                    0.33557    0.06641   5.053 4.50e-07 ***
-    ## dayweek7                    0.47154    0.05877   8.023 1.28e-15 ***
-    ## kw_avg_avg                  0.18056    0.01415  12.756  < 2e-16 ***
-    ## LDA_02                     -0.03261    0.01395  -2.338  0.01945 *  
-    ## self_reference_avg_sharess  0.09005    0.01394   6.462 1.13e-10 ***
-    ## n_non_stop_unique_tokens    0.02308    0.01374   1.680  0.09306 .  
-    ## average_token_length       -0.03115    0.01840  -1.693  0.09043 .  
-    ## n_tokens_content           -0.01980    0.01568  -1.263  0.20664    
-    ## n_tokens_title             -0.00467    0.01375  -0.339  0.73426    
-    ## global_subjectivity         0.05757    0.01835   3.137  0.00172 ** 
-    ## num_imgs                    0.04848    0.01547   3.134  0.00174 ** 
+    ##                             Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)                -0.002751   0.030770  -0.089   0.9288    
+    ## dayweek2                   -0.046973   0.042228  -1.112   0.2660    
+    ## dayweek3                   -0.081259   0.042300  -1.921   0.0548 .  
+    ## dayweek4                   -0.066960   0.042492  -1.576   0.1151    
+    ## dayweek5                   -0.008333   0.044579  -0.187   0.8517    
+    ## dayweek6                    0.305409   0.058488   5.222 1.83e-07 ***
+    ## dayweek7                    0.304747   0.057147   5.333 1.00e-07 ***
+    ## kw_avg_avg                  0.091773   0.012877   7.127 1.15e-12 ***
+    ## LDA_02                     -0.123324   0.013046  -9.453  < 2e-16 ***
+    ## self_reference_avg_sharess  0.056802   0.012602   4.507 6.69e-06 ***
+    ## n_non_stop_unique_tokens    0.046487   0.025219   1.843   0.0653 .  
+    ## average_token_length       -0.147636   0.024126  -6.119 1.00e-09 ***
+    ## n_tokens_content            0.005144   0.015755   0.326   0.7441    
+    ## n_tokens_title              0.028264   0.012579   2.247   0.0247 *  
+    ## global_subjectivity         0.106297   0.016556   6.420 1.47e-10 ***
+    ## num_imgs                    0.117106   0.014140   8.282  < 2e-16 ***
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
-    ## Residual standard error: 0.9614 on 4925 degrees of freedom
-    ## Multiple R-squared:  0.07857,    Adjusted R-squared:  0.07576 
-    ## F-statistic: 27.99 on 15 and 4925 DF,  p-value: < 2.2e-16
+    ## Residual standard error: 0.9588 on 5884 degrees of freedom
+    ## Multiple R-squared:  0.08296,    Adjusted R-squared:  0.08062 
+    ## F-statistic: 35.49 on 15 and 5884 DF,  p-value: < 2.2e-16
 
 ``` r
 cv_fit2 <- train(log.shares ~ . +I(n_tokens_content^2)+ kw_avg_avg:num_imgs + 
@@ -570,41 +570,41 @@ summary(cv_fit2)
     ## 
     ## Residuals:
     ##     Min      1Q  Median      3Q     Max 
-    ## -3.9681 -0.5985 -0.2383  0.3704  4.5117 
+    ## -4.4454 -0.5373 -0.1627  0.3689  5.3513 
     ## 
     ## Coefficients:
-    ##                                              Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)                                -0.0629559  0.0320851  -1.962 0.049801 *  
-    ## dayweek2                                   -0.0330453  0.0443006  -0.746 0.455744    
-    ## dayweek3                                   -0.0410796  0.0444284  -0.925 0.355207    
-    ## dayweek4                                   -0.0124044  0.0449895  -0.276 0.782777    
-    ## dayweek5                                    0.0408271  0.0484515   0.843 0.399472    
-    ## dayweek6                                    0.3405765  0.0662854   5.138 2.88e-07 ***
-    ## dayweek7                                    0.4752498  0.0586909   8.098 7.01e-16 ***
-    ## kw_avg_avg                                  0.1784387  0.0141973  12.569  < 2e-16 ***
-    ## LDA_02                                     -0.0334613  0.0139389  -2.401 0.016406 *  
-    ## self_reference_avg_sharess                  0.1213338  0.0316334   3.836 0.000127 ***
-    ## n_non_stop_unique_tokens                    0.0248505  0.0137240   1.811 0.070243 .  
-    ## average_token_length                        0.0186052  0.0438872   0.424 0.671634    
-    ## n_tokens_content                           -0.0287057  0.0209177  -1.372 0.170028    
-    ## n_tokens_title                             -0.0019196  0.0137736  -0.139 0.889166    
-    ## global_subjectivity                         0.0630246  0.0188140   3.350 0.000815 ***
-    ## num_imgs                                    0.0382324  0.0158350   2.414 0.015796 *  
-    ## `I(n_tokens_content^2)`                     0.0065954  0.0054429   1.212 0.225670    
-    ## `kw_avg_avg:num_imgs`                       0.0497198  0.0162574   3.058 0.002238 ** 
-    ## `average_token_length:global_subjectivity`  0.0154639  0.0123334   1.254 0.209963    
-    ## `dayweek2:self_reference_avg_sharess`       0.0007804  0.0489428   0.016 0.987279    
-    ## `dayweek3:self_reference_avg_sharess`       0.0146644  0.0470760   0.312 0.755430    
-    ## `dayweek4:self_reference_avg_sharess`       0.0276575  0.0452784   0.611 0.541339    
-    ## `dayweek5:self_reference_avg_sharess`      -0.0446623  0.0563137  -0.793 0.427759    
-    ## `dayweek6:self_reference_avg_sharess`      -0.1365807  0.0455444  -2.999 0.002724 ** 
-    ## `dayweek7:self_reference_avg_sharess`      -0.1139098  0.0553453  -2.058 0.039627 *  
+    ##                                             Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)                                 0.029871   0.031987   0.934 0.350430    
+    ## dayweek2                                   -0.051402   0.042146  -1.220 0.222667    
+    ## dayweek3                                   -0.082557   0.042187  -1.957 0.050406 .  
+    ## dayweek4                                   -0.065039   0.042398  -1.534 0.125079    
+    ## dayweek5                                   -0.006443   0.044471  -0.145 0.884816    
+    ## dayweek6                                    0.319985   0.058665   5.454 5.11e-08 ***
+    ## dayweek7                                    0.301551   0.057108   5.280 1.34e-07 ***
+    ## kw_avg_avg                                  0.087563   0.012969   6.752 1.60e-11 ***
+    ## LDA_02                                     -0.119596   0.013032  -9.177  < 2e-16 ***
+    ## self_reference_avg_sharess                  0.132455   0.052368   2.529 0.011455 *  
+    ## n_non_stop_unique_tokens                   -0.054433   0.030693  -1.773 0.076202 .  
+    ## average_token_length                       -0.304731   0.044298  -6.879 6.65e-12 ***
+    ## n_tokens_content                           -0.074987   0.023078  -3.249 0.001163 ** 
+    ## n_tokens_title                              0.020020   0.012671   1.580 0.114158    
+    ## global_subjectivity                         0.104450   0.016676   6.263 4.03e-10 ***
+    ## num_imgs                                    0.110089   0.014953   7.362 2.06e-13 ***
+    ## `I(n_tokens_content^2)`                     0.012808   0.003719   3.444 0.000578 ***
+    ## `kw_avg_avg:num_imgs`                       0.005288   0.011168   0.473 0.635904    
+    ## `average_token_length:global_subjectivity` -0.074859   0.015168  -4.935 8.22e-07 ***
+    ## `dayweek2:self_reference_avg_sharess`      -0.003436   0.063894  -0.054 0.957112    
+    ## `dayweek3:self_reference_avg_sharess`      -0.090528   0.060133  -1.505 0.132260    
+    ## `dayweek4:self_reference_avg_sharess`      -0.065537   0.069694  -0.940 0.347073    
+    ## `dayweek5:self_reference_avg_sharess`      -0.099533   0.054950  -1.811 0.070137 .  
+    ## `dayweek6:self_reference_avg_sharess`       0.043667   0.134343   0.325 0.745161    
+    ## `dayweek7:self_reference_avg_sharess`      -0.041787   0.099903  -0.418 0.675764    
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
-    ## Residual standard error: 0.959 on 4916 degrees of freedom
-    ## Multiple R-squared:  0.08472,    Adjusted R-squared:  0.08025 
-    ## F-statistic: 18.96 on 24 and 4916 DF,  p-value: < 2.2e-16
+    ## Residual standard error: 0.9562 on 5875 degrees of freedom
+    ## Multiple R-squared:  0.08944,    Adjusted R-squared:  0.08572 
+    ## F-statistic: 24.04 on 24 and 5875 DF,  p-value: < 2.2e-16
 
 ``` r
 cv_fit3 <- train(log.shares ~ . + I(n_tokens_content^2) + I(self_reference_avg_sharess^2) + 
@@ -621,36 +621,36 @@ summary(cv_fit3)
     ## 
     ## Residuals:
     ##     Min      1Q  Median      3Q     Max 
-    ## -3.9134 -0.5940 -0.2396  0.3708  4.5122 
+    ## -4.4489 -0.5407 -0.1628  0.3677  5.3424 
     ## 
     ## Coefficients:
-    ##                                             Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)                                -0.056348   0.032104  -1.755  0.07930 .  
-    ## dayweek2                                   -0.035456   0.044287  -0.801  0.42340    
-    ## dayweek3                                   -0.042243   0.044418  -0.951  0.34163    
-    ## dayweek4                                   -0.011961   0.044978  -0.266  0.79030    
-    ## dayweek5                                    0.042173   0.048395   0.871  0.38357    
-    ## dayweek6                                    0.350621   0.066343   5.285 1.31e-07 ***
-    ## dayweek7                                    0.473919   0.058668   8.078 8.21e-16 ***
-    ## kw_avg_avg                                  0.175351   0.014253  12.303  < 2e-16 ***
-    ## LDA_02                                     -0.031601   0.013931  -2.268  0.02335 *  
-    ## self_reference_avg_sharess                  0.157060   0.021133   7.432 1.25e-13 ***
-    ## n_non_stop_unique_tokens                    0.024666   0.013720   1.798  0.07227 .  
-    ## average_token_length                        0.019482   0.043855   0.444  0.65689    
-    ## n_tokens_content                           -0.028416   0.020891  -1.360  0.17382    
-    ## n_tokens_title                             -0.002401   0.013762  -0.174  0.86153    
-    ## global_subjectivity                         0.061796   0.018798   3.287  0.00102 ** 
-    ## num_imgs                                    0.037405   0.015830   2.363  0.01817 *  
-    ## `I(n_tokens_content^2)`                     0.006647   0.005439   1.222  0.22169    
-    ## `I(self_reference_avg_sharess^2)`          -0.007507   0.001779  -4.221 2.48e-05 ***
-    ## `kw_avg_avg:num_imgs`                       0.048536   0.016243   2.988  0.00282 ** 
-    ## `average_token_length:global_subjectivity`  0.016431   0.012335   1.332  0.18291    
+    ##                                              Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)                                 0.0304397  0.0319105   0.954  0.34017    
+    ## dayweek2                                   -0.0494542  0.0420452  -1.176  0.23956    
+    ## dayweek3                                   -0.0790586  0.0420920  -1.878  0.06040 .  
+    ## dayweek4                                   -0.0625729  0.0422904  -1.480  0.13903    
+    ## dayweek5                                   -0.0044289  0.0443591  -0.100  0.92047    
+    ## dayweek6                                    0.3183649  0.0582230   5.468 4.74e-08 ***
+    ## dayweek7                                    0.3045810  0.0568780   5.355 8.88e-08 ***
+    ## kw_avg_avg                                  0.0828304  0.0129750   6.384 1.86e-10 ***
+    ## LDA_02                                     -0.1173924  0.0130039  -9.027  < 2e-16 ***
+    ## self_reference_avg_sharess                  0.1662317  0.0232132   7.161 8.98e-13 ***
+    ## n_non_stop_unique_tokens                   -0.0515534  0.0306075  -1.684  0.09217 .  
+    ## average_token_length                       -0.3031317  0.0441563  -6.865 7.33e-12 ***
+    ## n_tokens_content                           -0.0703070  0.0230303  -3.053  0.00228 ** 
+    ## n_tokens_title                              0.0183542  0.0126362   1.453  0.14641    
+    ## global_subjectivity                         0.1019267  0.0166406   6.125 9.65e-10 ***
+    ## num_imgs                                    0.1061784  0.0149365   7.109 1.31e-12 ***
+    ## `I(n_tokens_content^2)`                     0.0123470  0.0037102   3.328  0.00088 ***
+    ## `I(self_reference_avg_sharess^2)`          -0.0044047  0.0007788  -5.656 1.63e-08 ***
+    ## `kw_avg_avg:num_imgs`                       0.0051250  0.0111290   0.461  0.64517    
+    ## `average_token_length:global_subjectivity` -0.0726858  0.0151340  -4.803 1.60e-06 ***
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
-    ## Residual standard error: 0.9588 on 4921 degrees of freedom
-    ## Multiple R-squared:  0.08425,    Adjusted R-squared:  0.08071 
-    ## F-statistic: 23.83 on 19 and 4921 DF,  p-value: < 2.2e-16
+    ## Residual standard error: 0.9539 on 5880 degrees of freedom
+    ## Multiple R-squared:  0.09295,    Adjusted R-squared:  0.09002 
+    ## F-statistic: 31.71 on 19 and 5880 DF,  p-value: < 2.2e-16
 
 ``` r
 result_tab <- data.frame(t(cv_fit1$results),t(cv_fit2$results), t(cv_fit3$results))
@@ -663,12 +663,12 @@ kable(result_tab, digits = 4, caption = "Cross Validation - Comparisons of the m
 |            | Model 1 | Model 2 | Model 3 |
 |:-----------|--------:|--------:|--------:|
 | intercept  |  1.0000 |  1.0000 |  1.0000 |
-| RMSE       |  1.3792 |  1.8517 |  1.7959 |
-| Rsquared   |  0.0695 |  0.0710 |  0.0645 |
-| MAE        |  0.7322 |  0.7526 |  0.7494 |
-| RMSESD     |  1.3456 |  2.8218 |  2.6527 |
-| RsquaredSD |  0.0398 |  0.0349 |  0.0340 |
-| MAESD      |  0.0902 |  0.1450 |  0.1445 |
+| RMSE       |  0.9601 |  0.9631 |  0.9599 |
+| Rsquared   |  0.0778 |  0.0807 |  0.0848 |
+| MAE        |  0.6775 |  0.6784 |  0.6759 |
+| RMSESD     |  0.0502 |  0.0540 |  0.0332 |
+| RsquaredSD |  0.0193 |  0.0324 |  0.0306 |
+| MAESD      |  0.0282 |  0.0273 |  0.0201 |
 
 Cross Validation - Comparisons of the models in training set
 
@@ -686,9 +686,9 @@ kable(result2, digits = 4, caption = "Table ###. Cross Validation - Model Predic
 
 |         |   RMSE | Rsquared |    MAE |
 |:--------|-------:|---------:|-------:|
-| Model 1 | 0.9813 |   0.0497 | 0.7037 |
-| Model 2 | 0.9758 |   0.0584 | 0.7012 |
-| Model 3 | 0.9732 |   0.0609 | 0.6995 |
+| Model 1 | 0.9845 |   0.0754 | 0.6977 |
+| Model 2 | 0.9970 |   0.0607 | 0.6996 |
+| Model 3 | 0.9792 |   0.0848 | 0.6940 |
 
 Table \#\#\#. Cross Validation - Model Predictions on Test Set
 
@@ -708,20 +708,20 @@ test2 <- test %>% select(-class_shares, -shares, -dayweek, -LDA_00, -LDA_01, -LD
 train2
 ```
 
-    ## # A tibble: 4,941 x 17
+    ## # A tibble: 5,900 x 17
     ##    log.shares kw_avg_avg LDA_02 weekday_is_monday weekday_is_tuesday weekday_is_wednesday weekday_is_thur~ weekday_is_frid~ weekday_is_satu~
     ##         <dbl>      <dbl>  <dbl>             <dbl>              <dbl>                <dbl>            <dbl>            <dbl>            <dbl>
-    ##  1       6.39         0  0.0400                 1                  0                    0                0                0                0
-    ##  2       7.09         0  0.495                  1                  0                    0                0                0                0
-    ##  3       7.65         0  0.215                  1                  0                    0                0                0                0
-    ##  4       7.09         0  0.0200                 1                  0                    0                0                0                0
-    ##  5       7.09         0  0.0225                 1                  0                    0                0                0                0
-    ##  6       6.45         0  0.0200                 1                  0                    0                0                0                0
-    ##  7       7.17      1114. 0.324                  0                  1                    0                0                0                0
-    ##  8       8.76       849. 0.0400                 0                  0                    1                0                0                0
-    ##  9       7.00       935. 0.258                  0                  0                    1                0                0                0
-    ## 10       7.31       827. 0.0333                 0                  0                    1                0                0                0
-    ## # ... with 4,931 more rows, and 8 more variables: weekday_is_sunday <dbl>, self_reference_avg_sharess <dbl>,
+    ##  1       6.57         0   0.840                 1                  0                    0                0                0                0
+    ##  2       7.70         0   0.401                 1                  0                    0                0                0                0
+    ##  3       7.38         0   0.867                 1                  0                    0                0                0                0
+    ##  4       7.31         0   0.700                 1                  0                    0                0                0                0
+    ##  5       7.50         0   0.840                 1                  0                    0                0                0                0
+    ##  6       7.09         0   0.485                 1                  0                    0                0                0                0
+    ##  7       6.20         0   0.702                 1                  0                    0                0                0                0
+    ##  8       6.63       804.  0.862                 0                  1                    0                0                0                0
+    ##  9       6.15       728.  0.700                 0                  1                    0                0                0                0
+    ## 10       7.24      1047.  0.602                 0                  0                    1                0                0                0
+    ## # ... with 5,890 more rows, and 8 more variables: weekday_is_sunday <dbl>, self_reference_avg_sharess <dbl>,
     ## #   n_non_stop_unique_tokens <dbl>, average_token_length <dbl>, n_tokens_content <dbl>, n_tokens_title <dbl>, global_subjectivity <dbl>,
     ## #   num_imgs <dbl>
 
@@ -767,36 +767,36 @@ boosted_tree
 
     ## Stochastic Gradient Boosting 
     ## 
-    ## 4941 samples
+    ## 5900 samples
     ##   16 predictor
     ## 
     ## No pre-processing
     ## Resampling: Cross-Validated (10 fold) 
-    ## Summary of sample sizes: 4447, 4449, 4447, 4446, 4446, 4447, ... 
+    ## Summary of sample sizes: 5309, 5310, 5309, 5310, 5309, 5310, ... 
     ## Resampling results across tuning parameters:
     ## 
     ##   interaction.depth  n.trees  RMSE       Rsquared    MAE      
-    ##   1                   25      0.9658893  0.07464788  0.7140226
-    ##   1                   50      0.9595639  0.08116757  0.7073590
-    ##   1                   75      0.9577154  0.08280655  0.7056202
-    ##   1                  100      0.9577698  0.08247236  0.7054139
-    ##   2                   25      0.9605362  0.08035490  0.7084321
-    ##   2                   50      0.9566896  0.08472053  0.7041160
-    ##   2                   75      0.9574753  0.08290929  0.7042801
-    ##   2                  100      0.9569497  0.08388002  0.7047055
-    ##   3                   25      0.9609741  0.07730143  0.7087700
-    ##   3                   50      0.9577675  0.08205197  0.7055517
-    ##   3                   75      0.9584468  0.08146307  0.7055401
-    ##   3                  100      0.9594165  0.08051896  0.7063919
-    ##   4                   25      0.9589043  0.08171526  0.7063486
-    ##   4                   50      0.9584947  0.08127019  0.7052882
-    ##   4                   75      0.9596207  0.08065970  0.7052690
-    ##   4                  100      0.9612653  0.07868383  0.7065377
+    ##   1                   25      0.9623526  0.08780588  0.6835523
+    ##   1                   50      0.9508500  0.10147634  0.6736996
+    ##   1                   75      0.9455138  0.10707025  0.6691216
+    ##   1                  100      0.9436303  0.10905948  0.6671669
+    ##   2                   25      0.9544086  0.09610269  0.6762822
+    ##   2                   50      0.9449359  0.10744574  0.6676724
+    ##   2                   75      0.9428336  0.11027948  0.6671402
+    ##   2                  100      0.9416785  0.11257197  0.6662855
+    ##   3                   25      0.9505636  0.10051183  0.6731096
+    ##   3                   50      0.9428029  0.11060393  0.6671273
+    ##   3                   75      0.9409892  0.11364781  0.6657236
+    ##   3                  100      0.9432849  0.11007610  0.6672995
+    ##   4                   25      0.9480835  0.10435311  0.6708911
+    ##   4                   50      0.9442431  0.10764657  0.6674456
+    ##   4                   75      0.9439751  0.10929295  0.6673037
+    ##   4                  100      0.9425848  0.11223649  0.6671638
     ## 
     ## Tuning parameter 'shrinkage' was held constant at a value of 0.1
     ## Tuning parameter 'n.minobsinnode' was held constant at a value of 10
     ## RMSE was used to select the optimal model using the smallest value.
-    ## The final values used for the model were n.trees = 50, interaction.depth = 2, shrinkage = 0.1 and n.minobsinnode = 10.
+    ## The final values used for the model were n.trees = 75, interaction.depth = 3, shrinkage = 0.1 and n.minobsinnode = 10.
 
 ``` r
 boosted_tree_predict <- predict(boosted_tree, newdata = testTransformed)
@@ -810,16 +810,16 @@ kable(result2, digits = 4, caption = "Cross Validation - Comparisons of the mode
 
 |                |   RMSE | Rsquared |    MAE |
 |:---------------|-------:|---------:|-------:|
-| Linear Model 1 | 0.9813 |   0.0497 | 0.7037 |
-| Linear Model 2 | 0.9732 |   0.0609 | 0.6995 |
-| Boosted Model  | 0.9634 |   0.0710 | 0.6970 |
+| Linear Model 1 | 0.9845 |   0.0754 | 0.6977 |
+| Linear Model 2 | 0.9792 |   0.0848 | 0.6940 |
+| Boosted Model  | 0.9686 |   0.1047 | 0.6844 |
 
 Cross Validation - Comparisons of the models in test set
 
 # Model Comparisons
 
-The best model fit to predict the number of shares for the entertainment
-channel is “need to automate this part”.
+The best model fit to predict the number of shares for the world channel
+is “need to automate this part”.
 
 The best model fit to predict the number of shares
 
