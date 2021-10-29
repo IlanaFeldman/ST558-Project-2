@@ -279,7 +279,7 @@ corrplot(correlation, type = "lower", method = "number", add = TRUE, diag = FALS
          title="Figure 1. Correlations Between the Variables")
 ```
 
-![](/images/unnamed-chunk-3-1.png)<!-- -->
+![](../images/unnamed-chunk-3-1.png)<!-- -->
 
 ### Boxplot
 
@@ -311,7 +311,7 @@ boxplot1 + geom_boxplot(fill = "white", outlier.shape = NA) +
         title = element_text(size = 14))
 ```
 
-![](/images/unnamed-chunk-4-1.png)<!-- -->
+![](../images/unnamed-chunk-4-1.png)<!-- -->
 
 ### Barplot
 
@@ -391,7 +391,7 @@ barplot1 + geom_bar(stat = "identity", position = "stack") +
   facet_wrap(~ class.shares)
 ```
 
-![](/images/unnamed-chunk-5-1.png)<!-- -->
+![](../images/unnamed-chunk-5-1.png)<!-- -->
 
 ### Line Plot
 
@@ -462,7 +462,7 @@ lineplot1 + geom_line(aes(color = LDA.Topic), lwd = 2) +
   facet_wrap(~ class.shares)
 ```
 
-![](/images/unnamed-chunk-6-1.png)<!-- -->
+![](../images/unnamed-chunk-6-1.png)<!-- -->
 
 ### Scatterplot
 
@@ -495,7 +495,7 @@ scatter1 + geom_point(size = 2) + #aes(shape = class.shares)
         title = element_text(size = 13))
 ```
 
-![](/images/unnamed-chunk-7-1.png)<!-- -->
+![](../images/unnamed-chunk-7-1.png)<!-- -->
 
 # Modeling
 
