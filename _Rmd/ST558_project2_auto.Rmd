@@ -7,7 +7,7 @@ params:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(fig.path = "../images/", echo = TRUE, message = FALSE, warning = FALSE)
+knitr::opts_chunk$set(fig.path = "/images/", echo = TRUE, message = FALSE, warning = FALSE)
 
 ```
 
