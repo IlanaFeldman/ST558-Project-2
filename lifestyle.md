@@ -3,7 +3,7 @@ ST558 - Project 2 - Predictive Modeling
 Jasmine Wang & Ilana Feldman
 10/31/2021
 
--   [Introduction - done by Jasmine](#introduction---done-by-jasmine)
+-   [Introduction](#introduction)
 -   [Data](#data)
 -   [Exploratory Data Analysis](#exploratory-data-analysis)
     -   [Numerical Summaries](#numerical-summaries)
@@ -20,7 +20,7 @@ Jasmine Wang & Ilana Feldman
 -   [Model Comparisons](#model-comparisons)
 -   [Automation](#automation)
 
-# Introduction - done by Jasmine
+# Introduction
 
 briefly describes the data briefly describes the variables you have to
 work with (describe what you want to use)

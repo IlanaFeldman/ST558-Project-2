@@ -11,7 +11,7 @@ knitr::opts_chunk$set(fig.path = "../images/", echo = TRUE, message = FALSE, war
 
 ```
 
-# Introduction - done by Jasmine
+# Introduction
 
 briefly describes the data 
 briefly describes the variables you have to work with (describe what you want to use)
@@ -21,7 +21,7 @@ methods you will use to model the response (more details in modeling section)
 
 61 variables (only 58 predictive variables, 2 non-predictive), target response is "shares".
 
-# Data 
+# Data
 
 
 Predictors                    | Attribute Information                              | Type   
