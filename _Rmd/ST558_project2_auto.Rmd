@@ -269,7 +269,7 @@ scatter1 + geom_point(size = 2) + #aes(shape = class.shares)
 
 ## Linear Regression
 
-a short but thorough explanation of the idea of a linear regression model.
+The linear regression process takes a matrix of all of the predictor variables we've chosen and compares their values to each of the corresponding values of the response variable, `log.shares`. This allows us to calculate the most accurate linear combination of the predictor variables to make up the response variable. We can choose a variety of sets of predictors and compare their Root Mean Square Errors, R-Squared values, and Mean Absolute Errors to see which one is the strongest model. Below, we've fit multiple linear models that include all of our variables and various combinations of interaction terms and/or quadratic terms.
 
 ```{r eval=TRUE}
 # using train1, dayweek is numeric, no class_shares
@@ -323,12 +323,7 @@ kable(result2, digits = 4, caption = "Table ###. Cross Validation - Model Predic
 
 ## Random Forest 
 
-Ilana
-
-short but reasonably thorough explanation of the ensemble model you are using
-
-
-Categorical variables have to be divided their levels into dummy variables style.
+The bootstrap approach to fitting a tree model involves resampling our data and fitting a tree to each sample, and then averaging the resulting predictions of each of those models. The random forest approach adds an extra step for each of these samples, where only a random subset of the predictor variables is chosen each time, in order to reduce the correlation between each of the trees. We don't have to worry about creating dummy variables for categorical variables, because our data already comes in an entirely numeric form.
 
 ```{r eval=TRUE}
 train2 <- train %>% select(-class_shares, -shares, -dayweek, -LDA_00, -LDA_01, -LDA_03, -LDA_04)
@@ -338,8 +333,13 @@ preProcValues <- preProcess(train2, method = c("center", "scale"))
 trainTransformed <- predict(preProcValues, train2)
 testTransformed <- predict(preProcValues, test2)
 
+random_forest <- train(log.shares ~ ., data = trainTransformed,
+    method = "rf",
+    trControl = trainControl(method = "cv", number = 10),
+    tuneGrid = data.frame(mtry = 1:15))
 
-
+random_forest_predict <- predict(random_forest, newdata = testTransformed)
+rf_rmse <- postResample(random_forest_predict, obs = testTransformed$log.shares)
 ```
 
 ## Boosted Tree
@@ -382,8 +382,8 @@ boosted_tree_predict <- predict(boosted_tree, newdata = testTransformed)
 
 boost_rmse <- postResample(boosted_tree_predict, obs = testTransformed$log.shares)
 
-result2 <- rbind(cv_rmse1, cv_rmse3, boost_rmse)
-row.names(result2) <- c("Linear Model 1", "Linear Model 2", "Boosted Model")
+result2 <- rbind(cv_rmse1, cv_rmse3, rf_rmse, boost_rmse)
+row.names(result2) <- c("Linear Model 1", "Linear Model 2", "Random Forest Model", "Boosted Model")
 kable(result2, digits = 4, caption = "Cross Validation - Comparisons of the models in test set")
 
 ```
