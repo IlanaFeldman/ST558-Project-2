@@ -123,6 +123,10 @@ In addition, Table 2 also shows the standard deviation of shares is huge for any
 
 Table 3 shows the numerical summaries of average keywords from `r params$channel` channel in mashable.com on different days of the week. Table 4 shows the numerical summaries of average shares of referenced articles in mashable.com on different days of the week. 
 
+Table 5 checks the numerical summaries of the `global_subjectivity` variable between popular and unpopular articles, to see if there's any difference or a higher variation in subjectivity in popular articles. Text subjectivity is a value between 0 and 1, so there isn't any need for transformation.
+
+Table 6 checks the numerical summaries of the image count per article on different days of the week, to see if there is a noticeable difference in image count on weekends versus weekdays across all channels, or only certain ones. Much like in table 2, the mean is smaller than the standard deviation for most of the days of the week, and the solution isn't as straightforward, since many of the articles don't have any images at all. I'll additionally include a log transformation of `images + 1` to account for this.
+
 ```{r eval=TRUE}
 # contingency table
 edadata <- train
@@ -145,6 +149,13 @@ edadata %>% group_by(day.week) %>% summarise(
   Median.reference = median(self_reference_avg_sharess), IQR.reference = IQR(self_reference_avg_sharess)) %>% 
   kable(digits = 4, caption = "Table 4. Summary of Average shares of referenced articles in Mashable on Day of the Week")
 
+edadata %>% group_by(class.shares) %>% summarize(
+  Avg.subjectivity = mean(global_subjectivity), Sd.subjectivity = sd(global_subjectivity), 
+  Median.subjectivity = median(global_subjectivity)) %>% kable(digits = 4, caption = "Table 5. Comparing Global Subjectivity between Popular and Unpopular Articles")
+
+edadata %>% group_by(day.week) %>% summarize(
+  Avg.images = mean(num_imgs), Sd.images = sd(num_imgs), Median.images = median(num_imgs), Avg.log.images = mean(log(num_imgs + 1)), Sd.log.images = sd(log(num_imgs + 1)), Median.log.images = median(log(num_imgs + 1))) %>%
+  kable(digits = 4, caption = "Table 6. Comparing Image Counts by the Day of the Week")
 ```
 
 ## Visualizations
@@ -262,6 +273,8 @@ dev.off()
 
 Figure 5 shows the relationship between average keyword and log-transformed number of shares for articles in the `r params$channel` channel across different days of the week. In the news popularity study, it says average keyword is the most important predictor in the models they used which accounted for the most variation in the data. Therefore, we are interested to see how average keyword is correlated with log shares. The different colored linear regression lines indicate different days of the week. If it is an upward trend, it shows positive linear relationship. If it is a downward trend, it shows a negative linear relationship. More tilted the line is, much stronger the relationship is regardless of positive or negative.
 
+Figure 6 is similar, except it compares the log-transformed number of shares to the log-transformed images in the article. As noted previously, both of these variables do not behave properly in a linear model due to the existence of extreme outliers in the data.
+
 ```{r eval=TRUE}
 file.name <- paste0("../images/", params$channel, 5, ".png")
 png(filename = file.name)
@@ -282,6 +295,100 @@ scatter1 + geom_point(size = 2) + #aes(shape = class.shares)
         title = element_text(size = 13))
 dev.off()
 ```
+
+```{r eval = TRUE}
+file.name <- paste0("../images/", params$channel, 6, ".png")
+png(filename = file.name)
+
+scatter2 <- ggplot(data = edadata, aes(x = log(num_imgs + 1), y = log.shares, color = day.week))
+scatter2 + geom_point(size = 2) +
+  scale_color_discrete(name = "Day of the Week") + 
+  geom_smooth(method = "lm", lwd = 2) + 
+  labs(x = "log(number of images)", y = "log(number of shares)", 
+       title = "Figure 5. Log Number of Images vs Log Number of Shares") + 
+  theme(axis.text.x = element_text(size = 10), 
+        axis.text.y = element_text(size = 10), 
+        axis.title.x = element_text(size = 15), 
+        axis.title.y = element_text(size = 15), 
+        legend.key.size = unit(1, 'cm'), 
+        legend.text = element_text(size = 13), 
+        title = element_text(size = 13))
+dev.off()
+```
+
+### QQ Plots
+
+To justify the usage of the log transformations for shares and images, we'll show the QQ plot of each over the `r params$channel` channel in figures 7a, 7b, 7c, and 7d. We're aiming for something close to a straight line, which would indicate that the data is approximately normal in its distribution and does not need further standardization.
+
+```{r eval = TRUE}
+file.name <- paste0("../images/", params$channel, "7a.png")
+png(filename = file.name)
+
+ggplot(edadata) + geom_qq(aes(sample = shares)) + geom_qq_line(aes(sample = shares)) + 
+  labs(x = "Theoretical Quantiles", y = "Share Numbers", 
+       title = "Figure 7a. QQ Plot for Non-Transformed Shares") +
+    theme(axis.text.x = element_text(size = 10), 
+        axis.text.y = element_text(size = 10), 
+        axis.title.x = element_text(size = 15), 
+        axis.title.y = element_text(size = 15), 
+        legend.key.size = unit(1, 'cm'), 
+        legend.text = element_text(size = 13), 
+        title = element_text(size = 13))
+dev.off()
+```
+
+```{r eval = TRUE}
+file.name <- paste0("../images/", params$channel, "7b.png")
+png(filename = file.name)
+
+ggplot(edadata) + geom_qq(aes(sample = log(shares))) + geom_qq_line(aes(sample = log(shares))) +
+    labs(x = "Theoretical Quantiles", y = "Log(Share Numbers)", 
+       title = "Figure 7b. QQ Plot for Log-Transformed Shares") +
+    theme(axis.text.x = element_text(size = 10), 
+        axis.text.y = element_text(size = 10), 
+        axis.title.x = element_text(size = 15), 
+        axis.title.y = element_text(size = 15), 
+        legend.key.size = unit(1, 'cm'), 
+        legend.text = element_text(size = 13), 
+        title = element_text(size = 13))
+dev.off()
+```
+
+```{r eval = TRUE}
+file.name <- paste0("../images/", params$channel, "7c.png")
+png(filename = file.name)
+
+ggplot(edadata) + geom_qq(aes(sample = num_imgs)) + geom_qq_line(aes(sample = num_imgs)) + 
+  labs(x = "Theoretical Quantiles", y = "Image Numbers", 
+       title = "Figure 7c. QQ Plot for Non-Transformed Image Numbers") +
+    theme(axis.text.x = element_text(size = 10), 
+        axis.text.y = element_text(size = 10), 
+        axis.title.x = element_text(size = 15), 
+        axis.title.y = element_text(size = 15), 
+        legend.key.size = unit(1, 'cm'), 
+        legend.text = element_text(size = 13), 
+        title = element_text(size = 13))
+dev.off()
+```
+
+```{r eval = TRUE}
+file.name <- paste0("../images/", params$channel, "7d.png")
+png(filename = file.name)
+
+ggplot(edadata) + geom_qq(aes(sample = log(num_imgs + 1))) + geom_qq_line(aes(sample = log(num_imgs + 1))) +
+    labs(x = "Theoretical Quantiles", y = "Log(Image Numbers)", 
+       title = "Figure 7d. QQ Plot for Log-Transformed Image Numbers") +
+    theme(axis.text.x = element_text(size = 10), 
+        axis.text.y = element_text(size = 10), 
+        axis.title.x = element_text(size = 15), 
+        axis.title.y = element_text(size = 15), 
+        legend.key.size = unit(1, 'cm'), 
+        legend.text = element_text(size = 13), 
+        title = element_text(size = 13))
+dev.off()
+```
+
+Whether it's appropriate to perform a logarithmic transformation on the number of images is somewhat less clear than for the number of shares.
 
 # Modeling
 
@@ -320,8 +427,16 @@ cv_fit3 <- train(log.shares ~ . + I(n_tokens_content^2) + I(self_reference_avg_s
                  trControl = trainControl(method = "cv", number = 10))
 summary(cv_fit3)
 
-result_tab <- data.frame(t(cv_fit1$results),t(cv_fit2$results), t(cv_fit3$results))
-colnames(result_tab) <- c("Model 1","Model 2", "Model 3")
+cv_fit4 <- train(log.shares ~ . - num_imgs + I(log(num_imgs + 1)) + I(n_tokens_content^2) +
+                 I(self_reference_avg_sharess^2) + kw_avg_avg:I(log(num_imgs + 1)) +
+                 average_token_length:global_subjectivity, 
+                 data=trainTransformed,
+                 method = "lm",
+                 trControl = trainControl(method = "cv", number = 10))
+summary(cv_fit4)
+
+result_tab <- data.frame(t(cv_fit1$results),t(cv_fit2$results), t(cv_fit3$results), t(cv_fit4$results))
+colnames(result_tab) <- c("Model 1","Model 2", "Model 3", "Model 4")
 rownames(result_tab) <- c("intercept", "RMSE", "Rsquared", "MAE", "RMSESD", "RsquaredSD", "MAESD")
 
 kable(result_tab, digits = 4, caption = "Cross Validation - Comparisons of the models in training set")
@@ -329,11 +444,13 @@ kable(result_tab, digits = 4, caption = "Cross Validation - Comparisons of the m
 pred1 <- predict(cv_fit1, newdata = testTransformed)
 pred2 <- predict(cv_fit2, newdata = testTransformed)
 pred3 <- predict(cv_fit3, newdata = testTransformed)
+pred4 <- predict(cv_fit4, newdata = testTransformed)
 cv_rmse1 <- postResample(pred1, obs = testTransformed$log.shares)
 cv_rmse2 <- postResample(pred2, obs = testTransformed$log.shares)
 cv_rmse3 <- postResample(pred3, obs = testTransformed$log.shares)
-result2 <- rbind(cv_rmse1, cv_rmse2, cv_rmse3)
-row.names(result2) <- c("Model 1","Model 2", "Model 3")
+cv_rmse4 <- postResample(pred4, obs = testTransformed$log.shares)
+result2 <- rbind(cv_rmse1, cv_rmse2, cv_rmse3, cv_rmse4)
+row.names(result2) <- c("Model 1","Model 2", "Model 3", "Model 4")
 kable(result2, digits = 4, caption = "Table ###. Cross Validation - Model Predictions on Test Set")
 
 ```
