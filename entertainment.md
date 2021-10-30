@@ -1,4 +1,4 @@
-ST558 - Project 2 - Predictive Modeling
+Project 2 - Predictive Models for Popularity of Online News
 ================
 Jasmine Wang & Ilana Feldman
 10/31/2021
@@ -69,24 +69,26 @@ test set. More details are in *Modeling* section.
 Table 1. Attributes used in the analyses for prediction of online news
 popularity
 
-| Attribute              | Attribute Information                     | Type                                              |         |
-|------------------------|-------------------------------------------|---------------------------------------------------|---------|
-| 1                      | `shares` (target)                         | Number of shares                                  | number  |
-| 2                      | `kw_avg_avg`                              | Average keyword (average shares)                  | number  |
-| 3                      | `LDA_02`                                  | Closeness to LDA topic 2                          | ratio   |
-| 4                      | `weekday_is_monday`                       | Was the article published on a Monday?            | boolean |
-| `weekday_is_tuesday`   | Was the article published on a Tuesday?   | boolean                                           |         |
-| `weekday_is_wednesday` | Was the article published on a Wednesday? | boolean                                           |         |
-| `weekday_is_thursday`  | Was the article published on a Thursday?  | boolean                                           |         |
-| `weekday_is_friday`    | Was the article published on a Friday?    | boolean                                           |         |
-| `weekday_is_saturday`  | Was the article published on a Saturday?  | boolean                                           |         |
-| `weekday_is_sunday`    | Was the article published on a Sunday?    | boolean                                           |         |
-| 5                      | `self_reference_avg_sharess`              | Average shares of referenced articles in Mashable | number  |
-| 6                      | `average_token_length`                    | Average length of the words in the content        | number  |
-| 7                      | `n_tokens_content`                        | Number of words in the content                    | number  |
-| 8                      | `n_tokens_title`                          | Number of words in the title                      | number  |
-| 9                      | `global_subjectivity`                     | Text subjectivity                                 | ratio   |
-| 10                     | `num_imgs`                                | Number of images                                  | number  |
+    | Attribute                     | Attribute Information                              | Type   
+
+— \| —————————– \| ————————————————– \| ——– 1 \| `shares` (target) \|
+Number of shares \| number 2 \| `kw_avg_avg` \| Average keyword (average
+shares) \| number 3 \| `LDA_02` \| Closeness to LDA topic 2 \| ratio 4.1
+\| `weekday_is_monday` \| Was the article published on a Monday? \|
+boolean 4.2 \| `weekday_is_tuesday` \| Was the article published on a
+Tuesday? \| boolean 4.3 \| `weekday_is_wednesday` \| Was the article
+published on a Wednesday? \| boolean 4.4 \| `weekday_is_thursday` \| Was
+the article published on a Thursday? \| boolean 4.5 \|
+`weekday_is_friday` \| Was the article published on a Friday? \| boolean
+4.6 \| `weekday_is_saturday` \| Was the article published on a Saturday?
+\| boolean 4.7 \| `weekday_is_sunday` \| Was the article published on a
+Sunday? \| boolean 5 \| `self_reference_avg_sharess` \| Average shares
+of referenced articles in Mashable \| number 6 \| `average_token_length`
+\| Average length of the words in the content \| number 7 \|
+`n_tokens_content` \| Number of words in the content \| number 8 \|
+`n_tokens_title` \| Number of words in the title \| number 9 \|
+`global_subjectivity` \| Text subjectivity \| ratio 10 \| `num_imgs` \|
+Number of images \| number
 
 ``` r
 library(tidyverse)
