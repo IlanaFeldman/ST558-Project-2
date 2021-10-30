@@ -109,9 +109,9 @@ The `r params$channel` channel has `r dim(train)[1]` articles collected. Now let
 
 ## Numerical Summaries
 
-Table 2 shows the popularity of the news articles on different days of the week. I classified number of shares greater than 1400 in a day as "popular" and number of shares less than 1400 in a day as "unpopular". We can see the total number of articles from `r params$channel` channel falls into different categories on different days of the week for 709 days. 
+Table 2 shows the popularity of the news articles on different days of the week. We classified the number of shares greater than 1400 in a day as "popular" and the number of shares less than 1400 in a day as "unpopular". We can see the number of articles from the `r params$channel` channel classified into "popular" group or "unpopular" group on different days of the week from January 7th, 2013 to January 7th, 2015 when the articles were published and retrieved by the study.
 
-Table 3 shows the average shares of the articles on different days of the week. Here, we can see a potential problem for our analysis later. Median shares are all very different from the average shares on any day of the week. Recall that median is a robust measure for center. It is robust to outliers in the data. On the contrary, mean is also a measure of center but it is not robust to outliers. Mean measure can be influenced by potential outliers. 
+Table 3 shows the average shares of the articles on different days of the week. We can compare and determine which day of the week has the most average number of shares for the `r params$channel` channel. Here, we can see a potential problem for our analysis later. Median shares are all very different from the average shares on any day of the week. Recall that median is a robust measure for center. It is robust to outliers in the data. On the contrary, mean is also a measure of center but it is not robust to outliers. Mean measure can be influenced by potential outliers. 
 
 In addition, Table 3 also shows the standard deviation of shares is huge for any day of the week. They are potentially larger than the average shares. This tells us the variance of shares for any day is huge. We know a common variance stabilizing transformation to deal with increasing variance of the response variable, that is, the log-transformation, which could help us on this matter. Therefore, Table 3 again shows after the log-transformation of shares, the mean values are similar to their corresponding median values, and their standard deviations are much smaller than before relatively speaking.
 
@@ -145,11 +145,11 @@ edadata %>% group_by(day.week) %>% summarise(
 
 edadata %>% group_by(class.shares) %>% summarize(
   Avg.subjectivity = mean(global_subjectivity), Sd.subjectivity = sd(global_subjectivity), 
-  Median.subjectivity = median(global_subjectivity)) %>% kable(digits = 4, caption = "Table 5. Comparing Global Subjectivity between Popular and Unpopular Articles")
+  Median.subjectivity = median(global_subjectivity)) %>% kable(digits = 4, caption = "Table 6. Comparing Global Subjectivity between Popular and Unpopular Articles")
 
 edadata %>% group_by(day.week) %>% summarize(
   Avg.images = mean(num_imgs), Sd.images = sd(num_imgs), Median.images = median(num_imgs), Avg.log.images = mean(log(num_imgs + 1)), Sd.log.images = sd(log(num_imgs + 1)), Median.log.images = median(log(num_imgs + 1))) %>%
-  kable(digits = 4, caption = "Table 6. Comparing Image Counts by the Day of the Week")
+  kable(digits = 4, caption = "Table 7. Comparing Image Counts by the Day of the Week")
 
 ```
 
@@ -355,20 +355,44 @@ Whether it's appropriate to perform a logarithmic transformation on the number o
 
 The linear regression process takes a matrix of all of the predictor variables we've chosen and compares their values to each of the corresponding values of the response variable, `log.shares`. This allows us to calculate the most accurate linear combination of the predictor variables to make up the response variable. We can choose a variety of sets of predictors and compare their Root Mean Square Errors, R-Squared values, and Mean Absolute Errors to see which one is the strongest model. Below, we've fit multiple linear models that include all of our variables and various combinations of interaction terms and/or quadratic terms.
 
+Originally, we used 20 top ranked predictors selected by the optimal predictive model used in the paper and fit them in three types of models below.  
+  
+1. All predictors  
+2. All predictors and their quadratic terms  
+3. All predictors and all their interaction terms  
+
+We slowly filtered out predictors, their corresponding second order terms and the interaction terms that were insignificant at 0.05 level. In addition, we also examined the predictors using correlation plots. We slowly got rid of some predictors that are highly correlated with each other such as the LDA topics variables which are also shown in Figures 3 and 4, average number of shares of keywords, maximum number of shares of average keywords, minimum number of shares of average keywords and many of others. We carefully monitored this process and compared the models with the adjusted R-squared and RMSE values. Due to multi-collinearity among the predictors, reducing the number of predictors that are correlated with one another did not make the model fit worse, and the RMSE value from the model was surprisingly decreased.
+
+We repeated this process to trim down the number of predictors and eventually selected the ones that seem to be important in predicting the number of shares, and they are not highly correlated with each other. The parameters in the linear regression model 1 were chosen through this process, and they are listed in Table 8 below. The response variable is `log(shares)`.
+
+Table 8. The predictors in linear regression model 1  
+Index  | Parameter in Model 1
+------ | ----------------------------- 
+1      | `kw_avg_avg`                  
+2      | `LDA_02`                      
+3      | `dayweek`                     
+4      | `self_reference_avg_sharess`  
+5      | `average_token_length`        
+6      | `n_tokens_content`            
+7      | `n_tokens_title`              
+8      | `global_subjectivity`        
+9      | `num_imgs`                   
+10     | `I(n_tokens_content^2)`
+11     | `kw_avg_avg:num_imgs`
+12     | `average_token_length:global_subjectivity`
+13     | `dayweek:self_reference_avg_sharess`
+
 
 
 ```{r eval=TRUE}
-# using train1, dayweek is numeric, no class_shares
-#train1 <- train %>% select(-class_shares, -shares) #keep log.shares
-#test1 <- test %>% select(-class_shares, -shares) #keep log.shares
 train1$dayweek <- as.factor(train1$dayweek)
 test1$dayweek <- as.factor(test1$dayweek)
 preProcValues <- preProcess(train1, method = c("center", "scale"))
 trainTransformed <- predict(preProcValues, train1)
 testTransformed <- predict(preProcValues, test1)
 
-cv_fit3 <- train(log.shares ~ . + I(n_tokens_content^2) + I(self_reference_avg_sharess^2) + 
-                 kw_avg_avg:num_imgs + average_token_length:global_subjectivity, 
+cv_fit3 <- train(log.shares ~ . + I(n_tokens_content^2) + kw_avg_avg:num_imgs + 
+                   average_token_length:global_subjectivity + dayweek:self_reference_avg_sharess, 
                  data=trainTransformed,
                  method = "lm",
                  trControl = trainControl(method = "cv", number = 10))
