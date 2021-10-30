@@ -1,12 +1,12 @@
 # Predicting the Popularity of Online News
 Collaborative project between Ilana Feldman and Jasmine Wang.
 
-1. Brief description of the purpose of the repo
+1. Purpose of the repo
 
 
 
 
-2. List of R packages were used to generate the analysis
+2. A list of R packages used to generate the analyses
 
    * tidyverse
    * knitr
@@ -15,7 +15,7 @@ Collaborative project between Ilana Feldman and Jasmine Wang.
    * ggplot2
    * gbm
 
-3. A link to each of the generated analyses using automation
+3. Links to each of the generated analyses using automation
 
    * The analysis for [Lifestyle articles is available here](lifestyle.html)
    * The analysis for [Entertainment articles is available here](entertainment.html)
@@ -24,7 +24,7 @@ Collaborative project between Ilana Feldman and Jasmine Wang.
    * The analysis for [Technology articles is available here](tech.html)
    * The analysis for [World articles is available here](world.html)
 
-4. A render function used to generate the six analyses for different channels
+4. The render function used to create six analyses from a single .Rmd file for different channels
 
 ```{r eval=FALSE}  
   library(rmarkdown)  
