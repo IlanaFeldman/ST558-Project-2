@@ -13,45 +13,34 @@ knitr::opts_chunk$set(fig.path = "../images/", echo = TRUE, message = FALSE, war
 
 # Introduction
 
-briefly describes the data 
-briefly describes the variables you have to work with (describe what you want to use)
+Due to the expansion of online businesses, people can almost do anything online. With the increasing amount of Internet usages, there has been a growing interest in online news as well since they allow for an easier and faster spread of information around the world. Hence, predicting the popularity of online news has become an interest for research purposes. Popularity of online news is frequently measured by the number of interactions in the social networks such as number of likes, comments and shares. Predicting such measures is important to news authors, advertisers and publishing organizations. Therefore, the study collected news articles published between January 7th, 2013 and January 7th, 2015 from different channels on Mashable which is one of the largest online news sites. 
 
-purpose of the analysis
-methods you will use to model the response (more details in modeling section)
+The study collected a total of 39,000 news articles from six data channel categories such as lifestyle, entertainment, business, social media, technology and world. In addition, the features contained in the articles were also measured to help predict the popularity of the news contents. Such features include digital media content (number of images or videos), earlier popularity of news referenced in the article; average number of shares of keywords, natural language features (title popularity or Latent Dirichlet Allocation topics) and many others. The study included 58 predictive attributes, 2 non-predictive attributes and 1 goal field which is the number of shares of the articles. The collected data was donated by the study to the [UCI Machine Learning repository](https://archive.ics.uci.edu/ml/datasets/online+news+popularity) where we downloaded the data.
 
-61 variables (only 58 predictive variables, 2 non-predictive), target response is "shares".
+Table 1 shows the list of variables we used in the analysis and their descriptions. The study shows after the best predictive model was selected using a test set, these variables that we are interested in are among the top ranked features according to their importance in the final predictive model using the entire data set. Thus, we are going to investigate their importance in predicting the number of shares using the predictive models we propose. 
 
-# Data
+The purpose of the analyses is to compare different predictive models and choose the best model in predicting the popularity of online news regarding their features in different channel categories. The methods implemented in prediction of shares are linear regression models with different inputs, a random forest model and a boosted tree model. The optimal model is chosen based on the smallest root MSE value fitting the test set. More details are in *Modeling* section.
 
+Table 1. Attributes used in the analyses for prediction of online news popularity
 
-Predictors                    | Attribute Information                              | Type   
------------------------------ | -------------------------------------------------- | -------------------------
-`kw_avg_avg`                  | Average keyword (average shares)                   | number
-`LDA_02`                      | Closeness to LDA topic 2                           | ratio
-`weekday_is_monday`           | Was the article published on a Monday?             | boolean
-`weekday_is_tuesday`          | Was the article published on a Tuesday?            | boolean
-`weekday_is_wednesday`        | Was the article published on a Wednesday?          | boolean
-`weekday_is_thursday`         | Was the article published on a Thursday?           | boolean
-`weekday_is_friday`           | Was the article published on a Friday?             | boolean
-`weekday_is_saturday`         | Was the article published on a Saturday?           | boolean
-`weekday_is_sunday`           | Was the article published on a Sunday?             | boolean
-`self_reference_avg_sharess`  | Average shares of referenced articles in Mashable  | number
-`n_non_stop_unique_tokens`    | Rate of unique non-stop words in the content       | ratio
-`average_token_length`        | Average length of the words in the content         | number
-`n_tokens_content`            | Number of words in the content                     | number
-`n_tokens_title`              | Number of words in the title                       | number
-`global_subjectivity`         | Text subjectivity                                  | ratio
-`num_imgs`                    | Number of images                                   | number
-
-I created a binary response variable, 0 if shares < 1400, 1 if shares > 1400. "class_shares" (can use it in EDA)
-
-I created a categorical variable grouped all binary variables, monday, tuesday, ..., sunday, together. "dayweek"
-if dayweek = 1, it's Monday, 2 is tuesday, 3 is wednesday, ..., 7 is sunday. 
-
-I created a log(shares) variable and use it as response instead of shares. In office hour, a lot of people say this improved fit a little better. 
-
-This analysis is based on the `r params$channel` channel popularity.
-
+   | Attribute                     | Attribute Information                              | Type   
+-- | ----------------------------- | -------------------------------------------------- | -------------------------
+1  | `shares`  (target)            | Number of shares                                   | number
+2  | `kw_avg_avg`                  | Average keyword (average shares)                   | number
+3  | `LDA_02`                      | Closeness to LDA topic 2                           | ratio
+4  | `weekday_is_monday`           | Was the article published on a Monday?             | boolean
+   | `weekday_is_tuesday`          | Was the article published on a Tuesday?            | boolean
+   | `weekday_is_wednesday`        | Was the article published on a Wednesday?          | boolean
+   | `weekday_is_thursday`         | Was the article published on a Thursday?           | boolean
+   | `weekday_is_friday`           | Was the article published on a Friday?             | boolean
+   | `weekday_is_saturday`         | Was the article published on a Saturday?           | boolean
+   | `weekday_is_sunday`           | Was the article published on a Sunday?             | boolean
+5  | `self_reference_avg_sharess`  | Average shares of referenced articles in Mashable  | number
+6  | `average_token_length`        | Average length of the words in the content         | number
+7  | `n_tokens_content`            | Number of words in the content                     | number
+8  | `n_tokens_title`              | Number of words in the title                       | number
+9  | `global_subjectivity`         | Text subjectivity                                  | ratio
+10 | `num_imgs`                    | Number of images                                   | number
 
 ```{r eval=TRUE}
 library(tidyverse)
@@ -61,11 +50,9 @@ library(corrplot)
 library(ggplot2)
 library(gbm)
 
-allnews <- read_csv("../_Data/OnlineNewsPopularity.csv", 
-                 col_names = TRUE)
+allnews <- read_csv("../_Data/OnlineNewsPopularity.csv", col_names = TRUE)
 
 ########KNIT with parameters!!!!!!!!!channels is in quotes!!!!Need to use it with quotes!!!!!!!!!!!!!!!!!!!!!!!!
-
 channels <- paste0("data_channel_is_", params$channel)
 subnews <- allnews[allnews[, channels] == 1, ]
 
@@ -73,7 +60,6 @@ news <- subnews %>% select(
   -data_channel_is_lifestyle, -data_channel_is_entertainment, -data_channel_is_bus, -data_channel_is_socmed, 
   -data_channel_is_tech, -data_channel_is_world, -url, -timedelta)
 #################!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-dim(news)
 
 diffday <- news %>% mutate(log.shares = log(shares),
                            class_shares = if_else(shares < 1400, 0, 1),
@@ -91,7 +77,7 @@ sel_data <- diffday %>% select(class_shares, shares, log.shares, dayweek,
                                weekday_is_monday, weekday_is_tuesday, weekday_is_wednesday,
                                weekday_is_thursday, weekday_is_friday, weekday_is_saturday, weekday_is_sunday,
                                self_reference_avg_sharess, 
-                               n_non_stop_unique_tokens, average_token_length, 
+                               average_token_length, 
                                n_tokens_content, n_tokens_title, global_subjectivity, 
                                num_imgs)
 
@@ -106,8 +92,16 @@ train1 <- train %>% select(-class_shares, -shares,
 train1
 test1 <- test %>% select(-class_shares, -shares, 
                          -weekday_is_monday, -weekday_is_tuesday, -weekday_is_wednesday, -weekday_is_thursday, 
-                         -weekday_is_friday, -weekday_is_saturday, -weekday_is_sunday, -LDA_00, -LDA_01, -LDA_03, -LDA_04) #keep log.shares
+                         -weekday_is_friday, -weekday_is_saturday, -weekday_is_sunday, -LDA_00, -LDA_01, -LDA_03, -LDA_04)
 ```
+
+# Data
+
+When a subset of data is selected for the `r params$channel` channel articles which contain `r dim(news)[1]` articles, the subset of data is then split into a training set (70% of the subset data) and a test set (30% of the subset data) based on the target variable, the number of shares. There are `r dim(train)[1]` articles in the training set and `r dim(test)[1]` observations in the test set regarding the `r params$channel` channel. The `createDataPartition` function from the `caret` package is used to split the data into training and test sets. We set a seed so that the analyses we implemented are reproducible. 
+
+The data donated by the study contains a "day of the week" categorical variable but in a boolean format (dummy variable) asking if the article was published on a day of a week for all seven days which is also shown in Table 1. Thus, we created a new variable called `dayweek` with seven levels to combine these dummy variables for the linear regression models. When `dayweek` = 1, the article was published on a Monday, when `dayweek` = 2, the article was published on a Tuesday, ..., and when `dayweek` = 7, the article was published on a Sunday. 
+
+However, these `dayweek` related variables for each day of the week in boolean format are needed when we run the ensemble models. 
 
 # Exploratory Data Analysis
 
@@ -115,36 +109,37 @@ The `r params$channel` channel has `r dim(train)[1]` articles collected. Now let
 
 ## Numerical Summaries
 
-Table 1 shows the popularity of the news articles on different days of the week. I classified number of shares greater than 1400 in a day as "popular" and number of shares less than 1400 in a day as "unpopular". We can see the total number of articles from `r params$channel` channel falls into different categories on different days of the week for 709 days. 
+Table 2 shows the popularity of the news articles on different days of the week. I classified number of shares greater than 1400 in a day as "popular" and number of shares less than 1400 in a day as "unpopular". We can see the total number of articles from `r params$channel` channel falls into different categories on different days of the week for 709 days. 
 
-Table 2 shows the average shares of the articles on different days of the week. Here, we can see a potential problem for our analysis later. Median shares are all very different from the average shares on any day of the week. Recall that median is a robust measure for center. It is robust to outliers in the data. On the contrary, mean is also a measure of center but it is not robust to outliers. Mean measure can be influenced by potential outliers. 
+Table 3 shows the average shares of the articles on different days of the week. Here, we can see a potential problem for our analysis later. Median shares are all very different from the average shares on any day of the week. Recall that median is a robust measure for center. It is robust to outliers in the data. On the contrary, mean is also a measure of center but it is not robust to outliers. Mean measure can be influenced by potential outliers. 
 
-In addition, Table 2 also shows the standard deviation of shares is huge for any day of the week. They are potentially larger than the average shares. This tells us the variance of shares for any day is huge. We know a common variance stabilizing transformation to deal with increasing variance of the response variable, that is, the log-transformation, which could help us on this matter. Therefore, Table 2 again shows after the log-transformation of shares, the mean values are similar to their corresponding median values, and their standard deviations are much smaller than before relatively speaking.
+In addition, Table 3 also shows the standard deviation of shares is huge for any day of the week. They are potentially larger than the average shares. This tells us the variance of shares for any day is huge. We know a common variance stabilizing transformation to deal with increasing variance of the response variable, that is, the log-transformation, which could help us on this matter. Therefore, Table 3 again shows after the log-transformation of shares, the mean values are similar to their corresponding median values, and their standard deviations are much smaller than before relatively speaking.
 
-Table 3 shows the numerical summaries of average keywords from `r params$channel` channel in mashable.com on different days of the week. Table 4 shows the numerical summaries of average shares of referenced articles in mashable.com on different days of the week. 
+Table 4 shows the numerical summaries of average keywords from `r params$channel` channel in mashable.com on different days of the week. Table 5 shows the numerical summaries of average shares of referenced articles in mashable.com on different days of the week. 
 
 ```{r eval=TRUE}
 # contingency table
 edadata <- train
 edadata$class.shares <- cut(edadata$class_shares, 2, c("Unpopular","Popular"))
 edadata$day.week <- cut(edadata$dayweek, 7, c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))
-table(edadata$class.shares, edadata$day.week) %>% kable(caption = "Table 1. Popularity on Day of the Week")
+table(edadata$class.shares, edadata$day.week) %>% kable(caption = "Table 2. Popularity on Day of the Week")
 
 edadata %>% group_by(day.week) %>% summarise(
   Avg.shares = mean(shares), Sd.shares = sd(shares), Median.shares = median(shares), 
   Avg.logshares = mean(log.shares), Sd.logshares = sd(log.shares), Median.logshares = median(log.shares)) %>% 
-  kable(digits = 4, caption = "Table 2. Average Shares vs. Average Log(shares) on Day of the Week")
+  kable(digits = 4, caption = "Table 3. Average Shares vs. Average Log(shares) on Day of the Week")
 
 edadata %>% group_by(day.week) %>% summarise(
   Avg.keyword = mean(kw_avg_avg), Sd.keyword = sd(kw_avg_avg), Median.keyword = median(kw_avg_avg), 
   IQR.keyword = IQR(kw_avg_avg)) %>% 
-  kable(digits = 4, caption = "Table 3. Summary of Average Keywords on Day of the Week")
+  kable(digits = 4, caption = "Table 4. Summary of Average Keywords on Day of the Week")
 
 edadata %>% group_by(day.week) %>% summarise(
   Avg.reference = mean(self_reference_avg_sharess), Sd.reference = sd(self_reference_avg_sharess), 
   Median.reference = median(self_reference_avg_sharess), IQR.reference = IQR(self_reference_avg_sharess)) %>% 
-  kable(digits = 4, caption = "Table 4. Summary of Average shares of referenced articles in Mashable on Day of the Week")
+  kable(digits = 4, caption = "Table 5. Summary of Average shares of referenced articles in Mashable on Day of the Week")
 
+file.name <- paste0("../images/", params$channel, 1, ".png")
 ```
 
 ## Visualizations
@@ -155,34 +150,30 @@ Graphical presentation is a great tool used to visualize the relationships betwe
 
 Figure 1 shows the correlations between the variables, both the response and the predictors, which will be used in the regression models as well as the ensemble models for predicting the number of shares. Notice that there may be some collinearity among the predictor variables. 
 
-```{r eval=TRUE}
+```{r eval=TRUE, fig.path = file.name}
 # keep log-shares
 #corplt <- train %>% select(-class_shares, -weekday_is_monday, -weekday_is_tuesday, -weekday_is_wednesday,
 #                           -weekday_is_thursday, -weekday_is_friday, -weekday_is_saturday, -weekday_is_sunday) 
-file.name <- paste0("../images/", params$channel, 1, ".png")
-png(filename = file.name)
-
 correlation <- cor(train1, method="spearman")
 
-corrplot(correlation, type = "upper", tl.pos = "lt")
-corrplot(correlation, type = "lower", method = "number", add = TRUE, diag = FALSE, tl.pos = "n", 
-         cex = 0.8,
-         title="Figure 1. Correlations Between the Variables")
-dev.off()
+corrplot(correlation, type = "upper", tl.pos = "lt", 
+         title="Figure 1. Correlations Between the Variables",
+         mar = c(0, 0, 2, 0))
+corrplot(correlation, type = "lower", method = "number", add = TRUE, diag = FALSE, tl.pos = "n")
+
+file.name <- paste0("../images/", params$channel, 2, ".png")
 ```
 
 ### Boxplot 
 
 Figure 2 shows the number of shares across different days of the week. Here, due to the huge number of large-valued outliers, I capped the number of shares to 10,000 so that we can see the medians and the interquartile ranges for different days of the week. Figure 2 coincides with the findings in Table 2 that the variance of shares is huge across days of the week, and the mean values of shares across different days are driven by larged-valued outliers. Therefore, those mean values of shares are not close to the median values of shares for each day of the week. The median number of shares seems to be bigger during weekend than weekdays.
 
-```{r eval=TRUE}
-file.name <- paste0("../images/", params$channel, 2, ".png")
-png(filename = file.name)
-
+```{r eval=TRUE, fig.path=file.name}
 boxplot1 <- ggplot(data = edadata, aes(x = day.week, y = shares))
 boxplot1 + geom_boxplot(fill = "white", outlier.shape = NA) + 
   coord_cartesian(ylim=c(0, 10000)) + 
   geom_jitter(aes(color = day.week), size = 1) + 
+  guides(color = guide_legend(override.aex = list(size = 6))) + 
   labs(x = "Day of the Week", y = "Number of Shares", 
        title = "Figure 2. Number of shares across different days of the week") + 
   scale_color_discrete(name = "Day of the Week") +
@@ -193,7 +184,8 @@ boxplot1 + geom_boxplot(fill = "white", outlier.shape = NA) +
         legend.key.size = unit(1, 'cm'), 
         legend.text = element_text(size = 13), 
         title = element_text(size = 14))
-dev.off()
+
+file.name <- paste0("../images/", params$channel, 3, ".png")
 ```
 
 ### Barplot
@@ -202,10 +194,7 @@ Figure 3 shows the popularity of the closeness to a top LDA topic for the `r par
 
 Some mean ratios of a LDA topic do not seem to vary over the days of a week while other mean ratios of LDA topics vary across different days of the week. Note, when we dicotomize a continuous variable into different groups, we lose information about that variable. Here, I just want to show you whether or not the mean ratios of a LDA topic differ across time for different levels of shares. The classified version of number of shares will not be used to fit in a model later.
 
-```{r eval=TRUE}
-file.name <- paste0("../images/", params$channel, 3, ".png")
-png(filename = file.name)
-
+```{r eval=TRUE, fig.path=file.name}
 b.plot1 <- edadata %>% group_by(day.week, class.shares) %>% 
   summarise(LDA_0=mean(LDA_00), LDA_1=mean(LDA_01), LDA_2=mean(LDA_02), LDA_3=mean(LDA_03), LDA_4=mean(LDA_04))
 
@@ -224,23 +213,19 @@ barplot1 + geom_bar(stat = "identity", position = "stack") +
         legend.text = element_text(size = 13), 
         title = element_text(size = 13)) + 
   facet_wrap(~ class.shares)
-dev.off()
+
+file.name <- paste0("../images/", params$channel, 4, ".png")
 ```
 
 ### Line Plot
 
 Here, Figure 4 shows the same measurements as in Figure 3 but in line plot which we can see how the patterns of the mean ratios of a LDA topic vary or not vary across time in different popularity groups more clearly. Again, some mean ratios do not seem to vary across time and across popularity groups while some other mean ratios vary across time and popularity groups for articles in the `r params$channel` channel.
 
-```{r eval=TRUE}
-file.name <- paste0("../images/", params$channel, 4, ".png")
-png(filename = file.name)
-
+```{r eval=TRUE, fig.path=file.name}
 l.plot1 <- edadata %>% group_by(day.week, class.shares) %>% 
   summarise(LDA_0=mean(LDA_00), LDA_1=mean(LDA_01), LDA_2=mean(LDA_02), LDA_3=mean(LDA_03), LDA_4=mean(LDA_04))
-l.plot1
 
 l.plot2 <- l.plot1 %>% pivot_longer(cols = 3:7, names_to = "LDA.Topic", values_to = "avg.LDA")
-l.plot2
 
 lineplot1 <- ggplot(data = l.plot2, aes(x = day.week, y = avg.LDA, group = LDA.Topic))
 lineplot1 + geom_line(aes(color = LDA.Topic), lwd = 2) + 
@@ -255,17 +240,15 @@ lineplot1 + geom_line(aes(color = LDA.Topic), lwd = 2) +
         legend.text = element_text(size = 13), 
         title = element_text(size = 13)) +
   facet_wrap(~ class.shares)
-dev.off()
+
+file.name <- paste0("../images/", params$channel, 5, ".png")
 ```
 
 ### Scatterplot
 
 Figure 5 shows the relationship between average keyword and log-transformed number of shares for articles in the `r params$channel` channel across different days of the week. In the news popularity study, it says average keyword is the most important predictor in the models they used which accounted for the most variation in the data. Therefore, we are interested to see how average keyword is correlated with log shares. The different colored linear regression lines indicate different days of the week. If it is an upward trend, it shows positive linear relationship. If it is a downward trend, it shows a negative linear relationship. More tilted the line is, much stronger the relationship is regardless of positive or negative.
 
-```{r eval=TRUE}
-file.name <- paste0("../images/", params$channel, 5, ".png")
-png(filename = file.name)
-
+```{r eval=TRUE, fig.path=file.name}
 scatter1 <- ggplot(data = edadata, aes(x = kw_avg_avg, y = log.shares, color = day.week)) #y=kw_avg_max
 scatter1 + geom_point(size = 2) + #aes(shape = class.shares)
   scale_color_discrete(name = "Day of the Week") + 
@@ -280,7 +263,7 @@ scatter1 + geom_point(size = 2) + #aes(shape = class.shares)
         legend.key.size = unit(1, 'cm'), 
         legend.text = element_text(size = 13), 
         title = element_text(size = 13))
-dev.off()
+
 ```
 
 # Modeling
@@ -288,6 +271,8 @@ dev.off()
 ## Linear Regression
 
 The linear regression process takes a matrix of all of the predictor variables we've chosen and compares their values to each of the corresponding values of the response variable, `log.shares`. This allows us to calculate the most accurate linear combination of the predictor variables to make up the response variable. We can choose a variety of sets of predictors and compare their Root Mean Square Errors, R-Squared values, and Mean Absolute Errors to see which one is the strongest model. Below, we've fit multiple linear models that include all of our variables and various combinations of interaction terms and/or quadratic terms.
+
+
 
 ```{r eval=TRUE}
 # using train1, dayweek is numeric, no class_shares
@@ -298,20 +283,6 @@ test1$dayweek <- as.factor(test1$dayweek)
 preProcValues <- preProcess(train1, method = c("center", "scale"))
 trainTransformed <- predict(preProcValues, train1)
 testTransformed <- predict(preProcValues, test1)
-
-cv_fit1 <- train(log.shares ~ . , 
-                 data=trainTransformed,
-                 method = "lm",
-                 trControl = trainControl(method = "cv", number = 10))
-summary(cv_fit1)
-
-cv_fit2 <- train(log.shares ~ . +I(n_tokens_content^2)+ kw_avg_avg:num_imgs + 
-                   average_token_length:global_subjectivity + 
-                   dayweek:self_reference_avg_sharess ,
-                 data=trainTransformed,
-                 method = "lm",
-                 trControl = trainControl(method = "cv", number = 10))
-summary(cv_fit2)
 
 cv_fit3 <- train(log.shares ~ . + I(n_tokens_content^2) + I(self_reference_avg_sharess^2) + 
                  kw_avg_avg:num_imgs + average_token_length:global_subjectivity, 
@@ -353,50 +324,42 @@ testTransformed <- predict(preProcValues, test2)
 random_forest <- train(log.shares ~ ., data = trainTransformed,
     method = "rf",
     trControl = trainControl(method = "cv", number = 10),
-    tuneGrid = data.frame(mtry = 1:15))
-
+    tuneGrid = data.frame(mtry = 1:5))
+random_forest
 random_forest_predict <- predict(random_forest, newdata = testTransformed)
 rf_rmse <- postResample(random_forest_predict, obs = testTransformed$log.shares)
-rf_rmse
+
 ```
 
 ## Boosted Tree
 
+Random forest models use bagging technique (bootstrap aggregation) to build independent decision trees with different subsets of predictors and combine them in parallel. On the contrary, gradient boosted trees use a method called boosting. Boosting method trains each weak learner slowly and then combines them sequentially, with weak learners being the decision trees with only one split. Thus, each new tree can correct the errors made by the previous tree. Because boosting is to slowly train the trees so that they avoid overfitting the data. Since the trees grow slowly and in a sequential manner, each tree we create is based off a previous tree and we update the predictions as we go. For instance, we fit the model, we get our predictions, and now we create a new model based off the previous model. Then, we update our predictions based on the new model. Then, we build a newer model based off the previous one, and we update the predictions from the new model. The process is repeated until the criteria set for the tuning parameters are met. 
 
+There are tuning parameters in gradient boosting machine learning technique to help us prevent from growing the trees too quickly and thus keep us from overfitting the model. 
+  
+* `shrinkage`: A shrinkage parameter controls the growth rate of the trees, slows fitting process  
+* `n.trees`: The amount of times we want to the process to repeat in training the trees.  
+* `interaction.depth`: The amount of splits we want to fit a tree.  
+* `n.minobsinnode`: The minimum number of observations in a node at least.  
 
+Here, we use the `caret` package and the `gbm` package to run the boosted tree model with the training set and predict on the test set. The values of the tuning parameters are set as below:
+  
+* `shrinkage` = 0.1  
+* `n.trees` = 25, 50, 75, 100, 125  
+* `interaction.depth` = 1, 2, 3, 4, 5  
+* `n.minobsinnode` = 10  
 
-short but reasonably thorough explanation of the ensemble model you are using
-
-
-Predictors                    | Attribute Information                              | Type   
------------------------------ | -------------------------------------------------- | -------------------------
-`kw_avg_avg`                  | Average keyword (average shares)                   | number
-`LDA_02`                      | Closeness to LDA topic 2                           | ratio
-`weekday_is_monday`           | Was the article published on a Monday?             | boolean
-`weekday_is_tuesday`          | Was the article published on a Tuesday?            | boolean
-`weekday_is_wednesday`        | Was the article published on a Wednesday?          | boolean
-`weekday_is_thursday`         | Was the article published on a Thursday?           | boolean
-`weekday_is_friday`           | Was the article published on a Friday?             | boolean
-`weekday_is_saturday`         | Was the article published on a Saturday?           | boolean
-`weekday_is_sunday`           | Was the article published on a Sunday?             | boolean
-`self_reference_avg_sharess`  | Average shares of referenced articles in Mashable  | number
-`n_non_stop_unique_tokens`    | Rate of unique non-stop words in the content       | ratio
-`average_token_length`        | Average length of the words in the content         | number
-`n_tokens_content`            | Number of words in the content                     | number
-`n_tokens_title`              | Number of words in the title                       | number
-`global_subjectivity`         | Text subjectivity                                  | ratio
-`num_imgs`                    | Number of images                                   | number
-
+We then use 10 fold cross validation to search all combinations of the tuning parameters values using the `expand.grid` function to choose an optimal model with the desired tuning parameters values. The optimal model chosen by cross validation across all combinations of tuning parameters values produces the lowest root mean squared error (RMSE). 
 
 ```{r eval=TRUE}
 #expand.grid(n.trees = c(25, 50, 100, 150, 200), interaction.depth = 1:4, shrinkage = 0.1, n.minobsinnode = 10)
 boosted_tree <- train(log.shares ~ . , data = trainTransformed,
       method = "gbm", 
       trControl = trainControl(method = "cv", number = 10), #method="repeatedcv", repeats=5
-      tuneGrid = expand.grid(n.trees = c(25, 50, 75, 100), interaction.depth = 1:4, shrinkage = 0.1, n.minobsinnode = 10),
+      tuneGrid = expand.grid(n.trees = c(25, 50, 75, 100, 125), interaction.depth = 1:5, shrinkage = 0.1, n.minobsinnode = 10),
       verbose = FALSE)
 boosted_tree
-boosted_tree_predict <- predict(boosted_tree, newdata = testTransformed)
+boosted_tree_predict <- predict(boosted_tree, newdata = select(testTransformed, -log.shares))
 
 boost_rmse <- postResample(boosted_tree_predict, obs = testTransformed$log.shares)
 
@@ -418,7 +381,7 @@ The best model fit to predict the number of shares for the `r params$channel` ch
 The best model fit to predict the number of shares
 
 
-# Automation
+# Final Model
 
 Automation is done with the modifications of the YAML header and the render function. 
 
