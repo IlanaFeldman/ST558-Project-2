@@ -342,10 +342,6 @@ edadata %>% group_by(day.week) %>% summarize(
 
 Table 6. Comparing Image Counts by the Day of the Week
 
-``` r
-#file.name <- paste0("../images/", params$channel, "1.png")
-```
-
 ## Visualizations
 
 Graphical presentation is a great tool used to visualize the
@@ -374,10 +370,6 @@ corrplot(correlation, type = "lower", method = "number", add = TRUE, diag = FALS
 
 ![](../images/lifestyleunnamed-chunk-3-1.png)<!-- -->
 
-``` r
-#file.name <- paste0("../images/", params$channel, "2.png")
-```
-
 ### Boxplot
 
 Figure 2 shows the number of shares across different days of the week.
@@ -396,7 +388,7 @@ ggplot(data = edadata, aes(x = day.week, y = shares)) +
   geom_boxplot(fill = "white", outlier.shape = NA) + 
   coord_cartesian(ylim=c(0, 10000)) + 
   geom_jitter(aes(color = day.week), size = 1) + 
-  guides(color = guide_legend(override.aex = list(size = 6))) + 
+  guides(color = guide_legend(override.aes = list(size = 6))) + 
   labs(x = "Day of the Week", y = "Number of Shares", 
        title = "Figure 2. Number of shares across different days of the week") + 
   scale_color_discrete(name = "Day of the Week") +
@@ -410,10 +402,6 @@ ggplot(data = edadata, aes(x = day.week, y = shares)) +
 ```
 
 ![](../images/lifestyleunnamed-chunk-4-1.png)<!-- -->
-
-``` r
-#file.name <- paste0("../images/", params$channel, "3.png")
-```
 
 ### Barplot
 
@@ -456,10 +444,6 @@ ggplot(data = b.plot2, aes(x = day.week, y = avg.LDA, fill = LDA.Topic)) +
 
 ![](../images/lifestyleunnamed-chunk-5-1.png)<!-- -->
 
-``` r
-#file.name <- paste0("../images/", params$channel, "4.png")
-```
-
 ### Line Plot
 
 Here, Figure 4 shows the same measurements as in Figure 3 but in line
@@ -491,10 +475,6 @@ ggplot(data = l.plot2, aes(x = day.week, y = avg.LDA, group = LDA.Topic)) +
 ```
 
 ![](../images/lifestyleunnamed-chunk-6-1.png)<!-- -->
-
-``` r
-#file.name <- paste0("../images/", params$channel, "5.png")
-```
 
 ### Scatterplots
 
@@ -535,10 +515,6 @@ ggplot(data = edadata, aes(x = kw_avg_avg, y = log.shares, color = day.week)) +
 ![](../images/lifestyleunnamed-chunk-7-1.png)<!-- -->
 
 ``` r
-#file.name <- paste0("../images/", params$channel, "6.png")
-```
-
-``` r
 ggplot(data = edadata, aes(x = log(num_imgs + 1), y = log.shares, color = day.week)) + 
   geom_point(size = 2) +
   scale_color_discrete(name = "Day of the Week") + 
@@ -555,10 +531,6 @@ ggplot(data = edadata, aes(x = log(num_imgs + 1), y = log.shares, color = day.we
 ```
 
 ![](../images/lifestyleunnamed-chunk-8-1.png)<!-- -->
-
-``` r
-#file.name <- paste0("../images/", params$channel, "7a.png")
-```
 
 ### QQ Plots
 
@@ -584,10 +556,6 @@ ggplot(edadata) + geom_qq(aes(sample = shares)) + geom_qq_line(aes(sample = shar
 ![](../images/lifestyleunnamed-chunk-9-1.png)<!-- -->
 
 ``` r
-#file.name <- paste0("../images/", params$channel, "7b.png")
-```
-
-``` r
 ggplot(edadata) + geom_qq(aes(sample = log(shares))) + geom_qq_line(aes(sample = log(shares))) +
     labs(x = "Theoretical Quantiles", y = "Log(Share Numbers)", 
        title = "Figure 7b. QQ Plot for Log-Transformed Shares") +
@@ -603,10 +571,6 @@ ggplot(edadata) + geom_qq(aes(sample = log(shares))) + geom_qq_line(aes(sample =
 ![](../images/lifestyleunnamed-chunk-10-1.png)<!-- -->
 
 ``` r
-#file.name <- paste0("../images/", params$channel, "7c.png")
-```
-
-``` r
 ggplot(edadata) + geom_qq(aes(sample = num_imgs)) + geom_qq_line(aes(sample = num_imgs)) + 
   labs(x = "Theoretical Quantiles", y = "Image Numbers", 
        title = "Figure 7c. QQ Plot for Non-Transformed Image Numbers") +
@@ -620,10 +584,6 @@ ggplot(edadata) + geom_qq(aes(sample = num_imgs)) + geom_qq_line(aes(sample = nu
 ```
 
 ![](../images/lifestyleunnamed-chunk-11-1.png)<!-- -->
-
-``` r
-#file.name <- paste0("../images/", params$channel, "7d.png")
-```
 
 ``` r
 ggplot(edadata) + geom_qq(aes(sample = log(num_imgs + 1))) + geom_qq_line(aes(sample = log(num_imgs + 1))) +

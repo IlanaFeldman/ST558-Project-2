@@ -7,7 +7,7 @@ params:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(fig.path = paste0("../images/", params$channel), echo = TRUE, message = FALSE, warning = FALSE)
+knitr::opts_chunk$set(fig.path = paste0("../images/", params$channel) , echo = TRUE, message = FALSE, warning = FALSE)
 
 ```
 
@@ -151,7 +151,6 @@ edadata %>% group_by(day.week) %>% summarize(
   Avg.images = mean(num_imgs), Sd.images = sd(num_imgs), Median.images = median(num_imgs), Avg.log.images = mean(log(num_imgs + 1)), Sd.log.images = sd(log(num_imgs + 1)), Median.log.images = median(log(num_imgs + 1))) %>%
   kable(digits = 4, caption = "Table 6. Comparing Image Counts by the Day of the Week")
 
-#file.name <- paste0("../images/", params$channel, "1.png")
 ```
 
 ## Visualizations
@@ -172,8 +171,6 @@ corrplot(correlation, type = "upper", tl.pos = "lt",
          title="Figure 1. Correlations Between the Variables",
          mar = c(0, 0, 2, 0))
 corrplot(correlation, type = "lower", method = "number", add = TRUE, diag = FALSE, tl.pos = "n")
-
-#file.name <- paste0("../images/", params$channel, "2.png")
 ```
 
 ### Boxplot 
@@ -185,7 +182,7 @@ ggplot(data = edadata, aes(x = day.week, y = shares)) +
   geom_boxplot(fill = "white", outlier.shape = NA) + 
   coord_cartesian(ylim=c(0, 10000)) + 
   geom_jitter(aes(color = day.week), size = 1) + 
-  guides(color = guide_legend(override.aex = list(size = 6))) + 
+  guides(color = guide_legend(override.aes = list(size = 6))) + 
   labs(x = "Day of the Week", y = "Number of Shares", 
        title = "Figure 2. Number of shares across different days of the week") + 
   scale_color_discrete(name = "Day of the Week") +
@@ -196,8 +193,6 @@ ggplot(data = edadata, aes(x = day.week, y = shares)) +
         legend.key.size = unit(1, 'cm'), 
         legend.text = element_text(size = 13), 
         title = element_text(size = 14))
-
-#file.name <- paste0("../images/", params$channel, "3.png")
 ```
 
 ### Barplot
@@ -225,8 +220,6 @@ ggplot(data = b.plot2, aes(x = day.week, y = avg.LDA, fill = LDA.Topic)) +
         legend.text = element_text(size = 13), 
         title = element_text(size = 13)) + 
   facet_wrap(~ class.shares)
-
-#file.name <- paste0("../images/", params$channel, "4.png")
 ```
 
 ### Line Plot
@@ -253,7 +246,6 @@ ggplot(data = l.plot2, aes(x = day.week, y = avg.LDA, group = LDA.Topic)) +
         title = element_text(size = 13)) +
   facet_wrap(~ class.shares)
 
-#file.name <- paste0("../images/", params$channel, "5.png")
 ```
 
 ### Scatterplots
@@ -278,7 +270,6 @@ ggplot(data = edadata, aes(x = kw_avg_avg, y = log.shares, color = day.week)) +
         legend.text = element_text(size = 13), 
         title = element_text(size = 13))
 
-#file.name <- paste0("../images/", params$channel, "6.png")
 ```
 
 ```{r eval = TRUE}
@@ -296,7 +287,6 @@ ggplot(data = edadata, aes(x = log(num_imgs + 1), y = log.shares, color = day.we
         legend.text = element_text(size = 13), 
         title = element_text(size = 13))
 
-#file.name <- paste0("../images/", params$channel, "7a.png")
 ```
 
 ### QQ Plots
@@ -315,7 +305,6 @@ ggplot(edadata) + geom_qq(aes(sample = shares)) + geom_qq_line(aes(sample = shar
         legend.text = element_text(size = 13), 
         title = element_text(size = 13))
 
-#file.name <- paste0("../images/", params$channel, "7b.png")
 ```
 
 ```{r eval = TRUE}
@@ -330,7 +319,6 @@ ggplot(edadata) + geom_qq(aes(sample = log(shares))) + geom_qq_line(aes(sample =
         legend.text = element_text(size = 13), 
         title = element_text(size = 13))
 
-#file.name <- paste0("../images/", params$channel, "7c.png")
 ```
 
 ```{r eval = TRUE}
@@ -344,8 +332,6 @@ ggplot(edadata) + geom_qq(aes(sample = num_imgs)) + geom_qq_line(aes(sample = nu
         legend.key.size = unit(1, 'cm'), 
         legend.text = element_text(size = 13), 
         title = element_text(size = 13))
-
-#file.name <- paste0("../images/", params$channel, "7d.png")
 ```
 
 ```{r eval = TRUE}
