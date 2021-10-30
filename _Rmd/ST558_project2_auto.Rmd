@@ -94,7 +94,6 @@ sel_data <- diffday %>% select(class_shares, shares, log.shares, dayweek,
                                n_non_stop_unique_tokens, average_token_length, 
                                n_tokens_content, n_tokens_title, global_subjectivity, 
                                num_imgs)
-sel_data
 
 set.seed(388588)
 sharesIndex <- createDataPartition(sel_data$shares, p = 0.7, list = FALSE)
@@ -103,7 +102,8 @@ test <- sel_data[-sharesIndex, ]
 
 train1 <- train %>% select(-class_shares, -shares, 
                            -weekday_is_monday, -weekday_is_tuesday, -weekday_is_wednesday, -weekday_is_thursday, 
-                           -weekday_is_friday, -weekday_is_saturday, -weekday_is_sunday, -LDA_00, -LDA_01, -LDA_03, -LDA_04) #keep log.shares
+                           -weekday_is_friday, -weekday_is_saturday, -weekday_is_sunday, -LDA_00, -LDA_01, -LDA_03, -LDA_04)
+train1
 test1 <- test %>% select(-class_shares, -shares, 
                          -weekday_is_monday, -weekday_is_tuesday, -weekday_is_wednesday, -weekday_is_thursday, 
                          -weekday_is_friday, -weekday_is_saturday, -weekday_is_sunday, -LDA_00, -LDA_01, -LDA_03, -LDA_04) #keep log.shares
@@ -111,7 +111,7 @@ test1 <- test %>% select(-class_shares, -shares,
 
 # Exploratory Data Analysis
 
-Now let us take a look at the relationships between our response and the predictors with some numerical summaries and plots. 
+The `r params$channel` channel has `r dim(train)[1]` articles collected. Now let us take a look at the relationships between our response and the predictors with some numerical summaries and plots. 
 
 ## Numerical Summaries
 
@@ -159,12 +159,16 @@ Figure 1 shows the correlations between the variables, both the response and the
 # keep log-shares
 #corplt <- train %>% select(-class_shares, -weekday_is_monday, -weekday_is_tuesday, -weekday_is_wednesday,
 #                           -weekday_is_thursday, -weekday_is_friday, -weekday_is_saturday, -weekday_is_sunday) 
+file.name <- paste0("../images/", params$channel, 1, ".png")
+png(filename = file.name)
+
 correlation <- cor(train1, method="spearman")
 
 corrplot(correlation, type = "upper", tl.pos = "lt")
 corrplot(correlation, type = "lower", method = "number", add = TRUE, diag = FALSE, tl.pos = "n", 
          cex = 0.8,
          title="Figure 1. Correlations Between the Variables")
+dev.off()
 ```
 
 ### Boxplot 
@@ -172,6 +176,9 @@ corrplot(correlation, type = "lower", method = "number", add = TRUE, diag = FALS
 Figure 2 shows the number of shares across different days of the week. Here, due to the huge number of large-valued outliers, I capped the number of shares to 10,000 so that we can see the medians and the interquartile ranges for different days of the week. Figure 2 coincides with the findings in Table 2 that the variance of shares is huge across days of the week, and the mean values of shares across different days are driven by larged-valued outliers. Therefore, those mean values of shares are not close to the median values of shares for each day of the week. The median number of shares seems to be bigger during weekend than weekdays.
 
 ```{r eval=TRUE}
+file.name <- paste0("../images/", params$channel, 2, ".png")
+png(filename = file.name)
+
 boxplot1 <- ggplot(data = edadata, aes(x = day.week, y = shares))
 boxplot1 + geom_boxplot(fill = "white", outlier.shape = NA) + 
   coord_cartesian(ylim=c(0, 10000)) + 
@@ -186,6 +193,7 @@ boxplot1 + geom_boxplot(fill = "white", outlier.shape = NA) +
         legend.key.size = unit(1, 'cm'), 
         legend.text = element_text(size = 13), 
         title = element_text(size = 14))
+dev.off()
 ```
 
 ### Barplot
@@ -195,12 +203,14 @@ Figure 3 shows the popularity of the closeness to a top LDA topic for the `r par
 Some mean ratios of a LDA topic do not seem to vary over the days of a week while other mean ratios of LDA topics vary across different days of the week. Note, when we dicotomize a continuous variable into different groups, we lose information about that variable. Here, I just want to show you whether or not the mean ratios of a LDA topic differ across time for different levels of shares. The classified version of number of shares will not be used to fit in a model later.
 
 ```{r eval=TRUE}
+file.name <- paste0("../images/", params$channel, 3, ".png")
+png(filename = file.name)
+
 b.plot1 <- edadata %>% group_by(day.week, class.shares) %>% 
   summarise(LDA_0=mean(LDA_00), LDA_1=mean(LDA_01), LDA_2=mean(LDA_02), LDA_3=mean(LDA_03), LDA_4=mean(LDA_04))
-b.plot1
 
 b.plot2 <- b.plot1 %>% pivot_longer(cols = 3:7, names_to = "LDA.Topic", values_to = "avg.LDA")
-b.plot2
+
 barplot1 <- ggplot(data = b.plot2, aes(x = day.week, y = avg.LDA, fill = LDA.Topic))
 barplot1 + geom_bar(stat = "identity", position = "stack") + 
   labs(x = "Day of the Week", y = "Closeness to Top LDA Topic", 
@@ -214,6 +224,7 @@ barplot1 + geom_bar(stat = "identity", position = "stack") +
         legend.text = element_text(size = 13), 
         title = element_text(size = 13)) + 
   facet_wrap(~ class.shares)
+dev.off()
 ```
 
 ### Line Plot
@@ -221,6 +232,9 @@ barplot1 + geom_bar(stat = "identity", position = "stack") +
 Here, Figure 4 shows the same measurements as in Figure 3 but in line plot which we can see how the patterns of the mean ratios of a LDA topic vary or not vary across time in different popularity groups more clearly. Again, some mean ratios do not seem to vary across time and across popularity groups while some other mean ratios vary across time and popularity groups for articles in the `r params$channel` channel.
 
 ```{r eval=TRUE}
+file.name <- paste0("../images/", params$channel, 4, ".png")
+png(filename = file.name)
+
 l.plot1 <- edadata %>% group_by(day.week, class.shares) %>% 
   summarise(LDA_0=mean(LDA_00), LDA_1=mean(LDA_01), LDA_2=mean(LDA_02), LDA_3=mean(LDA_03), LDA_4=mean(LDA_04))
 l.plot1
@@ -241,6 +255,7 @@ lineplot1 + geom_line(aes(color = LDA.Topic), lwd = 2) +
         legend.text = element_text(size = 13), 
         title = element_text(size = 13)) +
   facet_wrap(~ class.shares)
+dev.off()
 ```
 
 ### Scatterplot
@@ -248,6 +263,9 @@ lineplot1 + geom_line(aes(color = LDA.Topic), lwd = 2) +
 Figure 5 shows the relationship between average keyword and log-transformed number of shares for articles in the `r params$channel` channel across different days of the week. In the news popularity study, it says average keyword is the most important predictor in the models they used which accounted for the most variation in the data. Therefore, we are interested to see how average keyword is correlated with log shares. The different colored linear regression lines indicate different days of the week. If it is an upward trend, it shows positive linear relationship. If it is a downward trend, it shows a negative linear relationship. More tilted the line is, much stronger the relationship is regardless of positive or negative.
 
 ```{r eval=TRUE}
+file.name <- paste0("../images/", params$channel, 5, ".png")
+png(filename = file.name)
+
 scatter1 <- ggplot(data = edadata, aes(x = kw_avg_avg, y = log.shares, color = day.week)) #y=kw_avg_max
 scatter1 + geom_point(size = 2) + #aes(shape = class.shares)
   scale_color_discrete(name = "Day of the Week") + 
@@ -262,7 +280,7 @@ scatter1 + geom_point(size = 2) + #aes(shape = class.shares)
         legend.key.size = unit(1, 'cm'), 
         legend.text = element_text(size = 13), 
         title = element_text(size = 13))
-
+dev.off()
 ```
 
 # Modeling
@@ -320,7 +338,6 @@ kable(result2, digits = 4, caption = "Table ###. Cross Validation - Model Predic
 
 ```
 
-
 ## Random Forest 
 
 The bootstrap approach to fitting a tree model involves resampling our data and fitting a tree to each sample, and then averaging the resulting predictions of each of those models. The random forest approach adds an extra step for each of these samples, where only a random subset of the predictor variables is chosen each time, in order to reduce the correlation between each of the trees. We don't have to worry about creating dummy variables for categorical variables, because our data already comes in an entirely numeric form.
@@ -340,6 +357,7 @@ random_forest <- train(log.shares ~ ., data = trainTransformed,
 
 random_forest_predict <- predict(random_forest, newdata = testTransformed)
 rf_rmse <- postResample(random_forest_predict, obs = testTransformed$log.shares)
+rf_rmse
 ```
 
 ## Boosted Tree

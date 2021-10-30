@@ -110,27 +110,7 @@ sel_data <- diffday %>% select(class_shares, shares, log.shares, dayweek,
                                n_non_stop_unique_tokens, average_token_length, 
                                n_tokens_content, n_tokens_title, global_subjectivity, 
                                num_imgs)
-sel_data
-```
 
-    ## # A tibble: 2,323 x 24
-    ##    class_shares shares log.shares dayweek kw_avg_avg LDA_00 LDA_01 LDA_02 LDA_03 LDA_04 weekday_is_monday weekday_is_tuesd~ weekday_is_wedn~
-    ##           <dbl>  <dbl>      <dbl>   <dbl>      <dbl>  <dbl>  <dbl>  <dbl>  <dbl>  <dbl>             <dbl>             <dbl>            <dbl>
-    ##  1            1   2600       7.86       1         0  0.439  0.0225 0.0224 0.0233 0.493                  1                 0                0
-    ##  2            0    690       6.54       1         0  0.199  0.248  0.0201 0.513  0.0202                 1                 0                0
-    ##  3            1   4800       8.48       1         0  0.0298 0.194  0.0288 0.718  0.0293                 1                 0                0
-    ##  4            0    851       6.75       1         0  0.0355 0.0338 0.0336 0.863  0.0341                 1                 0                0
-    ##  5            1   4800       8.48       3       832. 0.0231 0.0223 0.0224 0.910  0.0226                 0                 0                1
-    ##  6            1   9200       9.13       3      1072. 0.0356 0.0334 0.619  0.0337 0.279                  0                 0                1
-    ##  7            1   1600       7.38       3      1564. 0.865  0.0334 0.0336 0.0347 0.0336                 0                 0                1
-    ##  8            0    775       6.65       4      1862. 0.509  0.0287 0.0299 0.404  0.0286                 0                 0                0
-    ##  9            1  18200       9.81       5      2210. 0.800  0.0500 0.0502 0.0501 0.0500                 0                 0                0
-    ## 10            1   1600       7.38       5      1398. 0.189  0.0250 0.319  0.0254 0.441                  0                 0                0
-    ## # ... with 2,313 more rows, and 11 more variables: weekday_is_thursday <dbl>, weekday_is_friday <dbl>, weekday_is_saturday <dbl>,
-    ## #   weekday_is_sunday <dbl>, self_reference_avg_sharess <dbl>, n_non_stop_unique_tokens <dbl>, average_token_length <dbl>,
-    ## #   n_tokens_content <dbl>, n_tokens_title <dbl>, global_subjectivity <dbl>, num_imgs <dbl>
-
-``` r
 set.seed(388588)
 sharesIndex <- createDataPartition(sel_data$shares, p = 0.7, list = FALSE)
 train <- sel_data[sharesIndex, ]
@@ -138,7 +118,26 @@ test <- sel_data[-sharesIndex, ]
 
 train1 <- train %>% select(-class_shares, -shares, 
                            -weekday_is_monday, -weekday_is_tuesday, -weekday_is_wednesday, -weekday_is_thursday, 
-                           -weekday_is_friday, -weekday_is_saturday, -weekday_is_sunday, -LDA_00, -LDA_01, -LDA_03, -LDA_04) #keep log.shares
+                           -weekday_is_friday, -weekday_is_saturday, -weekday_is_sunday, -LDA_00, -LDA_01, -LDA_03, -LDA_04)
+train1
+```
+
+    ## # A tibble: 1,628 x 11
+    ##    log.shares dayweek kw_avg_avg LDA_02 self_reference_a~ n_non_stop_uniq~ average_token_l~ n_tokens_content n_tokens_title global_subjecti~
+    ##         <dbl>   <dbl>      <dbl>  <dbl>             <dbl>            <dbl>            <dbl>            <dbl>          <dbl>            <dbl>
+    ##  1       7.86       1         0  0.0224             1775             0.671             4.64              257              8            0.4  
+    ##  2       6.54       1         0  0.0201             3900             0.688             4.44              218              8            0.522
+    ##  3       8.48       1         0  0.0288             2858.            0.617             4.39             1226              9            0.408
+    ##  4       6.75       1         0  0.0336             2796.            0.629             4.79             1121             10            0.497
+    ##  5       8.48       3       832. 0.0224             6600             0.865             4.68              168              9            0.638
+    ##  6       9.13       3      1072. 0.619              1800             0.803             4.45              100              9            0.338
+    ##  7       7.38       3      1564. 0.0336             2300             0.632             4.63             1596             10            0.454
+    ##  8       6.65       4      1862. 0.0299             3500             0.654             4.79              518              7            0.599
+    ##  9       9.81       5      2210. 0.0502            10400             0.687             4.25              358              8            0.504
+    ## 10       7.38       5      1398. 0.319              1600             0.777             5.39              358              6            0.493
+    ## # ... with 1,618 more rows, and 1 more variable: num_imgs <dbl>
+
+``` r
 test1 <- test %>% select(-class_shares, -shares, 
                          -weekday_is_monday, -weekday_is_tuesday, -weekday_is_wednesday, -weekday_is_thursday, 
                          -weekday_is_friday, -weekday_is_saturday, -weekday_is_sunday, -LDA_00, -LDA_01, -LDA_03, -LDA_04) #keep log.shares
@@ -146,8 +145,9 @@ test1 <- test %>% select(-class_shares, -shares,
 
 # Exploratory Data Analysis
 
-Now let us take a look at the relationships between our response and the
-predictors with some numerical summaries and plots.
+The socmed channel has 1628 articles collected. Now let us take a look
+at the relationships between our response and the predictors with some
+numerical summaries and plots.
 
 ## Numerical Summaries
 
@@ -271,15 +271,20 @@ there may be some collinearity among the predictor variables.
 # keep log-shares
 #corplt <- train %>% select(-class_shares, -weekday_is_monday, -weekday_is_tuesday, -weekday_is_wednesday,
 #                           -weekday_is_thursday, -weekday_is_friday, -weekday_is_saturday, -weekday_is_sunday) 
+file.name <- paste0("../images/", params$channel, 1, ".png")
+png(filename = file.name)
+
 correlation <- cor(train1, method="spearman")
 
 corrplot(correlation, type = "upper", tl.pos = "lt")
 corrplot(correlation, type = "lower", method = "number", add = TRUE, diag = FALSE, tl.pos = "n", 
          cex = 0.8,
          title="Figure 1. Correlations Between the Variables")
+dev.off()
 ```
 
-![](../images/unnamed-chunk-3-1.png)<!-- -->
+    ## png 
+    ##   2
 
 ### Boxplot
 
@@ -295,6 +300,9 @@ week. The median number of shares seems to be bigger during weekend than
 weekdays.
 
 ``` r
+file.name <- paste0("../images/", params$channel, 2, ".png")
+png(filename = file.name)
+
 boxplot1 <- ggplot(data = edadata, aes(x = day.week, y = shares))
 boxplot1 + geom_boxplot(fill = "white", outlier.shape = NA) + 
   coord_cartesian(ylim=c(0, 10000)) + 
@@ -309,9 +317,11 @@ boxplot1 + geom_boxplot(fill = "white", outlier.shape = NA) +
         legend.key.size = unit(1, 'cm'), 
         legend.text = element_text(size = 13), 
         title = element_text(size = 14))
+dev.off()
 ```
 
-![](../images/unnamed-chunk-4-1.png)<!-- -->
+    ## png 
+    ##   2
 
 ### Barplot
 
@@ -332,50 +342,14 @@ time for different levels of shares. The classified version of number of
 shares will not be used to fit in a model later.
 
 ``` r
+file.name <- paste0("../images/", params$channel, 3, ".png")
+png(filename = file.name)
+
 b.plot1 <- edadata %>% group_by(day.week, class.shares) %>% 
   summarise(LDA_0=mean(LDA_00), LDA_1=mean(LDA_01), LDA_2=mean(LDA_02), LDA_3=mean(LDA_03), LDA_4=mean(LDA_04))
-b.plot1
-```
 
-    ## # A tibble: 14 x 7
-    ##    day.week  class.shares LDA_0  LDA_1 LDA_2 LDA_3 LDA_4
-    ##    <fct>     <fct>        <dbl>  <dbl> <dbl> <dbl> <dbl>
-    ##  1 Monday    Unpopular    0.279 0.167  0.176 0.229 0.148
-    ##  2 Monday    Popular      0.408 0.0785 0.180 0.195 0.139
-    ##  3 Tuesday   Unpopular    0.290 0.124  0.208 0.195 0.183
-    ##  4 Tuesday   Popular      0.382 0.0661 0.219 0.157 0.176
-    ##  5 Wednesday Unpopular    0.335 0.105  0.198 0.179 0.182
-    ##  6 Wednesday Popular      0.475 0.0598 0.182 0.145 0.138
-    ##  7 Thursday  Unpopular    0.280 0.0813 0.255 0.231 0.153
-    ##  8 Thursday  Popular      0.462 0.0664 0.163 0.156 0.153
-    ##  9 Friday    Unpopular    0.295 0.0841 0.236 0.214 0.170
-    ## 10 Friday    Popular      0.434 0.0731 0.185 0.171 0.137
-    ## 11 Saturday  Unpopular    0.189 0.125  0.301 0.193 0.193
-    ## 12 Saturday  Popular      0.416 0.0804 0.184 0.137 0.183
-    ## 13 Sunday    Unpopular    0.199 0.120  0.373 0.172 0.136
-    ## 14 Sunday    Popular      0.318 0.0798 0.212 0.232 0.158
-
-``` r
 b.plot2 <- b.plot1 %>% pivot_longer(cols = 3:7, names_to = "LDA.Topic", values_to = "avg.LDA")
-b.plot2
-```
 
-    ## # A tibble: 70 x 4
-    ##    day.week class.shares LDA.Topic avg.LDA
-    ##    <fct>    <fct>        <chr>       <dbl>
-    ##  1 Monday   Unpopular    LDA_0      0.279 
-    ##  2 Monday   Unpopular    LDA_1      0.167 
-    ##  3 Monday   Unpopular    LDA_2      0.176 
-    ##  4 Monday   Unpopular    LDA_3      0.229 
-    ##  5 Monday   Unpopular    LDA_4      0.148 
-    ##  6 Monday   Popular      LDA_0      0.408 
-    ##  7 Monday   Popular      LDA_1      0.0785
-    ##  8 Monday   Popular      LDA_2      0.180 
-    ##  9 Monday   Popular      LDA_3      0.195 
-    ## 10 Monday   Popular      LDA_4      0.139 
-    ## # ... with 60 more rows
-
-``` r
 barplot1 <- ggplot(data = b.plot2, aes(x = day.week, y = avg.LDA, fill = LDA.Topic))
 barplot1 + geom_bar(stat = "identity", position = "stack") + 
   labs(x = "Day of the Week", y = "Closeness to Top LDA Topic", 
@@ -389,9 +363,11 @@ barplot1 + geom_bar(stat = "identity", position = "stack") +
         legend.text = element_text(size = 13), 
         title = element_text(size = 13)) + 
   facet_wrap(~ class.shares)
+dev.off()
 ```
 
-![](../images/unnamed-chunk-5-1.png)<!-- -->
+    ## png 
+    ##   2
 
 ### Line Plot
 
@@ -403,6 +379,9 @@ across popularity groups while some other mean ratios vary across time
 and popularity groups for articles in the socmed channel.
 
 ``` r
+file.name <- paste0("../images/", params$channel, 4, ".png")
+png(filename = file.name)
+
 l.plot1 <- edadata %>% group_by(day.week, class.shares) %>% 
   summarise(LDA_0=mean(LDA_00), LDA_1=mean(LDA_01), LDA_2=mean(LDA_02), LDA_3=mean(LDA_03), LDA_4=mean(LDA_04))
 l.plot1
@@ -460,9 +439,11 @@ lineplot1 + geom_line(aes(color = LDA.Topic), lwd = 2) +
         legend.text = element_text(size = 13), 
         title = element_text(size = 13)) +
   facet_wrap(~ class.shares)
+dev.off()
 ```
 
-![](../images/unnamed-chunk-6-1.png)<!-- -->
+    ## png 
+    ##   2
 
 ### Scatterplot
 
@@ -479,6 +460,9 @@ tilted the line is, much stronger the relationship is regardless of
 positive or negative.
 
 ``` r
+file.name <- paste0("../images/", params$channel, 5, ".png")
+png(filename = file.name)
+
 scatter1 <- ggplot(data = edadata, aes(x = kw_avg_avg, y = log.shares, color = day.week)) #y=kw_avg_max
 scatter1 + geom_point(size = 2) + #aes(shape = class.shares)
   scale_color_discrete(name = "Day of the Week") + 
@@ -493,16 +477,26 @@ scatter1 + geom_point(size = 2) + #aes(shape = class.shares)
         legend.key.size = unit(1, 'cm'), 
         legend.text = element_text(size = 13), 
         title = element_text(size = 13))
+dev.off()
 ```
 
-![](../images/unnamed-chunk-7-1.png)<!-- -->
+    ## png 
+    ##   2
 
 # Modeling
 
 ## Linear Regression
 
-a short but thorough explanation of the idea of a linear regression
-model.
+The linear regression process takes a matrix of all of the predictor
+variables we’ve chosen and compares their values to each of the
+corresponding values of the response variable, `log.shares`. This allows
+us to calculate the most accurate linear combination of the predictor
+variables to make up the response variable. We can choose a variety of
+sets of predictors and compare their Root Mean Square Errors, R-Squared
+values, and Mean Absolute Errors to see which one is the strongest
+model. Below, we’ve fit multiple linear models that include all of our
+variables and various combinations of interaction terms and/or quadratic
+terms.
 
 ``` r
 # using train1, dayweek is numeric, no class_shares
@@ -694,13 +688,14 @@ Table \#\#\#. Cross Validation - Model Predictions on Test Set
 
 ## Random Forest
 
-Ilana
-
-short but reasonably thorough explanation of the ensemble model you are
-using
-
-Categorical variables have to be divided their levels into dummy
-variables style.
+The bootstrap approach to fitting a tree model involves resampling our
+data and fitting a tree to each sample, and then averaging the resulting
+predictions of each of those models. The random forest approach adds an
+extra step for each of these samples, where only a random subset of the
+predictor variables is chosen each time, in order to reduce the
+correlation between each of the trees. We don’t have to worry about
+creating dummy variables for categorical variables, because our data
+already comes in an entirely numeric form.
 
 ``` r
 train2 <- train %>% select(-class_shares, -shares, -dayweek, -LDA_00, -LDA_01, -LDA_03, -LDA_04)
@@ -729,6 +724,14 @@ train2
 preProcValues <- preProcess(train2, method = c("center", "scale"))
 trainTransformed <- predict(preProcValues, train2)
 testTransformed <- predict(preProcValues, test2)
+
+random_forest <- train(log.shares ~ ., data = trainTransformed,
+    method = "rf",
+    trControl = trainControl(method = "cv", number = 10),
+    tuneGrid = data.frame(mtry = 1:15))
+
+random_forest_predict <- predict(random_forest, newdata = testTransformed)
+rf_rmse <- postResample(random_forest_predict, obs = testTransformed$log.shares)
 ```
 
 ## Boosted Tree
@@ -772,47 +775,48 @@ boosted_tree
     ## 
     ## No pre-processing
     ## Resampling: Cross-Validated (10 fold) 
-    ## Summary of sample sizes: 1466, 1466, 1466, 1464, 1465, 1466, ... 
+    ## Summary of sample sizes: 1466, 1465, 1464, 1465, 1465, 1465, ... 
     ## Resampling results across tuning parameters:
     ## 
     ##   interaction.depth  n.trees  RMSE       Rsquared   MAE      
-    ##   1                   25      0.9563584  0.1039828  0.7292613
-    ##   1                   50      0.9432782  0.1167046  0.7136912
-    ##   1                   75      0.9371780  0.1239080  0.7064511
-    ##   1                  100      0.9333179  0.1299314  0.7010428
-    ##   2                   25      0.9459758  0.1120277  0.7154238
-    ##   2                   50      0.9388429  0.1186364  0.7046044
-    ##   2                   75      0.9393088  0.1182916  0.7048373
-    ##   2                  100      0.9411249  0.1166611  0.7044972
-    ##   3                   25      0.9426883  0.1144991  0.7128484
-    ##   3                   50      0.9388824  0.1188852  0.7057286
-    ##   3                   75      0.9416441  0.1163447  0.7075866
-    ##   3                  100      0.9456942  0.1121671  0.7095331
-    ##   4                   25      0.9410292  0.1164638  0.7098217
-    ##   4                   50      0.9408549  0.1169649  0.7072676
-    ##   4                   75      0.9444103  0.1133524  0.7101411
-    ##   4                  100      0.9487296  0.1098466  0.7134655
+    ##   1                   25      0.9580681  0.1021414  0.7298828
+    ##   1                   50      0.9451414  0.1153086  0.7129299
+    ##   1                   75      0.9401497  0.1192933  0.7066125
+    ##   1                  100      0.9383357  0.1218009  0.7059585
+    ##   2                   25      0.9488560  0.1092255  0.7174314
+    ##   2                   50      0.9386313  0.1209186  0.7057316
+    ##   2                   75      0.9377747  0.1248673  0.7038493
+    ##   2                  100      0.9388362  0.1242225  0.7023814
+    ##   3                   25      0.9419812  0.1187714  0.7089843
+    ##   3                   50      0.9383775  0.1231565  0.7030257
+    ##   3                   75      0.9402245  0.1209567  0.7037382
+    ##   3                  100      0.9418841  0.1199468  0.7030178
+    ##   4                   25      0.9393119  0.1210075  0.7092764
+    ##   4                   50      0.9409584  0.1188640  0.7089845
+    ##   4                   75      0.9428210  0.1186861  0.7096224
+    ##   4                  100      0.9469745  0.1158114  0.7129505
     ## 
     ## Tuning parameter 'shrinkage' was held constant at a value of 0.1
     ## Tuning parameter 'n.minobsinnode' was held constant at a value of 10
     ## RMSE was used to select the optimal model using the smallest value.
-    ## The final values used for the model were n.trees = 100, interaction.depth = 1, shrinkage = 0.1 and n.minobsinnode = 10.
+    ## The final values used for the model were n.trees = 75, interaction.depth = 2, shrinkage = 0.1 and n.minobsinnode = 10.
 
 ``` r
 boosted_tree_predict <- predict(boosted_tree, newdata = testTransformed)
 
 boost_rmse <- postResample(boosted_tree_predict, obs = testTransformed$log.shares)
 
-result2 <- rbind(cv_rmse1, cv_rmse3, boost_rmse)
-row.names(result2) <- c("Linear Model 1", "Linear Model 2", "Boosted Model")
+result2 <- rbind(cv_rmse1, cv_rmse3, rf_rmse, boost_rmse)
+row.names(result2) <- c("Linear Model 1", "Linear Model 2", "Random Forest Model", "Boosted Model")
 kable(result2, digits = 4, caption = "Cross Validation - Comparisons of the models in test set")
 ```
 
-|                |   RMSE | Rsquared |    MAE |
-|:---------------|-------:|---------:|-------:|
-| Linear Model 1 | 1.0765 |   0.0619 | 0.7797 |
-| Linear Model 2 | 1.0734 |   0.0697 | 0.7820 |
-| Boosted Model  | 1.0395 |   0.1268 | 0.7553 |
+|                     |   RMSE | Rsquared |    MAE |
+|:--------------------|-------:|---------:|-------:|
+| Linear Model 1      | 1.0765 |   0.0619 | 0.7797 |
+| Linear Model 2      | 1.0734 |   0.0697 | 0.7820 |
+| Random Forest Model | 1.0378 |   0.1290 | 0.7488 |
+| Boosted Model       | 1.0421 |   0.1211 | 0.7561 |
 
 Cross Validation - Comparisons of the models in test set
 
