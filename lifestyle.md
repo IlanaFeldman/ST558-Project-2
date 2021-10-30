@@ -69,26 +69,24 @@ test set. More details are in *Modeling* section.
 Table 1. Attributes used in the analyses for prediction of online news
 popularity
 
-    | Attribute                     | Attribute Information                              | Type   
-
-— \| —————————– \| ————————————————– \| ——– 1 \| `shares` (target) \|
-Number of shares \| number 2 \| `kw_avg_avg` \| Average keyword (average
-shares) \| number 3 \| `LDA_02` \| Closeness to LDA topic 2 \| ratio 4.1
-\| `weekday_is_monday` \| Was the article published on a Monday? \|
-boolean 4.2 \| `weekday_is_tuesday` \| Was the article published on a
-Tuesday? \| boolean 4.3 \| `weekday_is_wednesday` \| Was the article
-published on a Wednesday? \| boolean 4.4 \| `weekday_is_thursday` \| Was
-the article published on a Thursday? \| boolean 4.5 \|
-`weekday_is_friday` \| Was the article published on a Friday? \| boolean
-4.6 \| `weekday_is_saturday` \| Was the article published on a Saturday?
-\| boolean 4.7 \| `weekday_is_sunday` \| Was the article published on a
-Sunday? \| boolean 5 \| `self_reference_avg_sharess` \| Average shares
-of referenced articles in Mashable \| number 6 \| `average_token_length`
-\| Average length of the words in the content \| number 7 \|
-`n_tokens_content` \| Number of words in the content \| number 8 \|
-`n_tokens_title` \| Number of words in the title \| number 9 \|
-`global_subjectivity` \| Text subjectivity \| ratio 10 \| `num_imgs` \|
-Number of images \| number
+| Index | Attribute                    | Attribute Information                             | Type    |
+|-------|------------------------------|---------------------------------------------------|---------|
+| 1     | `shares` (target)            | Number of shares                                  | number  |
+| 2     | `kw_avg_avg`                 | Average keyword (average shares)                  | number  |
+| 3     | `LDA_02`                     | Closeness to LDA topic 2                          | ratio   |
+| 4.1   | `weekday_is_monday`          | Was the article published on a Monday?            | boolean |
+| 4.2   | `weekday_is_tuesday`         | Was the article published on a Tuesday?           | boolean |
+| 4.3   | `weekday_is_wednesday`       | Was the article published on a Wednesday?         | boolean |
+| 4.4   | `weekday_is_thursday`        | Was the article published on a Thursday?          | boolean |
+| 4.5   | `weekday_is_friday`          | Was the article published on a Friday?            | boolean |
+| 4.6   | `weekday_is_saturday`        | Was the article published on a Saturday?          | boolean |
+| 4.7   | `weekday_is_sunday`          | Was the article published on a Sunday?            | boolean |
+| 5     | `self_reference_avg_sharess` | Average shares of referenced articles in Mashable | number  |
+| 6     | `average_token_length`       | Average length of the words in the content        | number  |
+| 7     | `n_tokens_content`           | Number of words in the content                    | number  |
+| 8     | `n_tokens_title`             | Number of words in the title                      | number  |
+| 9     | `global_subjectivity`        | Text subjectivity                                 | ratio   |
+| 10    | `num_imgs`                   | Number of images                                  | number  |
 
 ``` r
 library(tidyverse)
@@ -368,7 +366,7 @@ corrplot(correlation, type = "upper", tl.pos = "lt",
 corrplot(correlation, type = "lower", method = "number", add = TRUE, diag = FALSE, tl.pos = "n")
 ```
 
-![](../images/lifestyleunnamed-chunk-3-1.png)<!-- -->
+![](../images/unnamed-chunk-3-1.png)<!-- -->
 
 ### Boxplot
 
@@ -401,7 +399,7 @@ ggplot(data = edadata, aes(x = day.week, y = shares)) +
         title = element_text(size = 14))
 ```
 
-![](../images/lifestyleunnamed-chunk-4-1.png)<!-- -->
+![](../images/unnamed-chunk-4-1.png)<!-- -->
 
 ### Barplot
 
@@ -442,7 +440,7 @@ ggplot(data = b.plot2, aes(x = day.week, y = avg.LDA, fill = LDA.Topic)) +
   facet_wrap(~ class.shares)
 ```
 
-![](../images/lifestyleunnamed-chunk-5-1.png)<!-- -->
+![](../images/unnamed-chunk-5-1.png)<!-- -->
 
 ### Line Plot
 
@@ -474,7 +472,7 @@ ggplot(data = l.plot2, aes(x = day.week, y = avg.LDA, group = LDA.Topic)) +
   facet_wrap(~ class.shares)
 ```
 
-![](../images/lifestyleunnamed-chunk-6-1.png)<!-- -->
+![](../images/unnamed-chunk-6-1.png)<!-- -->
 
 ### Scatterplots
 
@@ -512,7 +510,7 @@ ggplot(data = edadata, aes(x = kw_avg_avg, y = log.shares, color = day.week)) +
         title = element_text(size = 13))
 ```
 
-![](../images/lifestyleunnamed-chunk-7-1.png)<!-- -->
+![](../images/unnamed-chunk-7-1.png)<!-- -->
 
 ``` r
 ggplot(data = edadata, aes(x = log(num_imgs + 1), y = log.shares, color = day.week)) + 
@@ -530,7 +528,7 @@ ggplot(data = edadata, aes(x = log(num_imgs + 1), y = log.shares, color = day.we
         title = element_text(size = 13))
 ```
 
-![](../images/lifestyleunnamed-chunk-8-1.png)<!-- -->
+![](../images/unnamed-chunk-8-1.png)<!-- -->
 
 ### QQ Plots
 
@@ -553,7 +551,7 @@ ggplot(edadata) + geom_qq(aes(sample = shares)) + geom_qq_line(aes(sample = shar
         title = element_text(size = 13))
 ```
 
-![](../images/lifestyleunnamed-chunk-9-1.png)<!-- -->
+![](../images/unnamed-chunk-9-1.png)<!-- -->
 
 ``` r
 ggplot(edadata) + geom_qq(aes(sample = log(shares))) + geom_qq_line(aes(sample = log(shares))) +
@@ -568,7 +566,7 @@ ggplot(edadata) + geom_qq(aes(sample = log(shares))) + geom_qq_line(aes(sample =
         title = element_text(size = 13))
 ```
 
-![](../images/lifestyleunnamed-chunk-10-1.png)<!-- -->
+![](../images/unnamed-chunk-10-1.png)<!-- -->
 
 ``` r
 ggplot(edadata) + geom_qq(aes(sample = num_imgs)) + geom_qq_line(aes(sample = num_imgs)) + 
@@ -583,7 +581,7 @@ ggplot(edadata) + geom_qq(aes(sample = num_imgs)) + geom_qq_line(aes(sample = nu
         title = element_text(size = 13))
 ```
 
-![](../images/lifestyleunnamed-chunk-11-1.png)<!-- -->
+![](../images/unnamed-chunk-11-1.png)<!-- -->
 
 ``` r
 ggplot(edadata) + geom_qq(aes(sample = log(num_imgs + 1))) + geom_qq_line(aes(sample = log(num_imgs + 1))) +
@@ -598,7 +596,7 @@ ggplot(edadata) + geom_qq(aes(sample = log(num_imgs + 1))) + geom_qq_line(aes(sa
         title = element_text(size = 13))
 ```
 
-![](../images/lifestyleunnamed-chunk-12-1.png)<!-- -->
+![](../images/unnamed-chunk-12-1.png)<!-- -->
 
 Whether it’s appropriate to perform a logarithmic transformation on the
 number of images is somewhat less clear than for the number of shares.
