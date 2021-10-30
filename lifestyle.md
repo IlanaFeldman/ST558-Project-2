@@ -366,7 +366,7 @@ corrplot(correlation, type = "upper", tl.pos = "lt",
 corrplot(correlation, type = "lower", method = "number", add = TRUE, diag = FALSE, tl.pos = "n")
 ```
 
-![](../images/unnamed-chunk-3-1.png)<!-- -->
+![](../images/lifestyle/unnamed-chunk-3-1.png)<!-- -->
 
 ### Boxplot
 
@@ -399,7 +399,7 @@ ggplot(data = edadata, aes(x = day.week, y = shares)) +
         title = element_text(size = 14))
 ```
 
-![](../images/unnamed-chunk-4-1.png)<!-- -->
+![](../images/lifestyle/unnamed-chunk-4-1.png)<!-- -->
 
 ### Barplot
 
@@ -440,7 +440,7 @@ ggplot(data = b.plot2, aes(x = day.week, y = avg.LDA, fill = LDA.Topic)) +
   facet_wrap(~ class.shares)
 ```
 
-![](../images/unnamed-chunk-5-1.png)<!-- -->
+![](../images/lifestyle/unnamed-chunk-5-1.png)<!-- -->
 
 ### Line Plot
 
@@ -472,7 +472,7 @@ ggplot(data = l.plot2, aes(x = day.week, y = avg.LDA, group = LDA.Topic)) +
   facet_wrap(~ class.shares)
 ```
 
-![](../images/unnamed-chunk-6-1.png)<!-- -->
+![](../images/lifestyle/unnamed-chunk-6-1.png)<!-- -->
 
 ### Scatterplots
 
@@ -510,7 +510,7 @@ ggplot(data = edadata, aes(x = kw_avg_avg, y = log.shares, color = day.week)) +
         title = element_text(size = 13))
 ```
 
-![](../images/unnamed-chunk-7-1.png)<!-- -->
+![](../images/lifestyle/unnamed-chunk-7-1.png)<!-- -->
 
 ``` r
 ggplot(data = edadata, aes(x = log(num_imgs + 1), y = log.shares, color = day.week)) + 
@@ -528,7 +528,7 @@ ggplot(data = edadata, aes(x = log(num_imgs + 1), y = log.shares, color = day.we
         title = element_text(size = 13))
 ```
 
-![](../images/unnamed-chunk-8-1.png)<!-- -->
+![](../images/lifestyle/unnamed-chunk-8-1.png)<!-- -->
 
 ### QQ Plots
 
@@ -551,7 +551,7 @@ ggplot(edadata) + geom_qq(aes(sample = shares)) + geom_qq_line(aes(sample = shar
         title = element_text(size = 13))
 ```
 
-![](../images/unnamed-chunk-9-1.png)<!-- -->
+![](../images/lifestyle/unnamed-chunk-9-1.png)<!-- -->
 
 ``` r
 ggplot(edadata) + geom_qq(aes(sample = log(shares))) + geom_qq_line(aes(sample = log(shares))) +
@@ -566,7 +566,7 @@ ggplot(edadata) + geom_qq(aes(sample = log(shares))) + geom_qq_line(aes(sample =
         title = element_text(size = 13))
 ```
 
-![](../images/unnamed-chunk-10-1.png)<!-- -->
+![](../images/lifestyle/unnamed-chunk-10-1.png)<!-- -->
 
 ``` r
 ggplot(edadata) + geom_qq(aes(sample = num_imgs)) + geom_qq_line(aes(sample = num_imgs)) + 
@@ -581,7 +581,7 @@ ggplot(edadata) + geom_qq(aes(sample = num_imgs)) + geom_qq_line(aes(sample = nu
         title = element_text(size = 13))
 ```
 
-![](../images/unnamed-chunk-11-1.png)<!-- -->
+![](../images/lifestyle/unnamed-chunk-11-1.png)<!-- -->
 
 ``` r
 ggplot(edadata) + geom_qq(aes(sample = log(num_imgs + 1))) + geom_qq_line(aes(sample = log(num_imgs + 1))) +
@@ -596,7 +596,7 @@ ggplot(edadata) + geom_qq(aes(sample = log(num_imgs + 1))) + geom_qq_line(aes(sa
         title = element_text(size = 13))
 ```
 
-![](../images/unnamed-chunk-12-1.png)<!-- -->
+![](../images/lifestyle/unnamed-chunk-12-1.png)<!-- -->
 
 Whether it’s appropriate to perform a logarithmic transformation on the
 number of images is somewhat less clear than for the number of shares.
