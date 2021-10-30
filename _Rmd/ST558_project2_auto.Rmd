@@ -469,8 +469,8 @@ testTransformed <- predict(preProcValues, test2)
 
 random_forest <- train(log.shares ~ ., data = trainTransformed,
     method = "rf",
-    trControl = trainControl(method = "cv", number = 10),
-    tuneGrid = data.frame(mtry = 1:15))
+    trControl = trainControl(method = "cv", number = 5),
+    tuneGrid = data.frame(mtry = 1:5))
 
 random_forest_predict <- predict(random_forest, newdata = testTransformed)
 rf_rmse <- postResample(random_forest_predict, obs = testTransformed$log.shares)
