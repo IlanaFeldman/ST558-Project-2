@@ -19,11 +19,10 @@ rmarkdown::render("C:/Users/peach/Documents/ST558/ST558_repos/ST558-Project-2/_R
 ##### To run 6 reports !!!!!!!!!######### Knit with parameters, automating reports render function
 library(rmarkdown)
 library(tidyverse)
-type <- c("bus", "socmed") #, "bus", "socmed", "tech", "world") #, "entertainment") #, "bus", "socmed", "tech", "world"
+type <- c("socmed") #, "bus", "socmed", "tech", "world") #, "entertainment") #, "bus", "socmed", "tech", "world"
 output_file <- paste0(type, ".md")
 params <- lapply(type, FUN = function(x){list(channel = x)})
 reports <- tibble(output_file, params)
-reports
 
 apply(reports, MARGIN = 1, 
       FUN = function(x){

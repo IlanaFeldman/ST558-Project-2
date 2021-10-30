@@ -12,7 +12,7 @@ Jasmine Wang & Ilana Feldman
         -   [Boxplot](#boxplot)
         -   [Barplot](#barplot)
         -   [Line Plot](#line-plot)
-        -   [Scatterplot](#scatterplot)
+        -   [Scatterplots](#scatterplots)
         -   [QQ Plots](#qq-plots)
 -   [Modeling](#modeling)
     -   [Linear Regression](#linear-regression)
@@ -341,7 +341,7 @@ edadata %>% group_by(day.week) %>% summarize(
 Table 6. Comparing Image Counts by the Day of the Week
 
 ``` r
-file.name <- paste0("../images/", params$channel, "1.png")
+#file.name <- paste0("../images/", params$channel, "1.png")
 ```
 
 ## Visualizations
@@ -370,10 +370,10 @@ corrplot(correlation, type = "upper", tl.pos = "lt",
 corrplot(correlation, type = "lower", method = "number", add = TRUE, diag = FALSE, tl.pos = "n")
 ```
 
-![](../images/socmed1.pngunnamed-chunk-3-1.png)<!-- -->
+![](../images/socmedunnamed-chunk-3-1.png)<!-- -->
 
 ``` r
-file.name <- paste0("../images/", params$channel, "2.png")
+#file.name <- paste0("../images/", params$channel, "2.png")
 ```
 
 ### Boxplot
@@ -390,8 +390,8 @@ week. The median number of shares seems to be bigger during weekend than
 weekdays.
 
 ``` r
-boxplot1 <- ggplot(data = edadata, aes(x = day.week, y = shares))
-boxplot1 + geom_boxplot(fill = "white", outlier.shape = NA) + 
+ggplot(data = edadata, aes(x = day.week, y = shares)) + 
+  geom_boxplot(fill = "white", outlier.shape = NA) + 
   coord_cartesian(ylim=c(0, 10000)) + 
   geom_jitter(aes(color = day.week), size = 1) + 
   guides(color = guide_legend(override.aex = list(size = 6))) + 
@@ -407,10 +407,10 @@ boxplot1 + geom_boxplot(fill = "white", outlier.shape = NA) +
         title = element_text(size = 14))
 ```
 
-![](../images/socmed2.pngunnamed-chunk-4-1.png)<!-- -->
+![](../images/socmedunnamed-chunk-4-1.png)<!-- -->
 
 ``` r
-file.name <- paste0("../images/", params$channel, "3.png")
+#file.name <- paste0("../images/", params$channel, "3.png")
 ```
 
 ### Barplot
@@ -437,8 +437,8 @@ b.plot1 <- edadata %>% group_by(day.week, class.shares) %>%
 
 b.plot2 <- b.plot1 %>% pivot_longer(cols = 3:7, names_to = "LDA.Topic", values_to = "avg.LDA")
 
-barplot1 <- ggplot(data = b.plot2, aes(x = day.week, y = avg.LDA, fill = LDA.Topic))
-barplot1 + geom_bar(stat = "identity", position = "stack") + 
+ggplot(data = b.plot2, aes(x = day.week, y = avg.LDA, fill = LDA.Topic)) + 
+  geom_bar(stat = "identity", position = "stack") + 
   labs(x = "Day of the Week", y = "Closeness to Top LDA Topic", 
        title = "Figure 3. Popularity of Top LDA Topic on Day of the Week") + 
   scale_fill_discrete(name = "LDA Topic") + 
@@ -452,10 +452,10 @@ barplot1 + geom_bar(stat = "identity", position = "stack") +
   facet_wrap(~ class.shares)
 ```
 
-![](../images/socmed3.pngunnamed-chunk-5-1.png)<!-- -->
+![](../images/socmedunnamed-chunk-5-1.png)<!-- -->
 
 ``` r
-file.name <- paste0("../images/", params$channel, "4.png")
+#file.name <- paste0("../images/", params$channel, "4.png")
 ```
 
 ### Line Plot
@@ -473,8 +473,8 @@ l.plot1 <- edadata %>% group_by(day.week, class.shares) %>%
 
 l.plot2 <- l.plot1 %>% pivot_longer(cols = 3:7, names_to = "LDA.Topic", values_to = "avg.LDA")
 
-lineplot1 <- ggplot(data = l.plot2, aes(x = day.week, y = avg.LDA, group = LDA.Topic))
-lineplot1 + geom_line(aes(color = LDA.Topic), lwd = 2) + 
+ggplot(data = l.plot2, aes(x = day.week, y = avg.LDA, group = LDA.Topic)) + 
+  geom_line(aes(color = LDA.Topic), lwd = 2) + 
   labs(x = "Day of the Week", y = "Closeness to LDA Topic", 
        title = "Figure 4. Popularity of LDA Topic on Day of the Week") + 
   scale_color_discrete(name = "LDA Topic") +
@@ -488,13 +488,13 @@ lineplot1 + geom_line(aes(color = LDA.Topic), lwd = 2) +
   facet_wrap(~ class.shares)
 ```
 
-![](../images/socmed4.pngunnamed-chunk-6-1.png)<!-- -->
+![](../images/socmedunnamed-chunk-6-1.png)<!-- -->
 
 ``` r
-file.name <- paste0("../images/", params$channel, "5.png")
+#file.name <- paste0("../images/", params$channel, "5.png")
 ```
 
-### Scatterplot
+### Scatterplots
 
 Figure 5 shows the relationship between average keyword and
 log-transformed number of shares for articles in the socmed channel
@@ -514,8 +514,8 @@ previously, both of these variables do not behave properly in a linear
 model due to the existence of extreme outliers in the data.
 
 ``` r
-scatter1 <- ggplot(data = edadata, aes(x = kw_avg_avg, y = log.shares, color = day.week)) #y=kw_avg_max
-scatter1 + geom_point(size = 2) + #aes(shape = class.shares)
+ggplot(data = edadata, aes(x = kw_avg_avg, y = log.shares, color = day.week)) + 
+  geom_point(size = 2) + #aes(shape = class.shares)
   scale_color_discrete(name = "Day of the Week") + 
   coord_cartesian(xlim=c(0, 10000)) +
   geom_smooth(method = "lm", lwd = 2) + 
@@ -530,15 +530,15 @@ scatter1 + geom_point(size = 2) + #aes(shape = class.shares)
         title = element_text(size = 13))
 ```
 
-![](../images/socmed5.pngunnamed-chunk-7-1.png)<!-- -->
+![](../images/socmedunnamed-chunk-7-1.png)<!-- -->
 
 ``` r
-file.name <- paste0("../images/", params$channel, "6.png")
+#file.name <- paste0("../images/", params$channel, "6.png")
 ```
 
 ``` r
-scatter2 <- ggplot(data = edadata, aes(x = log(num_imgs + 1), y = log.shares, color = day.week))
-scatter2 + geom_point(size = 2) +
+ggplot(data = edadata, aes(x = log(num_imgs + 1), y = log.shares, color = day.week)) + 
+  geom_point(size = 2) +
   scale_color_discrete(name = "Day of the Week") + 
   geom_smooth(method = "lm", lwd = 2) + 
   labs(x = "log(number of images)", y = "log(number of shares)", 
@@ -552,10 +552,10 @@ scatter2 + geom_point(size = 2) +
         title = element_text(size = 13))
 ```
 
-![](../images/socmed6.pngunnamed-chunk-8-1.png)<!-- -->
+![](../images/socmedunnamed-chunk-8-1.png)<!-- -->
 
 ``` r
-file.name <- paste0("../images/", params$channel, "7a.png")
+#file.name <- paste0("../images/", params$channel, "7a.png")
 ```
 
 ### QQ Plots
@@ -579,10 +579,10 @@ ggplot(edadata) + geom_qq(aes(sample = shares)) + geom_qq_line(aes(sample = shar
         title = element_text(size = 13))
 ```
 
-![](../images/socmed7a.pngunnamed-chunk-9-1.png)<!-- -->
+![](../images/socmedunnamed-chunk-9-1.png)<!-- -->
 
 ``` r
-file.name <- paste0("../images/", params$channel, "7b.png")
+#file.name <- paste0("../images/", params$channel, "7b.png")
 ```
 
 ``` r
@@ -598,10 +598,10 @@ ggplot(edadata) + geom_qq(aes(sample = log(shares))) + geom_qq_line(aes(sample =
         title = element_text(size = 13))
 ```
 
-![](../images/socmed7b.pngunnamed-chunk-10-1.png)<!-- -->
+![](../images/socmedunnamed-chunk-10-1.png)<!-- -->
 
 ``` r
-file.name <- paste0("../images/", params$channel, "7c.png")
+#file.name <- paste0("../images/", params$channel, "7c.png")
 ```
 
 ``` r
@@ -617,10 +617,10 @@ ggplot(edadata) + geom_qq(aes(sample = num_imgs)) + geom_qq_line(aes(sample = nu
         title = element_text(size = 13))
 ```
 
-![](../images/socmed7c.pngunnamed-chunk-11-1.png)<!-- -->
+![](../images/socmedunnamed-chunk-11-1.png)<!-- -->
 
 ``` r
-file.name <- paste0("../images/", params$channel, "7d.png")
+#file.name <- paste0("../images/", params$channel, "7d.png")
 ```
 
 ``` r
@@ -636,7 +636,7 @@ ggplot(edadata) + geom_qq(aes(sample = log(num_imgs + 1))) + geom_qq_line(aes(sa
         title = element_text(size = 13))
 ```
 
-![](../images/socmed7d.pngunnamed-chunk-12-1.png)<!-- -->
+![](../images/socmedunnamed-chunk-12-1.png)<!-- -->
 
 Whether it’s appropriate to perform a logarithmic transformation on the
 number of images is somewhat less clear than for the number of shares.
