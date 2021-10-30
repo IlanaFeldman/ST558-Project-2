@@ -115,11 +115,13 @@ Table 3 shows the average shares of the articles on different days of the week. 
 
 In addition, Table 3 also shows the standard deviation of shares is huge for any day of the week. They are potentially larger than the average shares. This tells us the variance of shares for any day is huge. We know a common variance stabilizing transformation to deal with increasing variance of the response variable, that is, the log-transformation, which could help us on this matter. Therefore, Table 3 again shows after the log-transformation of shares, the mean values are similar to their corresponding median values, and their standard deviations are much smaller than before relatively speaking.
 
-Table 4 shows the numerical summaries of average keywords from `r params$channel` channel in mashable.com on different days of the week. Table 5 shows the numerical summaries of average shares of referenced articles in mashable.com on different days of the week. 
+Table 4 shows the numerical summaries of average keywords from `r params$channel` channel in mashable.com on different days of the week. This table indicates the number of times average keywords shown in the articles with average number of shares, and the table is showing the average number of the average keywords 
 
-Table 5 checks the numerical summaries of the `global_subjectivity` variable between popular and unpopular articles, to see if there's any difference or a higher variation in subjectivity in popular articles. Text subjectivity is a value between 0 and 1, so there isn't any need for transformation.
+Table 5 shows the numerical summaries of average shares of referenced articles in mashable.com on different days of the week. 
 
-Table 6 checks the numerical summaries of the image count per article on different days of the week, to see if there is a noticeable difference in image count on weekends versus weekdays across all channels, or only certain ones. Much like in table 2, the mean is smaller than the standard deviation for most of the days of the week, and the solution isn't as straightforward, since many of the articles don't have any images at all. I'll additionally include a log transformation of `images + 1` to account for this.
+Table 6 checks the numerical summaries of the `global_subjectivity` variable between popular and unpopular articles, to see if there's any difference or a higher variation in subjectivity in popular articles. Text subjectivity is a value between 0 and 1, so there isn't any need for transformation.
+
+Table 7 checks the numerical summaries of the image count per article on different days of the week, to see if there is a noticeable difference in image count on weekends versus weekdays across all channels, or only certain ones. Much like in table 2, the mean is smaller than the standard deviation for most of the days of the week, and the solution isn't as straightforward, since many of the articles don't have any images at all. I'll additionally include a log transformation of `images + 1` to account for this.
 
 ```{r eval=TRUE}
 # contingency table
@@ -145,7 +147,8 @@ edadata %>% group_by(day.week) %>% summarise(
 
 edadata %>% group_by(class.shares) %>% summarize(
   Avg.subjectivity = mean(global_subjectivity), Sd.subjectivity = sd(global_subjectivity), 
-  Median.subjectivity = median(global_subjectivity)) %>% kable(digits = 4, caption = "Table 6. Comparing Global Subjectivity between Popular and Unpopular Articles")
+  Median.subjectivity = median(global_subjectivity)) %>% 
+  kable(digits = 4, caption = "Table 6. Comparing Global Subjectivity between Popular and Unpopular Articles")
 
 edadata %>% group_by(day.week) %>% summarize(
   Avg.images = mean(num_imgs), Sd.images = sd(num_imgs), Median.images = median(num_imgs), Avg.log.images = mean(log(num_imgs + 1)), Sd.log.images = sd(log(num_imgs + 1)), Median.log.images = median(log(num_imgs + 1))) %>%
