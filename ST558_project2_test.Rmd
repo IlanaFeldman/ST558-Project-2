@@ -54,7 +54,8 @@ library(ggplot2)
 library(gbm)
 library(vip)
 
-allnews <- read_csv("../_Data/OnlineNewsPopularity.csv", col_names = TRUE)
+allnews <- read_csv("C:/Users/peach/Documents/ST558/ST558_repos/ST558-Project-2/_Data/OnlineNewsPopularity.csv",
+                    col_names = TRUE)
 
 ########KNIT with parameters!!!!!!!!!channels is in quotes!!!!Need to use it with quotes!!!!!!!!!!!!!!!!!!!!!!!!
 channels <- paste0("data_channel_is_", params$channel)
@@ -398,7 +399,7 @@ We slowly filtered out predictors, their corresponding second order terms and th
 
 We repeated this process to trim down the number of predictors and eventually selected the ones that seem to be important in predicting the number of shares, and they are not highly correlated with each other. The parameters in the linear regression model 1 were chosen through this process, and they are listed in Table 8 below. The response variable is `log(shares)`.
 
-The second linear regression model provided below applies a log transformation to the variables `num_imgs` and `self_reference_avg_sharess`, which are extremely skewed to the right even after standardization, to see if this accounts for outliers in the data and puts those variables in an appropriate context.
+The second linear regression model provided below applies a log transformation to the variables `num_imgs` and `self_reference_avg_sharess`, which are extremely skewed to the right even after standardization, to see if this accounts for the outliers in the data and puts those variables in an appropriate context.
 
 Table 8. The predictors in linear regression model 1  
   

@@ -105,7 +105,8 @@ library(ggplot2)
 library(gbm)
 library(vip)
 
-allnews <- read_csv("../_Data/OnlineNewsPopularity.csv", col_names = TRUE)
+allnews <- read_csv("C:/Users/peach/Documents/ST558/ST558_repos/ST558-Project-2/_Data/OnlineNewsPopularity.csv",
+                    col_names = TRUE)
 
 ########KNIT with parameters!!!!!!!!!channels is in quotes!!!!Need to use it with quotes!!!!!!!!!!!!!!!!!!!!!!!!
 channels <- paste0("data_channel_is_", params$channel)
@@ -759,21 +760,21 @@ data and puts those variables in an appropriate context.
 
 Table 8. The predictors in linear regression model 1
 
-| Index | Parameter in Linear Regression 1           |
-|-------|--------------------------------------------|
-| 1     | `kw_avg_avg`                               |
-| 2     | `LDA_02`                                   |
-| 3     | `dayweek`                                  |
-| 4     | `self_reference_avg_sharess`               |
-| 5     | `average_token_length`                     |
-| 6     | `n_tokens_content`                         |
-| 7     | `n_tokens_title`                           |
-| 8     | `global_subjectivity`                      |
-| 9     | `num_imgs`                                 |
-| 10    | `I(n_tokens_content^2)`                    |
-| 11    | `kw_avg_avg:num_imgs`                      |
-| 12    | `average_token_length:global_subjectivity` |
-| 13    | `dayweek:self_reference_avg_sharess`       |
+| Index | Predictor in Linear Regression 1           | Predictor Information                                               |
+|-------|--------------------------------------------|---------------------------------------------------------------------|
+| 1     | `kw_avg_avg`                               | Average keyword (average shares)                                    |
+| 2     | `LDA_02`                                   | Closeness of current article to a LDA Topic 2                       |
+| 3     | `dayweek`                                  | Day of a week the article was published                             |
+| 4     | `self_reference_avg_sharess`               | Average shares of earlier popularity news referenced in the article |
+| 5     | `average_token_length`                     | Average length of the words in the content                          |
+| 6     | `n_tokens_content`                         | Number of words in the content                                      |
+| 7     | `n_tokens_title`                           | Number of words in the title                                        |
+| 8     | `global_subjectivity`                      | Text subjectivity                                                   |
+| 9     | `num_imgs`                                 | Number of images                                                    |
+| 10    | `I(n_tokens_content^2)`                    | Quadratic term of number of words in the content                    |
+| 11    | `kw_avg_avg:num_imgs`                      | Interaction term                                                    |
+| 12    | `average_token_length:global_subjectivity` | Interaction term                                                    |
+| 13    | `dayweek:self_reference_avg_sharess`       | Interaction term                                                    |
 
 We standardized both the training set and the test set before we fit the
 linear regression models. We used the standardized mean and standard
@@ -1237,10 +1238,36 @@ boostedt <- function(...){
 The best model fit to predict the number of shares is the **Random
 Forest** model for the socmed articles. We fit the entire data set, both
 the training and the test set from the channel in the final chosen
-model. A variable importance plot and a table containing a ranking
-metric of the relative variable importance are produced below. We can
-examine which predictors contributed the most in predicting the
-popularity of online news in the final model accordingly.
+model. The values of RMSE, MAE and R-squared are calculated with the
+entire data set using the final model. A variable importance plot and a
+table containing a ranking metric of the relative variable importance
+are produced below. We can examine which predictors contributed the most
+in predicting the popularity of online news in the final model
+accordingly. Table 1 containing attribute information from the
+*Introduction* section is copied below for comparisons of variable
+importance.
+
+Table 1. Attributes used in the analyses for prediction of online news
+popularity
+
+| Index | Attribute                    | Attribute Information                                  | Type    |
+|-------|------------------------------|--------------------------------------------------------|---------|
+| 1     | `shares` (target)            | Number of shares                                       | number  |
+| 2     | `kw_avg_avg`                 | Average keyword (average shares)                       | number  |
+| 3     | `LDA_02`                     | Closeness of current article to a LDA Topic 2          | ratio   |
+| 4.1   | `weekday_is_monday`          | Was the article published on a Monday?                 | boolean |
+| 4.2   | `weekday_is_tuesday`         | Was the article published on a Tuesday?                | boolean |
+| 4.3   | `weekday_is_wednesday`       | Was the article published on a Wednesday?              | boolean |
+| 4.4   | `weekday_is_thursday`        | Was the article published on a Thursday?               | boolean |
+| 4.5   | `weekday_is_friday`          | Was the article published on a Friday?                 | boolean |
+| 4.6   | `weekday_is_saturday`        | Was the article published on a Saturday?               | boolean |
+| 4.7   | `weekday_is_sunday`          | Was the article published on a Sunday?                 | boolean |
+| 5     | `self_reference_avg_sharess` | Avg. shares of popular news referenced in the articles | number  |
+| 6     | `average_token_length`       | Average length of the words in the content             | number  |
+| 7     | `n_tokens_content`           | Number of words in the content                         | number  |
+| 8     | `n_tokens_title`             | Number of words in the title                           | number  |
+| 9     | `global_subjectivity`        | Text subjectivity                                      | ratio   |
+| 10    | `num_imgs`                   | Number of images                                       | number  |
 
 ``` r
 f_model <- if_else(final_model == "Random Forest", 3, 
@@ -1324,7 +1351,7 @@ reports <- tibble(output_file, params)
 
 apply(reports, MARGIN = 1, 
       FUN = function(x){
-        render(input = "C:/Users/peach/Documents/ST558/ST558_repos/ST558-Project-2/_Rmd/ST558_project2_auto.Rmd",
+        render(input = "C:/Users/peach/Documents/ST558/ST558_repos/ST558-Project-2/ST558_project2_test.Rmd",
                output_format = "github_document", 
                output_file = paste0("C:/Users/peach/documents/ST558/ST558_repos/ST558-Project-2/", x[[1]]),
                params = x[[2]],
