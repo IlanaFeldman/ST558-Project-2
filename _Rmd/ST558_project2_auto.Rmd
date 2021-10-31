@@ -524,16 +524,8 @@ rsq_best <- names(which.max(result2[,2]))
 mae_best <- names(which.min(result2[,3]))
 model_best <- table(c(rmse_best, rsq_best, mae_best))
 final_model <- if_else(max(model_best) > 1, names(which.max(model_best)), rmse_best)
+
 ```
-
-# Final Model Fit with Entire Data
-
-The best model fit to predict the number of shares is the **`r final_model`** model for the `r params$channel` articles.
-
-both training and the test sets have been standardized with same mean and same standard deviation. 
-
-Figure 9. variable importance plot
-
 
 ```{r eval=TRUE}
 linear1 <- function(...){
@@ -599,7 +591,20 @@ boostedt <- function(...){
   return(list(btfit, important, plot_imp))
   
 }
+```
 
+# Final Model Fit with Entire Data
+
+The best model fit to predict the number of shares is the **`r final_model`** model for the `r params$channel` articles.
+
+both training and the test sets have been standardized with same mean and same standard deviation. 
+
+Figure 9. variable importance plot
+
+
+
+
+```{r eval=TRUE}
 f_model <- if_else(final_model == "Random Forest", 3, 
            if_else(final_model == "Boosted Tree", 4, 
                    if_else(final_model == "Linear Regression 1", 1, 2)))
