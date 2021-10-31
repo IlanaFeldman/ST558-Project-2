@@ -602,7 +602,7 @@ boostedt <- function(...){
 
 # Final Model Fit with Entire Data
 
-The best model fit to predict the number of shares is the **`r final_model`** model for the `r params$channel` articles. We fit the entire data set, both the training and the test set from the channel in the final chosen model. The values of RMSE, MAE and R-squared are calculated with the entire data set using the final model. A variable importance plot and a table containing a ranking metric of the relative variable importance are produced below. We can examine which predictors contributed the most in predicting the popularity of online news in the final model accordingly. Table 1 containing attribute information from the *Introduction* section is copied below for comparisons of variable importance.
+The best model fit to predict the number of shares is the **`r final_model`** model for the `r params$channel` articles. We fit the entire data set, both the training and the test set from the channel in the final chosen model. The values of RMSE, MAE and R-squared are calculated with the entire data set using the final model. A variable importance plot of the top 10 most important variables and a table containing a ranking metric of the relative variable importance are produced below. We can examine which predictors contributed the most in predicting the popularity of online news in the final model accordingly. Table 1 containing attribute information from the *Introduction* section is copied below for comparisons of variable importance.
 
 Table 1. Attributes used in the analyses for prediction of online news popularity
 
