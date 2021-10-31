@@ -51,7 +51,7 @@ library(ggplot2)
 library(gbm)
 library(vip)
 
-allnews <- read_csv("../_Data/OnlineNewsPopularity.csv", col_names = TRUE)
+allnews <- read_csv("C:/Users/peach/Documents/ST558/ST558_repos/St558-Project-2/_Data/OnlineNewsPopularity.csv", col_names = TRUE)
 
 ########KNIT with parameters!!!!!!!!!channels is in quotes!!!!Need to use it with quotes!!!!!!!!!!!!!!!!!!!!!!!!
 channels <- paste0("data_channel_is_", params$channel)
