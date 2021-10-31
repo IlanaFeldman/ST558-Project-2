@@ -13,6 +13,7 @@ The purpose of the repo is to use supervised machine learning methods (linear re
    * corrplot
    * ggplot2
    * gbm
+   * vip
 
 ## Links to each of the generated analyses using automation
 
@@ -28,7 +29,7 @@ The purpose of the repo is to use supervised machine learning methods (linear re
 ```{r eval=FALSE}  
   library(rmarkdown)  
   library(tidyverse)  
-  type <- c("lifestyle", "entertainment") #, "bus", "socmed", "tech", "world"  
+  type <- c("lifestyle", "entertainment", "bus", "socmed", "tech", "world")  
   output_file <- paste0(type, ".md")  
   params <- lapply(type, FUN = function(x){list(channel = x)})  
   reports <- tibble(output_file, params)  
