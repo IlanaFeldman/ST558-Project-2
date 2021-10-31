@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 
 ```
 
-# Introduction
+# 1. Introduction
 
 Due to the expansion of online businesses, people can almost do anything online. With the increasing amount of Internet usages, there has been a growing interest in online news as well since they allow for an easier and faster spread of information around the world. Hence, predicting the popularity of online news has become an interest for research purposes. Popularity of online news is frequently measured by the number of interactions in the social networks such as number of likes, comments and shares. Predicting such measures is important to news authors, advertisers and publishing organizations. Therefore, the study collected news articles published between January 7th, 2013 and January 7th, 2015 from different channels on Mashable which is one of the largest online news sites. 
 
@@ -100,7 +100,7 @@ test1 <- test %>% select(-class_shares, -shares,
                          -weekday_is_friday, -weekday_is_saturday, -weekday_is_sunday, -LDA_00, -LDA_01, -LDA_03, -LDA_04)
 ```
 
-# Data
+# 2. Data
 
 When a subset of data is selected for the `r params$channel` channel articles which contain `r dim(news)[1]` articles, the subset of data is then split into a training set (70% of the subset data) and a test set (30% of the subset data) based on the target variable, the number of shares. There are `r dim(train)[1]` articles in the training set and `r dim(test)[1]` observations in the test set regarding the `r params$channel` channel. The `createDataPartition` function from the `caret` package is used to split the data into training and test sets. We set a seed so that the analyses we implemented are reproducible. 
 
@@ -108,11 +108,11 @@ The data donated by the study contains a "day of the week" categorical variable 
 
 However, these `dayweek` related variables for each day of the week in boolean format are needed when we run the ensemble models. In addition, we classified the articles based on their number of shares into two categories, a "popular" group when their number of shares is more than 1,400 and an "unpopular" group when their number of shares is less than 1,400. Note that, when we dichotomize a continuous variable into different groups, we lose information about that variable. We hope to see some patterns in different categories of shares although what we discover may not reflect on what the data really presents because we did not use the "complete version" of the information within the data. This is purely for data exploratory analysis purpose in the next section. 
 
-# Exploratory Data Analysis
+# 3. Exploratory Data Analysis
 
 The `r params$channel` channel has `r dim(train)[1]` articles collected. Now let us take a look at the relationships between our response and the predictors with some numerical summaries and plots. 
 
-## Numerical Summaries
+## 3.1. Numerical Summaries
 
 Table 2 shows the popularity of the news articles on different days of the week. We classified the number of shares greater than 1400 in a day as "popular" and the number of shares less than 1400 in a day as "unpopular". We can see the number of articles from the `r params$channel` channel classified into "popular" group or "unpopular" group on different days of the week from January 7th, 2013 to January 7th, 2015 when the articles were published and retrieved by the study. Note, this table may not reflect on the information contained in the data due to dichotomizing the data.
 
@@ -161,11 +161,11 @@ edadata %>% group_by(day.week) %>% summarize(
 
 ```
 
-## Visualizations
+## 3.2. Visualizations
 
 Graphical presentation is a great tool used to visualize the relationships between the predictors and the number of shares (or log number of shares). Below we will see some plots that tell us stories between those variables.
 
-### Correlation Plot
+### 3.2.1. Correlation Plot
 
 Figure 1 shows the linear relationship between the variables, both the response and the predictors, which will be used in the regression models as well as the ensemble models for predicting the number of shares. Notice that there may be potential collinearity among the predictor variables. The correlation ranges between -1 and 1, with the value equals 0 means that there is no linear relationship between the two variables. The closer the correlation measures towards 1, the stronger the positive linear correlation/relationship there is between the two variables. Vice verse, the close the correlation measures towards -1, the stronger the negative linear correlation/relationship there is between the two variables.
 
@@ -180,7 +180,7 @@ corrplot(correlation, type = "upper", tl.pos = "lt",
 corrplot(correlation, type = "lower", method = "number", add = TRUE, diag = FALSE, tl.pos = "n")
 ```
 
-### Boxplot 
+### 3.2.2. Boxplot 
 
 Figure 2 shows the number of shares across different days of the week. Here, due to the huge number of large-valued outliers, I capped the number of shares to 8,000 so that we can see the medians and the interquartile ranges clearly for different days of the week.
 
@@ -225,7 +225,7 @@ ggplot(data = edadata, aes(x = day.week, y = n_tokens_content)) +
         title = element_text(size = 14))
 ```
 
-### Barplot
+### 3.2.3. Barplot
 
 Figure 4 shows the popularity of the news articles in relations to their closeness to a top LDA topic for the `r params$channel` channel on any day of the week. The Latent Dirichlet Allocation (LDA) is an algorithm applied to the Mashable texts of the articles in order to identify the five top relevant topics and then measure the closeness of the current articles to each topic, and there are five topics categories. Thus, each article published on Mashable was measured for each of the topic categories. Together, those LDA measures in ratios are added to 1 for each article. Thus, these LDA topics variables are highly correlated with one another. 
 
@@ -254,7 +254,7 @@ ggplot(data = b.plot2, aes(x = day.week, y = avg.LDA, fill = LDA.Topic)) +
   facet_wrap(~ class.shares)
 ```
 
-### Line Plot
+### 3.2.4. Line Plot
 
 Figure 5 is a line plot that shows the same measurements as in Figure 4 that we can see the patterns of the mean ratios of a LDA topic vary or not vary across time in different popularity groups more clearly. Again, some mean ratios of LDA topics do not seem to vary across time when the corresponding lines are flattened while other mean ratios of LDA topics vary across time when their lines are fluctuating. The patterns observed in the "popular" group may not reflect on the same trend in the "unpopular" group for articles in the `r params$channel` channel.
 
@@ -280,7 +280,7 @@ ggplot(data = l.plot2, aes(x = day.week, y = avg.LDA, group = LDA.Topic)) +
 
 ```
 
-### Scatterplots
+### 3.2.5. Scatterplots
 
 Figure 6 shows the relationship between the average keyword and log-transformed shares for articles in the `r params$channel` channel across different days of the week. In the news popularity study, it showed average keyword was ranked top one predictor in variable importance in the optimal predictive model (random forest) they selected that produced the highest accuracy in prediction of popularity online articles. Therefore, we are interested to see how average keyword is related with log shares. The different colored linear regression lines indicate different days of the week. 
 
@@ -323,7 +323,7 @@ ggplot(data = edadata, aes(x = log(num_imgs + 1), y = log.shares, color = day.we
 
 ```
 
-### QQ Plots
+### 3.2.6. QQ Plots
 
 To justify the usage of the log transformations for shares and images, we'll show the QQ plot of each over the `r params$channel` channel in figures 8a, 8b, 8c, and 8d. We're aiming for something close to a straight line, which would indicate that the data is approximately normal in its distribution and does not need further standardization.
 
@@ -383,9 +383,9 @@ ggplot(edadata) + geom_qq(aes(sample = log(num_imgs + 1))) + geom_qq_line(aes(sa
 
 Whether it's appropriate to perform a logarithmic transformation on the number of images is somewhat less clear than for the number of shares.
 
-# Candidate Models
+# 4. Candidate Models
 
-## Linear Regression
+## 4.1. Linear Regression
 
 The linear regression process takes a matrix of all of the predictor variables we've chosen and compares their values to each of the corresponding values of the response variable, `log.shares`. This allows us to calculate the most accurate linear combination of the predictor variables to make up the response variable. We can choose a variety of sets of predictors and compare their Root Mean Square Errors, R-Squared values, and Mean Absolute Errors to see which one is the strongest model. Below, we've fit multiple linear models that include all of our variables and various combinations of interaction terms and/or quadratic terms.
 
@@ -452,7 +452,7 @@ cv_rmse1 <- postResample(pred1, obs = testTransformed1$log.shares)
 cv_rmse2 <- postResample(pred2, obs = testTransformed1$log.shares)
 ```
 
-## Random Forest 
+## 4.2. Random Forest 
 
 The bootstrap approach to fitting a tree model involves resampling our data and fitting a tree to each sample, and then averaging the resulting predictions of each of those models. The random forest approach adds an extra step for each of these samples, where only a random subset of the predictor variables is chosen each time, in order to reduce the correlation between each of the trees. We don't have to worry about creating dummy variables for categorical variables, because our data already comes in an entirely numeric form. 
 
@@ -480,7 +480,7 @@ random_forest$results
 
 We then used 5 fold cross validation to search for the tuning parameter value ranging from 1 to 5 that produces the optimal random forest model. The optimal model chosen by cross validation produced the smallest RMSE value when mtry = `r random_forest$bestTune[[1]]` and the lowest RMSE = `r min(random_forest$results[, 2])` when training the model on the training set.  
 
-## Boosted Tree
+## 4.3. Boosted Tree
 
 Random forest models use bagging technique (bootstrap aggregation) to build independent decision trees with different subsets of predictors and combine them in parallel. On the contrary, gradient boosted trees use a method called boosting. Boosting method trains each weak learner slowly and then combines them sequentially, with weak learners being the decision trees with only one split. Thus, each new tree can correct the errors made by the previous tree. Because boosting is to slowly train the trees so that they avoid overfitting the data. Since the trees grow slowly and in a sequential manner, each tree we create is based off a previous tree and we update the predictions as we go. For instance, we fit the model, we get our predictions, and now we create a new model based off the previous model. Then, we update our predictions based on the new model. Then, we build a newer model based off the previous one, and we update the predictions from the new model. The process is repeated until the criteria set for the tuning parameters are met. 
 
@@ -516,7 +516,7 @@ boosted_tree
 
 We then used 10 fold cross validation to search all combinations of the tuning parameters values using the `expand.grid` function to choose an optimal model with the desired tuning parameters values. The optimal boosted tree model chosen by cross validation produced the smallest RMSE value (`r min(boosted_tree$results[, 5])`) when n.trees = `r boosted_tree$bestTune[[1]]`, interaction.depth = `r boosted_tree$bestTune[[2]]`, shrinkage = `r boosted_tree$bestTune[[3]]` and n.minobsinnode = `r boosted_tree$bestTune[[4]]` when training the model with the training set. 
 
-## Model Comparisons
+## 4.4. Model Comparisons
 
 The best model fit to predict the number of shares for the `r params$channel` channel can be determined by looking at the Root Mean Squared Error, the Mean Absolute Error, or the R-squared value using the test set. Table 8 shows these criteria measures for each candidate model. The approach I've taken below picks whichever model is considered superior by the majority score of these three metrics, and if each of the metrics picks a different model or the majority score is a tiebreaker, then the one with the lowest RMSE will be chosen. 
 
@@ -600,7 +600,7 @@ boostedt <- function(...){
 }
 ```
 
-# Final Model Fit with Entire Data
+# 5. Final Model Fit with Entire Data
 
 The best model fit to predict the number of shares is the **`r final_model`** model for the `r params$channel` articles. We fit the entire data set, both the training and the test set from the channel in the final chosen model. The values of RMSE, MAE and R-squared are calculated with the entire data set using the final model. A variable importance plot of the top 10 most important variables and a table containing a ranking metric of the relative variable importance are produced below. We can examine which predictors contributed the most in predicting the popularity of online news in the final model accordingly. Table 1 containing attribute information from the *Introduction* section is copied below for comparisons of variable importance.
 
@@ -645,7 +645,7 @@ switch(f_model,
 #print(paste0("The most important predictor is ", first, ", the second is ", second))
 ```
 
-# Automation 
+# 6. Automation 
 
 To knit with the parameters with this single .Rmd file, we specified the parameters in the YAML header and created a data frame which contains both the output .md file names and the parameters we supplied to the YAML header to automate the reports. Both the names of the parameters and the values of the parameters were saved in a list format in that data frame. Then, we used the render function below to knit with the parameters in R console to generate the reports. The render function is not evaluated with this .Rmd file.
 
