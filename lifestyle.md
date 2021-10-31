@@ -181,7 +181,16 @@ models. When `dayweek` = 1, the article was published on a Monday, when
 `dayweek` = 7, the article was published on a Sunday.
 
 However, these `dayweek` related variables for each day of the week in
-boolean format are needed when we run the ensemble models.
+boolean format are needed when we run the ensemble models. In addition,
+we classified the articles based on their number of shares into two
+categories, a “popular” group when their number of shares is more than
+1,400 and an “unpopular” group when their number of shares is less than
+1,400. Note that, when we dichotomize a continuous variable into
+different groups, we lose information about that variable. We hope to
+see some patterns in different categories of shares although what we
+discover may not reflect on what the data really presents because we did
+not use the “complete version” of the information within the data. This
+is purely for data exploratory analysis purpose in the next section.
 
 # Exploratory Data Analysis
 
@@ -197,7 +206,9 @@ as “popular” and the number of shares less than 1400 in a day as
 “unpopular”. We can see the number of articles from the lifestyle
 channel classified into “popular” group or “unpopular” group on
 different days of the week from January 7th, 2013 to January 7th, 2015
-when the articles were published and retrieved by the study.
+when the articles were published and retrieved by the study. Note, this
+table may not reflect on the information contained in the data due to
+dichotomizing the data.
 
 Table 3 shows the average shares of the articles on different days of
 the week. We can compare and determine which day of the week has the
@@ -219,14 +230,22 @@ log-transformation, which could help us on this matter. Therefore, Table
 are similar to their corresponding median values, and their standard
 deviations are much smaller than before relatively speaking.
 
-Table 4 shows the numerical summaries of average keywords from lifestyle
-channel in mashable.com on different days of the week. This table
-indicates the number of times average keywords shown in the articles
-with average number of shares, and the table is showing the average
-number of the average keywords
+Table 4 shows the numerical summaries of *average keywords* from
+lifestyle channel in mashable.com on different days of the week. This
+table indicates the number of times *average keywords* shown in the
+articles regarding the average number of shares, and the table is
+showing the average number of those *average keywords* calculated for
+each day of the week so that we can compare to see which day of the
+week, the *average keywords* showed up the most or the worst according
+to the average of shares in the lifestyle channel.
 
 Table 5 shows the numerical summaries of average shares of referenced
-articles in mashable.com on different days of the week.
+articles in mashable.com on different days of the week. We calculated
+the average number of shares of those articles that contained the
+earlier popularity of news referenced for each day of the week so that
+we can compare which day has the most or the worst average number of
+shares when there were earlier popularity of news referenced in the
+lifestylearticles.
 
 Table 6 checks the numerical summaries of the `global_subjectivity`
 variable between popular and unpopular articles, to see if there’s any
@@ -358,15 +377,26 @@ between those variables.
 
 ### Correlation Plot
 
-Figure 1 shows the correlations between the variables, both the response
-and the predictors, which will be used in the regression models as well
-as the ensemble models for predicting the number of shares. Notice that
-there may be some collinearity among the predictor variables.
+Figure 1 shows the linear relationship between the variables, both the
+response and the predictors, which will be used in the regression models
+as well as the ensemble models for predicting the number of shares.
+Notice that there may be potential collinearity among the predictor
+variables. The correlation ranges between -1 and 1, with the value
+equals 0 means that there is no linear relationship between the two
+variables. The closer the correlation measures towards 1, the stronger
+the positive linear correlation/relationship there is between the two
+variables. Vice verse, the close the correlation measures towards -1,
+the stronger the negative linear correlation/relationship there is
+between the two variables.
+
+The correlation measures the “linear” relationships between the
+variables. If the relationships between the variables are not linear,
+then correlation measures cannot capture them, for instance, a quadratic
+relationship. Scatterplots between the variables may be easier to spot
+those non-linear relationships between the variables which we will show
+in the following section.
 
 ``` r
-# keep log-shares
-#corplt <- train %>% select(-class_shares, -weekday_is_monday, -weekday_is_tuesday, -weekday_is_wednesday,
-#                           -weekday_is_thursday, -weekday_is_friday, -weekday_is_saturday, -weekday_is_sunday) 
 correlation <- cor(train1, method="spearman")
 
 corrplot(correlation, type = "upper", tl.pos = "lt", 
@@ -375,27 +405,32 @@ corrplot(correlation, type = "upper", tl.pos = "lt",
 corrplot(correlation, type = "lower", method = "number", add = TRUE, diag = FALSE, tl.pos = "n")
 ```
 
-![](../images/lifestyle/unnamed-chunk-5-1.png)<!-- -->
+![](../images/lifestyle/unnamed-chunk-10-1.png)<!-- -->
 
 ### Boxplot
 
 Figure 2 shows the number of shares across different days of the week.
 Here, due to the huge number of large-valued outliers, I capped the
 number of shares to 10,000 so that we can see the medians and the
-interquartile ranges for different days of the week. Figure 2 coincides
-with the findings in Table 2 that the variance of shares is huge across
-days of the week, and the mean values of shares across different days
-are driven by larged-valued outliers. Therefore, those mean values of
-shares are not close to the median values of shares for each day of the
-week. The median number of shares seems to be bigger during weekend than
-weekdays.
+interquartile ranges clearly for different days of the week.
+
+This is a boxplot with the days of the week on the x-axis and the number
+of shares on the y-axis. We can inspect the trend of shares to see if
+the shares are higher on a Monday, a Friday or a Sunday for the
+lifestyle articles.
+
+Figure 2 coincides with the findings in Table 3 that the variance of
+shares is huge across days of the week, and the mean values of shares
+across different days are driven by larged-valued outliers. Therefore,
+those mean values of shares are not close to the median values of shares
+for each day of the week.
 
 ``` r
 ggplot(data = edadata, aes(x = day.week, y = shares)) + 
   geom_boxplot(fill = "white", outlier.shape = NA) + 
   coord_cartesian(ylim=c(0, 10000)) + 
   geom_jitter(aes(color = day.week), size = 1) + 
-  guides(color = guide_legend(override.aes = list(size = 6))) + 
+  guides(color = guide_legend(override.aes = list(size = 8))) + 
   labs(x = "Day of the Week", y = "Number of Shares", 
        title = "Figure 2. Number of shares across different days of the week") + 
   scale_color_discrete(name = "Day of the Week") +
@@ -408,25 +443,33 @@ ggplot(data = edadata, aes(x = day.week, y = shares)) +
         title = element_text(size = 14))
 ```
 
-![](../images/lifestyle/unnamed-chunk-6-1.png)<!-- -->
+![](../images/lifestyle/unnamed-chunk-11-1.png)<!-- -->
 
 ### Barplot
 
-Figure 3 shows the popularity of the closeness to a top LDA topic for
-the lifestyle channel on mashable.com on any day of the week. The
-measurements of the different LDA topics are in ratios, and these are
-the mean ratios calculated for the specific day of thte week for that
-topic across 709 days of collections of data in mashable.com. These mean
-ratios are further classified into a “popular” group and an “unpopular”
-group according to their number of shares.
+Figure 3 shows the popularity of the news articles in relations to their
+closeness to a top LDA topic for the lifestyle channel on any day of the
+week. The Latent Dirichlet Allocation (LDA) is an algorithm applied to
+the Mashable texts of the articles in order to identify the five top
+relevant topics and then measure the closeness of the current articles
+to each topic, and there are five topics categories. Thus, each article
+published on Mashable was measured for each of the topic categories.
+Together, those LDA measures in ratios are added to 1 for each article.
+Thus, these LDA topics variables are highly correlated with one another.
+
+We calculated the mean ratios of these LDA topics variables for the
+specific day of the week. These mean ratios are further classified into
+a “popular” group and an “unpopular” group according to their number of
+shares (&gt; 1400 or &lt; 1400) which is shown in Figure 3 barplot.
+Note, the `position = "stack"` not `position = "fill"` in the `geom_bar`
+function.
 
 Some mean ratios of a LDA topic do not seem to vary over the days of a
-week while other mean ratios of LDA topics vary across different days of
-the week. Note, when we dicotomize a continuous variable into different
-groups, we lose information about that variable. Here, I just want to
-show you whether or not the mean ratios of a LDA topic differ across
-time for different levels of shares. The classified version of number of
-shares will not be used to fit in a model later.
+week while other mean ratios of the LDA topics vary across different
+days of the week. Recall, when we dichotomize a continuous variable into
+different groups, we lose information about that variable. Here, I just
+want to show you whether or not the mean ratios of a LDA topic differ
+across time for different categories of shares.
 
 ``` r
 b.plot1 <- edadata %>% group_by(day.week, class.shares) %>% 
@@ -449,16 +492,18 @@ ggplot(data = b.plot2, aes(x = day.week, y = avg.LDA, fill = LDA.Topic)) +
   facet_wrap(~ class.shares)
 ```
 
-![](../images/lifestyle/unnamed-chunk-7-1.png)<!-- -->
+![](../images/lifestyle/unnamed-chunk-12-1.png)<!-- -->
 
 ### Line Plot
 
-Here, Figure 4 shows the same measurements as in Figure 3 but in line
-plot which we can see how the patterns of the mean ratios of a LDA topic
-vary or not vary across time in different popularity groups more
-clearly. Again, some mean ratios do not seem to vary across time and
-across popularity groups while some other mean ratios vary across time
-and popularity groups for articles in the lifestyle channel.
+Figure 4 is a line plot that shows the same measurements as in Figure 3
+that we can see the patterns of the mean ratios of a LDA topic vary or
+not vary across time in different popularity groups more clearly. Again,
+some mean ratios of LDA topics do not seem to vary across time when the
+corresponding lines are flattened while other mean ratios of LDA topics
+vary across time when their lines are fluctuating. The patterns observed
+in the “popular” group may not reflect on the same trend in the
+“unpopular” group for articles in the lifestyle channel.
 
 ``` r
 l.plot1 <- edadata %>% group_by(day.week, class.shares) %>% 
@@ -481,21 +526,30 @@ ggplot(data = l.plot2, aes(x = day.week, y = avg.LDA, group = LDA.Topic)) +
   facet_wrap(~ class.shares)
 ```
 
-![](../images/lifestyle/unnamed-chunk-8-1.png)<!-- -->
+![](../images/lifestyle/unnamed-chunk-13-1.png)<!-- -->
 
 ### Scatterplots
 
-Figure 5 shows the relationship between average keyword and
-log-transformed number of shares for articles in the lifestyle channel
-across different days of the week. In the news popularity study, it says
-average keyword is the most important predictor in the models they used
-which accounted for the most variation in the data. Therefore, we are
-interested to see how average keyword is correlated with log shares. The
-different colored linear regression lines indicate different days of the
-week. If it is an upward trend, it shows positive linear relationship.
-If it is a downward trend, it shows a negative linear relationship. More
-tilted the line is, much stronger the relationship is regardless of
-positive or negative.
+Figure 5 shows the relationship between the average keyword and
+log-transformed shares for articles in the lifestyle channel across
+different days of the week. In the news popularity study, it showed
+average keyword was ranked top one predictor in variable importance in
+the optimal predictive model (random forest) they selected that produced
+the highest accuracy in prediction of popularity online articles.
+Therefore, we are interested to see how average keyword is related with
+log shares. The different colored linear regression lines indicate
+different days of the week.
+
+If the points display an upward trend, it indicates a positive
+relationship between the average keyword and log-shares. With an
+increasing log number of shares, the number of average keywords also
+increases, meaning people tend to share the article more when they see
+more of those average keywords in the article. On the contrary, if the
+points are in a downward trend, it indicates a negative relationship
+between the average keyword and log-shares. With an decreasing log
+number of shares, the number of average keywords decreases as well.
+People tend to share the articles less when they see less of these
+average keywords in the articles from the lifestyle channel.
 
 Figure 6 is similar, except it compares the log-transformed number of
 shares to the log-transformed images in the article. As noted
@@ -519,7 +573,7 @@ ggplot(data = edadata, aes(x = kw_avg_avg, y = log.shares, color = day.week)) +
         title = element_text(size = 13))
 ```
 
-![](../images/lifestyle/unnamed-chunk-9-1.png)<!-- -->
+![](../images/lifestyle/unnamed-chunk-14-1.png)<!-- -->
 
 ``` r
 ggplot(data = edadata, aes(x = log(num_imgs + 1), y = log.shares, color = day.week)) + 
@@ -537,7 +591,7 @@ ggplot(data = edadata, aes(x = log(num_imgs + 1), y = log.shares, color = day.we
         title = element_text(size = 13))
 ```
 
-![](../images/lifestyle/unnamed-chunk-10-1.png)<!-- -->
+![](../images/lifestyle/unnamed-chunk-15-1.png)<!-- -->
 
 ### QQ Plots
 
@@ -560,7 +614,7 @@ ggplot(edadata) + geom_qq(aes(sample = shares)) + geom_qq_line(aes(sample = shar
         title = element_text(size = 13))
 ```
 
-![](../images/lifestyle/unnamed-chunk-11-1.png)<!-- -->
+![](../images/lifestyle/unnamed-chunk-16-1.png)<!-- -->
 
 ``` r
 ggplot(edadata) + geom_qq(aes(sample = log(shares))) + geom_qq_line(aes(sample = log(shares))) +
@@ -575,7 +629,7 @@ ggplot(edadata) + geom_qq(aes(sample = log(shares))) + geom_qq_line(aes(sample =
         title = element_text(size = 13))
 ```
 
-![](../images/lifestyle/unnamed-chunk-12-1.png)<!-- -->
+![](../images/lifestyle/unnamed-chunk-17-1.png)<!-- -->
 
 ``` r
 ggplot(edadata) + geom_qq(aes(sample = num_imgs)) + geom_qq_line(aes(sample = num_imgs)) + 
@@ -590,7 +644,7 @@ ggplot(edadata) + geom_qq(aes(sample = num_imgs)) + geom_qq_line(aes(sample = nu
         title = element_text(size = 13))
 ```
 
-![](../images/lifestyle/unnamed-chunk-13-1.png)<!-- -->
+![](../images/lifestyle/unnamed-chunk-18-1.png)<!-- -->
 
 ``` r
 ggplot(edadata) + geom_qq(aes(sample = log(num_imgs + 1))) + geom_qq_line(aes(sample = log(num_imgs + 1))) +
@@ -605,7 +659,7 @@ ggplot(edadata) + geom_qq(aes(sample = log(num_imgs + 1))) + geom_qq_line(aes(sa
         title = element_text(size = 13))
 ```
 
-![](../images/lifestyle/unnamed-chunk-14-1.png)<!-- -->
+![](../images/lifestyle/unnamed-chunk-19-1.png)<!-- -->
 
 Whether it’s appropriate to perform a logarithmic transformation on the
 number of images is somewhat less clear than for the number of shares.

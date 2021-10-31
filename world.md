@@ -1,4 +1,4 @@
-ST558 - Project 2 - Predictive Modeling
+Project 2 - Predictive Models for Popularity of Online News
 ================
 Jasmine Wang & Ilana Feldman
 10/31/2021
@@ -12,7 +12,7 @@ Jasmine Wang & Ilana Feldman
         -   [Boxplot](#boxplot)
         -   [Barplot](#barplot)
         -   [Line Plot](#line-plot)
-        -   [Scatterplot](#scatterplot)
+        -   [Scatterplots](#scatterplots)
         -   [QQ Plots](#qq-plots)
 -   [Modeling](#modeling)
     -   [Linear Regression](#linear-regression)
@@ -69,24 +69,24 @@ test set. More details are in *Modeling* section.
 Table 1. Attributes used in the analyses for prediction of online news
 popularity
 
-| Attribute              | Attribute Information                     | Type                                              |         |
-|------------------------|-------------------------------------------|---------------------------------------------------|---------|
-| 1                      | `shares` (target)                         | Number of shares                                  | number  |
-| 2                      | `kw_avg_avg`                              | Average keyword (average shares)                  | number  |
-| 3                      | `LDA_02`                                  | Closeness to LDA topic 2                          | ratio   |
-| 4                      | `weekday_is_monday`                       | Was the article published on a Monday?            | boolean |
-| `weekday_is_tuesday`   | Was the article published on a Tuesday?   | boolean                                           |         |
-| `weekday_is_wednesday` | Was the article published on a Wednesday? | boolean                                           |         |
-| `weekday_is_thursday`  | Was the article published on a Thursday?  | boolean                                           |         |
-| `weekday_is_friday`    | Was the article published on a Friday?    | boolean                                           |         |
-| `weekday_is_saturday`  | Was the article published on a Saturday?  | boolean                                           |         |
-| `weekday_is_sunday`    | Was the article published on a Sunday?    | boolean                                           |         |
-| 5                      | `self_reference_avg_sharess`              | Average shares of referenced articles in Mashable | number  |
-| 6                      | `average_token_length`                    | Average length of the words in the content        | number  |
-| 7                      | `n_tokens_content`                        | Number of words in the content                    | number  |
-| 8                      | `n_tokens_title`                          | Number of words in the title                      | number  |
-| 9                      | `global_subjectivity`                     | Text subjectivity                                 | ratio   |
-| 10                     | `num_imgs`                                | Number of images                                  | number  |
+| Index | Attribute                    | Attribute Information                             | Type    |
+|-------|------------------------------|---------------------------------------------------|---------|
+| 1     | `shares` (target)            | Number of shares                                  | number  |
+| 2     | `kw_avg_avg`                 | Average keyword (average shares)                  | number  |
+| 3     | `LDA_02`                     | Closeness to LDA topic 2                          | ratio   |
+| 4.1   | `weekday_is_monday`          | Was the article published on a Monday?            | boolean |
+| 4.2   | `weekday_is_tuesday`         | Was the article published on a Tuesday?           | boolean |
+| 4.3   | `weekday_is_wednesday`       | Was the article published on a Wednesday?         | boolean |
+| 4.4   | `weekday_is_thursday`        | Was the article published on a Thursday?          | boolean |
+| 4.5   | `weekday_is_friday`          | Was the article published on a Friday?            | boolean |
+| 4.6   | `weekday_is_saturday`        | Was the article published on a Saturday?          | boolean |
+| 4.7   | `weekday_is_sunday`          | Was the article published on a Sunday?            | boolean |
+| 5     | `self_reference_avg_sharess` | Average shares of referenced articles in Mashable | number  |
+| 6     | `average_token_length`       | Average length of the words in the content        | number  |
+| 7     | `n_tokens_content`           | Number of words in the content                    | number  |
+| 8     | `n_tokens_title`             | Number of words in the title                      | number  |
+| 9     | `global_subjectivity`        | Text subjectivity                                 | ratio   |
+| 10    | `num_imgs`                   | Number of images                                  | number  |
 
 ``` r
 library(tidyverse)
@@ -180,7 +180,16 @@ models. When `dayweek` = 1, the article was published on a Monday, when
 `dayweek` = 7, the article was published on a Sunday.
 
 However, these `dayweek` related variables for each day of the week in
-boolean format are needed when we run the ensemble models.
+boolean format are needed when we run the ensemble models. In addition,
+we classified the articles based on their number of shares into two
+categories, a “popular” group when their number of shares is more than
+1,400 and an “unpopular” group when their number of shares is less than
+1,400. Note that, when we dichotomize a continuous variable into
+different groups, we lose information about that variable. We hope to
+see some patterns in different categories of shares although what we
+discover may not reflect on what the data really presents because we did
+not use the “complete version” of the information within the data. This
+is purely for data exploratory analysis purpose in the next section.
 
 # Exploratory Data Analysis
 
@@ -191,18 +200,24 @@ numerical summaries and plots.
 ## Numerical Summaries
 
 Table 2 shows the popularity of the news articles on different days of
-the week. I classified number of shares greater than 1400 in a day as
-“popular” and number of shares less than 1400 in a day as “unpopular”.
-We can see the total number of articles from world channel falls into
-different categories on different days of the week for 709 days.
+the week. We classified the number of shares greater than 1400 in a day
+as “popular” and the number of shares less than 1400 in a day as
+“unpopular”. We can see the number of articles from the world channel
+classified into “popular” group or “unpopular” group on different days
+of the week from January 7th, 2013 to January 7th, 2015 when the
+articles were published and retrieved by the study. Note, this table may
+not reflect on the information contained in the data due to
+dichotomizing the data.
 
 Table 3 shows the average shares of the articles on different days of
-the week. Here, we can see a potential problem for our analysis later.
-Median shares are all very different from the average shares on any day
-of the week. Recall that median is a robust measure for center. It is
-robust to outliers in the data. On the contrary, mean is also a measure
-of center but it is not robust to outliers. Mean measure can be
-influenced by potential outliers.
+the week. We can compare and determine which day of the week has the
+most average number of shares for the world channel. Here, we can see a
+potential problem for our analysis later. Median shares are all very
+different from the average shares on any day of the week. Recall that
+median is a robust measure for center. It is robust to outliers in the
+data. On the contrary, mean is also a measure of center but it is not
+robust to outliers. Mean measure can be influenced by potential
+outliers.
 
 In addition, Table 3 also shows the standard deviation of shares is huge
 for any day of the week. They are potentially larger than the average
@@ -214,18 +229,30 @@ log-transformation, which could help us on this matter. Therefore, Table
 are similar to their corresponding median values, and their standard
 deviations are much smaller than before relatively speaking.
 
-Table 4 shows the numerical summaries of average keywords from world
-channel in mashable.com on different days of the week. Table 5 shows the
-numerical summaries of average shares of referenced articles in
-mashable.com on different days of the week.
+Table 4 shows the numerical summaries of *average keywords* from world
+channel in mashable.com on different days of the week. This table
+indicates the number of times *average keywords* shown in the articles
+regarding the average number of shares, and the table is showing the
+average number of those *average keywords* calculated for each day of
+the week so that we can compare to see which day of the week, the
+*average keywords* showed up the most or the worst according to the
+average of shares in the world channel.
 
-Table 5 checks the numerical summaries of the `global_subjectivity`
+Table 5 shows the numerical summaries of average shares of referenced
+articles in mashable.com on different days of the week. We calculated
+the average number of shares of those articles that contained the
+earlier popularity of news referenced for each day of the week so that
+we can compare which day has the most or the worst average number of
+shares when there were earlier popularity of news referenced in the
+worldarticles.
+
+Table 6 checks the numerical summaries of the `global_subjectivity`
 variable between popular and unpopular articles, to see if there’s any
 difference or a higher variation in subjectivity in popular articles.
 Text subjectivity is a value between 0 and 1, so there isn’t any need
 for transformation.
 
-Table 6 checks the numerical summaries of the image count per article on
+Table 7 checks the numerical summaries of the image count per article on
 different days of the week, to see if there is a noticeable difference
 in image count on weekends versus weekdays across all channels, or only
 certain ones. Much like in table 2, the mean is smaller than the
@@ -310,7 +337,8 @@ Day of the Week
 ``` r
 edadata %>% group_by(class.shares) %>% summarize(
   Avg.subjectivity = mean(global_subjectivity), Sd.subjectivity = sd(global_subjectivity), 
-  Median.subjectivity = median(global_subjectivity)) %>% kable(digits = 4, caption = "Table 5. Comparing Global Subjectivity between Popular and Unpopular Articles")
+  Median.subjectivity = median(global_subjectivity)) %>% 
+  kable(digits = 4, caption = "Table 6. Comparing Global Subjectivity between Popular and Unpopular Articles")
 ```
 
 | class.shares | Avg.subjectivity | Sd.subjectivity | Median.subjectivity |
@@ -318,13 +346,13 @@ edadata %>% group_by(class.shares) %>% summarize(
 | Unpopular    |           0.4002 |          0.1011 |              0.4090 |
 | Popular      |           0.4072 |          0.1148 |              0.4233 |
 
-Table 5. Comparing Global Subjectivity between Popular and Unpopular
+Table 6. Comparing Global Subjectivity between Popular and Unpopular
 Articles
 
 ``` r
 edadata %>% group_by(day.week) %>% summarize(
   Avg.images = mean(num_imgs), Sd.images = sd(num_imgs), Median.images = median(num_imgs), Avg.log.images = mean(log(num_imgs + 1)), Sd.log.images = sd(log(num_imgs + 1)), Median.log.images = median(log(num_imgs + 1))) %>%
-  kable(digits = 4, caption = "Table 6. Comparing Image Counts by the Day of the Week")
+  kable(digits = 4, caption = "Table 7. Comparing Image Counts by the Day of the Week")
 ```
 
 | day.week  | Avg.images | Sd.images | Median.images | Avg.log.images | Sd.log.images | Median.log.images |
@@ -337,11 +365,7 @@ edadata %>% group_by(day.week) %>% summarize(
 | Saturday  |     2.3324 |    4.5487 |             1 |         0.8937 |        0.6490 |            0.6931 |
 | Sunday    |     3.1125 |    4.8646 |             1 |         1.0199 |        0.7829 |            0.6931 |
 
-Table 6. Comparing Image Counts by the Day of the Week
-
-``` r
-file.name <- paste0("../images/", params$channel, "1.png")
-```
+Table 7. Comparing Image Counts by the Day of the Week
 
 ## Visualizations
 
@@ -352,15 +376,26 @@ between those variables.
 
 ### Correlation Plot
 
-Figure 1 shows the correlations between the variables, both the response
-and the predictors, which will be used in the regression models as well
-as the ensemble models for predicting the number of shares. Notice that
-there may be some collinearity among the predictor variables.
+Figure 1 shows the linear relationship between the variables, both the
+response and the predictors, which will be used in the regression models
+as well as the ensemble models for predicting the number of shares.
+Notice that there may be potential collinearity among the predictor
+variables. The correlation ranges between -1 and 1, with the value
+equals 0 means that there is no linear relationship between the two
+variables. The closer the correlation measures towards 1, the stronger
+the positive linear correlation/relationship there is between the two
+variables. Vice verse, the close the correlation measures towards -1,
+the stronger the negative linear correlation/relationship there is
+between the two variables.
+
+The correlation measures the “linear” relationships between the
+variables. If the relationships between the variables are not linear,
+then correlation measures cannot capture them, for instance, a quadratic
+relationship. Scatterplots between the variables may be easier to spot
+those non-linear relationships between the variables which we will show
+in the following section.
 
 ``` r
-# keep log-shares
-#corplt <- train %>% select(-class_shares, -weekday_is_monday, -weekday_is_tuesday, -weekday_is_wednesday,
-#                           -weekday_is_thursday, -weekday_is_friday, -weekday_is_saturday, -weekday_is_sunday) 
 correlation <- cor(train1, method="spearman")
 
 corrplot(correlation, type = "upper", tl.pos = "lt", 
@@ -369,31 +404,32 @@ corrplot(correlation, type = "upper", tl.pos = "lt",
 corrplot(correlation, type = "lower", method = "number", add = TRUE, diag = FALSE, tl.pos = "n")
 ```
 
-![](../images/world1.pngunnamed-chunk-3-1.png)<!-- -->
-
-``` r
-file.name <- paste0("../images/", params$channel, "2.png")
-```
+![](../images/world/unnamed-chunk-3-1.png)<!-- -->
 
 ### Boxplot
 
 Figure 2 shows the number of shares across different days of the week.
 Here, due to the huge number of large-valued outliers, I capped the
 number of shares to 10,000 so that we can see the medians and the
-interquartile ranges for different days of the week. Figure 2 coincides
-with the findings in Table 2 that the variance of shares is huge across
-days of the week, and the mean values of shares across different days
-are driven by larged-valued outliers. Therefore, those mean values of
-shares are not close to the median values of shares for each day of the
-week. The median number of shares seems to be bigger during weekend than
-weekdays.
+interquartile ranges clearly for different days of the week.
+
+This is a boxplot with the days of the week on the x-axis and the number
+of shares on the y-axis. We can inspect the trend of shares to see if
+the shares are higher on a Monday, a Friday or a Sunday for the world
+articles.
+
+Figure 2 coincides with the findings in Table 3 that the variance of
+shares is huge across days of the week, and the mean values of shares
+across different days are driven by larged-valued outliers. Therefore,
+those mean values of shares are not close to the median values of shares
+for each day of the week.
 
 ``` r
-boxplot1 <- ggplot(data = edadata, aes(x = day.week, y = shares))
-boxplot1 + geom_boxplot(fill = "white", outlier.shape = NA) + 
+ggplot(data = edadata, aes(x = day.week, y = shares)) + 
+  geom_boxplot(fill = "white", outlier.shape = NA) + 
   coord_cartesian(ylim=c(0, 10000)) + 
   geom_jitter(aes(color = day.week), size = 1) + 
-  guides(color = guide_legend(override.aex = list(size = 6))) + 
+  guides(color = guide_legend(override.aes = list(size = 8))) + 
   labs(x = "Day of the Week", y = "Number of Shares", 
        title = "Figure 2. Number of shares across different days of the week") + 
   scale_color_discrete(name = "Day of the Week") +
@@ -406,29 +442,33 @@ boxplot1 + geom_boxplot(fill = "white", outlier.shape = NA) +
         title = element_text(size = 14))
 ```
 
-![](../images/world2.pngunnamed-chunk-4-1.png)<!-- -->
-
-``` r
-file.name <- paste0("../images/", params$channel, "3.png")
-```
+![](../images/world/unnamed-chunk-4-1.png)<!-- -->
 
 ### Barplot
 
-Figure 3 shows the popularity of the closeness to a top LDA topic for
-the world channel on mashable.com on any day of the week. The
-measurements of the different LDA topics are in ratios, and these are
-the mean ratios calculated for the specific day of thte week for that
-topic across 709 days of collections of data in mashable.com. These mean
-ratios are further classified into a “popular” group and an “unpopular”
-group according to their number of shares.
+Figure 3 shows the popularity of the news articles in relations to their
+closeness to a top LDA topic for the world channel on any day of the
+week. The Latent Dirichlet Allocation (LDA) is an algorithm applied to
+the Mashable texts of the articles in order to identify the five top
+relevant topics and then measure the closeness of the current articles
+to each topic, and there are five topics categories. Thus, each article
+published on Mashable was measured for each of the topic categories.
+Together, those LDA measures in ratios are added to 1 for each article.
+Thus, these LDA topics variables are highly correlated with one another.
+
+We calculated the mean ratios of these LDA topics variables for the
+specific day of the week. These mean ratios are further classified into
+a “popular” group and an “unpopular” group according to their number of
+shares (&gt; 1400 or &lt; 1400) which is shown in Figure 3 barplot.
+Note, the `position = "stack"` not `position = "fill"` in the `geom_bar`
+function.
 
 Some mean ratios of a LDA topic do not seem to vary over the days of a
-week while other mean ratios of LDA topics vary across different days of
-the week. Note, when we dicotomize a continuous variable into different
-groups, we lose information about that variable. Here, I just want to
-show you whether or not the mean ratios of a LDA topic differ across
-time for different levels of shares. The classified version of number of
-shares will not be used to fit in a model later.
+week while other mean ratios of the LDA topics vary across different
+days of the week. Recall, when we dichotomize a continuous variable into
+different groups, we lose information about that variable. Here, I just
+want to show you whether or not the mean ratios of a LDA topic differ
+across time for different categories of shares.
 
 ``` r
 b.plot1 <- edadata %>% group_by(day.week, class.shares) %>% 
@@ -436,8 +476,8 @@ b.plot1 <- edadata %>% group_by(day.week, class.shares) %>%
 
 b.plot2 <- b.plot1 %>% pivot_longer(cols = 3:7, names_to = "LDA.Topic", values_to = "avg.LDA")
 
-barplot1 <- ggplot(data = b.plot2, aes(x = day.week, y = avg.LDA, fill = LDA.Topic))
-barplot1 + geom_bar(stat = "identity", position = "stack") + 
+ggplot(data = b.plot2, aes(x = day.week, y = avg.LDA, fill = LDA.Topic)) + 
+  geom_bar(stat = "identity", position = "stack") + 
   labs(x = "Day of the Week", y = "Closeness to Top LDA Topic", 
        title = "Figure 3. Popularity of Top LDA Topic on Day of the Week") + 
   scale_fill_discrete(name = "LDA Topic") + 
@@ -451,20 +491,18 @@ barplot1 + geom_bar(stat = "identity", position = "stack") +
   facet_wrap(~ class.shares)
 ```
 
-![](../images/world3.pngunnamed-chunk-5-1.png)<!-- -->
-
-``` r
-file.name <- paste0("../images/", params$channel, "4.png")
-```
+![](../images/world/unnamed-chunk-5-1.png)<!-- -->
 
 ### Line Plot
 
-Here, Figure 4 shows the same measurements as in Figure 3 but in line
-plot which we can see how the patterns of the mean ratios of a LDA topic
-vary or not vary across time in different popularity groups more
-clearly. Again, some mean ratios do not seem to vary across time and
-across popularity groups while some other mean ratios vary across time
-and popularity groups for articles in the world channel.
+Figure 4 is a line plot that shows the same measurements as in Figure 3
+that we can see the patterns of the mean ratios of a LDA topic vary or
+not vary across time in different popularity groups more clearly. Again,
+some mean ratios of LDA topics do not seem to vary across time when the
+corresponding lines are flattened while other mean ratios of LDA topics
+vary across time when their lines are fluctuating. The patterns observed
+in the “popular” group may not reflect on the same trend in the
+“unpopular” group for articles in the world channel.
 
 ``` r
 l.plot1 <- edadata %>% group_by(day.week, class.shares) %>% 
@@ -472,8 +510,8 @@ l.plot1 <- edadata %>% group_by(day.week, class.shares) %>%
 
 l.plot2 <- l.plot1 %>% pivot_longer(cols = 3:7, names_to = "LDA.Topic", values_to = "avg.LDA")
 
-lineplot1 <- ggplot(data = l.plot2, aes(x = day.week, y = avg.LDA, group = LDA.Topic))
-lineplot1 + geom_line(aes(color = LDA.Topic), lwd = 2) + 
+ggplot(data = l.plot2, aes(x = day.week, y = avg.LDA, group = LDA.Topic)) + 
+  geom_line(aes(color = LDA.Topic), lwd = 2) + 
   labs(x = "Day of the Week", y = "Closeness to LDA Topic", 
        title = "Figure 4. Popularity of LDA Topic on Day of the Week") + 
   scale_color_discrete(name = "LDA Topic") +
@@ -487,25 +525,30 @@ lineplot1 + geom_line(aes(color = LDA.Topic), lwd = 2) +
   facet_wrap(~ class.shares)
 ```
 
-![](../images/world4.pngunnamed-chunk-6-1.png)<!-- -->
+![](../images/world/unnamed-chunk-6-1.png)<!-- -->
 
-``` r
-file.name <- paste0("../images/", params$channel, "5.png")
-```
+### Scatterplots
 
-### Scatterplot
+Figure 5 shows the relationship between the average keyword and
+log-transformed shares for articles in the world channel across
+different days of the week. In the news popularity study, it showed
+average keyword was ranked top one predictor in variable importance in
+the optimal predictive model (random forest) they selected that produced
+the highest accuracy in prediction of popularity online articles.
+Therefore, we are interested to see how average keyword is related with
+log shares. The different colored linear regression lines indicate
+different days of the week.
 
-Figure 5 shows the relationship between average keyword and
-log-transformed number of shares for articles in the world channel
-across different days of the week. In the news popularity study, it says
-average keyword is the most important predictor in the models they used
-which accounted for the most variation in the data. Therefore, we are
-interested to see how average keyword is correlated with log shares. The
-different colored linear regression lines indicate different days of the
-week. If it is an upward trend, it shows positive linear relationship.
-If it is a downward trend, it shows a negative linear relationship. More
-tilted the line is, much stronger the relationship is regardless of
-positive or negative.
+If the points display an upward trend, it indicates a positive
+relationship between the average keyword and log-shares. With an
+increasing log number of shares, the number of average keywords also
+increases, meaning people tend to share the article more when they see
+more of those average keywords in the article. On the contrary, if the
+points are in a downward trend, it indicates a negative relationship
+between the average keyword and log-shares. With an decreasing log
+number of shares, the number of average keywords decreases as well.
+People tend to share the articles less when they see less of these
+average keywords in the articles from the world channel.
 
 Figure 6 is similar, except it compares the log-transformed number of
 shares to the log-transformed images in the article. As noted
@@ -513,8 +556,8 @@ previously, both of these variables do not behave properly in a linear
 model due to the existence of extreme outliers in the data.
 
 ``` r
-scatter1 <- ggplot(data = edadata, aes(x = kw_avg_avg, y = log.shares, color = day.week)) #y=kw_avg_max
-scatter1 + geom_point(size = 2) + #aes(shape = class.shares)
+ggplot(data = edadata, aes(x = kw_avg_avg, y = log.shares, color = day.week)) + 
+  geom_point(size = 2) + #aes(shape = class.shares)
   scale_color_discrete(name = "Day of the Week") + 
   coord_cartesian(xlim=c(0, 10000)) +
   geom_smooth(method = "lm", lwd = 2) + 
@@ -529,15 +572,11 @@ scatter1 + geom_point(size = 2) + #aes(shape = class.shares)
         title = element_text(size = 13))
 ```
 
-![](../images/world5.pngunnamed-chunk-7-1.png)<!-- -->
+![](../images/world/unnamed-chunk-7-1.png)<!-- -->
 
 ``` r
-file.name <- paste0("../images/", params$channel, "6.png")
-```
-
-``` r
-scatter2 <- ggplot(data = edadata, aes(x = log(num_imgs + 1), y = log.shares, color = day.week))
-scatter2 + geom_point(size = 2) +
+ggplot(data = edadata, aes(x = log(num_imgs + 1), y = log.shares, color = day.week)) + 
+  geom_point(size = 2) +
   scale_color_discrete(name = "Day of the Week") + 
   geom_smooth(method = "lm", lwd = 2) + 
   labs(x = "log(number of images)", y = "log(number of shares)", 
@@ -551,11 +590,7 @@ scatter2 + geom_point(size = 2) +
         title = element_text(size = 13))
 ```
 
-![](../images/world6.pngunnamed-chunk-8-1.png)<!-- -->
-
-``` r
-file.name <- paste0("../images/", params$channel, "7a.png")
-```
+![](../images/world/unnamed-chunk-8-1.png)<!-- -->
 
 ### QQ Plots
 
@@ -578,11 +613,7 @@ ggplot(edadata) + geom_qq(aes(sample = shares)) + geom_qq_line(aes(sample = shar
         title = element_text(size = 13))
 ```
 
-![](../images/world7a.pngunnamed-chunk-9-1.png)<!-- -->
-
-``` r
-file.name <- paste0("../images/", params$channel, "7b.png")
-```
+![](../images/world/unnamed-chunk-9-1.png)<!-- -->
 
 ``` r
 ggplot(edadata) + geom_qq(aes(sample = log(shares))) + geom_qq_line(aes(sample = log(shares))) +
@@ -597,11 +628,7 @@ ggplot(edadata) + geom_qq(aes(sample = log(shares))) + geom_qq_line(aes(sample =
         title = element_text(size = 13))
 ```
 
-![](../images/world7b.pngunnamed-chunk-10-1.png)<!-- -->
-
-``` r
-file.name <- paste0("../images/", params$channel, "7c.png")
-```
+![](../images/world/unnamed-chunk-10-1.png)<!-- -->
 
 ``` r
 ggplot(edadata) + geom_qq(aes(sample = num_imgs)) + geom_qq_line(aes(sample = num_imgs)) + 
@@ -616,11 +643,7 @@ ggplot(edadata) + geom_qq(aes(sample = num_imgs)) + geom_qq_line(aes(sample = nu
         title = element_text(size = 13))
 ```
 
-![](../images/world7c.pngunnamed-chunk-11-1.png)<!-- -->
-
-``` r
-file.name <- paste0("../images/", params$channel, "7d.png")
-```
+![](../images/world/unnamed-chunk-11-1.png)<!-- -->
 
 ``` r
 ggplot(edadata) + geom_qq(aes(sample = log(num_imgs + 1))) + geom_qq_line(aes(sample = log(num_imgs + 1))) +
@@ -635,7 +658,7 @@ ggplot(edadata) + geom_qq(aes(sample = log(num_imgs + 1))) + geom_qq_line(aes(sa
         title = element_text(size = 13))
 ```
 
-![](../images/world7d.pngunnamed-chunk-12-1.png)<!-- -->
+![](../images/world/unnamed-chunk-12-1.png)<!-- -->
 
 Whether it’s appropriate to perform a logarithmic transformation on the
 number of images is somewhat less clear than for the number of shares.
@@ -655,18 +678,57 @@ model. Below, we’ve fit multiple linear models that include all of our
 variables and various combinations of interaction terms and/or quadratic
 terms.
 
+Originally, we used 20 top ranked predictors selected by the optimal
+predictive model used in the paper and fit them in three types of models
+below.
+
+1.  All predictors  
+2.  All predictors and their quadratic terms  
+3.  All predictors and all their interaction terms
+
+We slowly filtered out predictors, their corresponding second order
+terms and the interaction terms that were insignificant at 0.05 level.
+In addition, we also examined the predictors using correlation plots. We
+slowly got rid of some predictors that are highly correlated with each
+other such as the LDA topics variables which are also shown in Figures 3
+and 4, average number of shares of keywords, maximum number of shares of
+average keywords, minimum number of shares of average keywords and many
+of others. We carefully monitored this process and compared the models
+with the adjusted R-squared and RMSE values. Due to multi-collinearity
+among the predictors, reducing the number of predictors that are
+correlated with one another did not make the model fit worse, and the
+RMSE value from the model was surprisingly decreased.
+
+We repeated this process to trim down the number of predictors and
+eventually selected the ones that seem to be important in predicting the
+number of shares, and they are not highly correlated with each other.
+The parameters in the linear regression model 1 were chosen through this
+process, and they are listed in Table 8 below. The response variable is
+`log(shares)`.
+
+Table 8. The predictors in linear regression model 1  
+Index \| Parameter in Model 1 —— \| —————————– 1 \| `kw_avg_avg`  
+2 \| `LDA_02`  
+3 \| `dayweek`  
+4 \| `self_reference_avg_sharess`  
+5 \| `average_token_length`  
+6 \| `n_tokens_content`  
+7 \| `n_tokens_title`  
+8 \| `global_subjectivity`  
+9 \| `num_imgs`  
+10 \| `I(n_tokens_content^2)` 11 \| `kw_avg_avg:num_imgs` 12 \|
+`average_token_length:global_subjectivity` 13 \|
+`dayweek:self_reference_avg_sharess`
+
 ``` r
-# using train1, dayweek is numeric, no class_shares
-#train1 <- train %>% select(-class_shares, -shares) #keep log.shares
-#test1 <- test %>% select(-class_shares, -shares) #keep log.shares
 train1$dayweek <- as.factor(train1$dayweek)
 test1$dayweek <- as.factor(test1$dayweek)
 preProcValues <- preProcess(train1, method = c("center", "scale"))
 trainTransformed <- predict(preProcValues, train1)
 testTransformed <- predict(preProcValues, test1)
 
-cv_fit3 <- train(log.shares ~ . + I(n_tokens_content^2) + I(self_reference_avg_sharess^2) + 
-                 kw_avg_avg:num_imgs + average_token_length:global_subjectivity, 
+cv_fit3 <- train(log.shares ~ . + I(n_tokens_content^2) + kw_avg_avg:num_imgs + 
+                   average_token_length:global_subjectivity + dayweek:self_reference_avg_sharess, 
                  data=trainTransformed,
                  method = "lm",
                  trControl = trainControl(method = "cv", number = 10))
@@ -679,35 +741,40 @@ summary(cv_fit3)
     ## 
     ## Residuals:
     ##     Min      1Q  Median      3Q     Max 
-    ## -4.4660 -0.5427 -0.1597  0.3692  5.3608 
+    ## -4.4635 -0.5415 -0.1601  0.3701  5.3714 
     ## 
     ## Coefficients:
-    ##                                              Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)                                 0.0244710  0.0317180   0.772  0.44043    
-    ## dayweek2                                   -0.0488882  0.0420504  -1.163  0.24504    
-    ## dayweek3                                   -0.0796494  0.0420971  -1.892  0.05853 .  
-    ## dayweek4                                   -0.0631973  0.0422953  -1.494  0.13518    
-    ## dayweek5                                   -0.0054166  0.0443622  -0.122  0.90282    
-    ## dayweek6                                    0.3167958  0.0582247   5.441 5.51e-08 ***
-    ## dayweek7                                    0.3076476  0.0568577   5.411 6.52e-08 ***
-    ## kw_avg_avg                                  0.0833156  0.0129738   6.422 1.45e-10 ***
-    ## LDA_02                                     -0.1156664  0.0129655  -8.921  < 2e-16 ***
-    ## self_reference_avg_sharess                  0.1661917  0.0232168   7.158 9.17e-13 ***
-    ## average_token_length                       -0.2981887  0.0440656  -6.767 1.44e-11 ***
-    ## n_tokens_content                           -0.0459741  0.0179386  -2.563  0.01041 *  
-    ## n_tokens_title                              0.0196072  0.0126162   1.554  0.12021    
-    ## global_subjectivity                         0.0963430  0.0163096   5.907 3.68e-09 ***
-    ## num_imgs                                    0.1117624  0.0145662   7.673 1.96e-14 ***
-    ## `I(n_tokens_content^2)`                     0.0103693  0.0035200   2.946  0.00323 ** 
-    ## `I(self_reference_avg_sharess^2)`          -0.0044174  0.0007789  -5.671 1.48e-08 ***
-    ## `kw_avg_avg:num_imgs`                       0.0050688  0.0111307   0.455  0.64884    
-    ## `average_token_length:global_subjectivity` -0.0592001  0.0128446  -4.609 4.13e-06 ***
+    ##                                             Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)                                 0.023584   0.031796   0.742  0.45829    
+    ## dayweek2                                   -0.050822   0.042153  -1.206  0.22799    
+    ## dayweek3                                   -0.083189   0.042194  -1.972  0.04870 *  
+    ## dayweek4                                   -0.065664   0.042404  -1.549  0.12155    
+    ## dayweek5                                   -0.007498   0.044476  -0.169  0.86612    
+    ## dayweek6                                    0.318293   0.058668   5.425 6.02e-08 ***
+    ## dayweek7                                    0.304738   0.057090   5.338 9.76e-08 ***
+    ## kw_avg_avg                                  0.088111   0.012968   6.795 1.19e-11 ***
+    ## LDA_02                                     -0.117785   0.012995  -9.064  < 2e-16 ***
+    ## self_reference_avg_sharess                  0.130386   0.052365   2.490  0.01280 *  
+    ## average_token_length                       -0.299627   0.044212  -6.777 1.35e-11 ***
+    ## n_tokens_content                           -0.049326   0.017981  -2.743  0.00610 ** 
+    ## n_tokens_title                              0.021366   0.012650   1.689  0.09128 .  
+    ## global_subjectivity                         0.098562   0.016345   6.030 1.74e-09 ***
+    ## num_imgs                                    0.116018   0.014577   7.959 2.07e-15 ***
+    ## `I(n_tokens_content^2)`                     0.010724   0.003530   3.038  0.00239 ** 
+    ## `kw_avg_avg:num_imgs`                       0.005213   0.011170   0.467  0.64074    
+    ## `average_token_length:global_subjectivity` -0.060661   0.012885  -4.708 2.56e-06 ***
+    ## `dayweek2:self_reference_avg_sharess`      -0.002136   0.063901  -0.033  0.97333    
+    ## `dayweek3:self_reference_avg_sharess`      -0.088649   0.060135  -1.474  0.14049    
+    ## `dayweek4:self_reference_avg_sharess`      -0.061977   0.069678  -0.889  0.37378    
+    ## `dayweek5:self_reference_avg_sharess`      -0.097854   0.054951  -1.781  0.07501 .  
+    ## `dayweek6:self_reference_avg_sharess`       0.044819   0.134366   0.334  0.73872    
+    ## `dayweek7:self_reference_avg_sharess`      -0.041096   0.099921  -0.411  0.68087    
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
-    ## Residual standard error: 0.9541 on 5881 degrees of freedom
-    ## Multiple R-squared:  0.09251,    Adjusted R-squared:  0.08973 
-    ## F-statistic: 33.31 on 18 and 5881 DF,  p-value: < 2.2e-16
+    ## Residual standard error: 0.9564 on 5876 degrees of freedom
+    ## Multiple R-squared:  0.08895,    Adjusted R-squared:  0.08538 
+    ## F-statistic: 24.94 on 23 and 5876 DF,  p-value: < 2.2e-16
 
 ``` r
 cv_fit4 <- train(log.shares ~ . - num_imgs + I(log(num_imgs + 1)) + I(n_tokens_content^2) +
@@ -777,7 +844,7 @@ kable(result2, digits = 4, caption = "Table ###. Cross Validation - Model Predic
 
 |         |   RMSE | Rsquared |    MAE |
 |:--------|-------:|---------:|-------:|
-| Model 1 | 0.9794 |   0.0845 | 0.6941 |
+| Model 1 | 0.9972 |   0.0604 | 0.6997 |
 | Model 2 | 0.9793 |   0.0846 | 0.6942 |
 
 Table \#\#\#. Cross Validation - Model Predictions on Test Set
@@ -959,7 +1026,7 @@ kable(result2, digits = 4, caption = "Cross Validation - Comparisons of the mode
 
 |                     |   RMSE | Rsquared |    MAE |
 |:--------------------|-------:|---------:|-------:|
-| Linear Model 1      | 0.9794 |   0.0845 | 0.6941 |
+| Linear Model 1      | 0.9972 |   0.0604 | 0.6997 |
 | Linear Model 2      | 0.9793 |   0.0846 | 0.6942 |
 | Random Forest Model | 0.9701 |   0.1021 | 0.6855 |
 | Boosted Tree Model  | 0.9701 |   0.1023 | 0.6866 |
