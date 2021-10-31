@@ -19,7 +19,9 @@ The study collected a total of 39,000 news articles from six data channel catego
 
 Table 1 shows the list of variables we used in the analysis and their descriptions. The study shows after the best predictive model was selected using a test set, these variables that we are interested in are among the top ranked features according to their importance in the final predictive model using the entire data set. Thus, we are going to investigate their importance in predicting the number of shares using the predictive models we propose. 
 
-The purpose of the analyses is to compare different predictive models and choose the best model in predicting the popularity of online news regarding their features in different channel categories. The methods implemented in prediction of shares are linear regression models with different inputs, a random forest model and a boosted tree model. The optimal model is chosen based on the smallest root MSE value fitting the test set. More details are in *Candidate Models* section.
+The purpose of the analyses is to compare different predictive models and choose the best model in predicting the popularity of online news regarding their features in different channel categories. The methods implemented in prediction of shares are linear regression models using different predictors, a random forest model and a boosted tree model. More details are in the *Candidate Models* section. 
+
+The optimal model is chosen based on the majority score of the three metrics, root Mean Squared Error, Mean Absolute Error, and R-Squared values when fitting the candidate models on the test set. If each of the metrics picks a different model or the majority score is a tie, the one with the lowest RMSE will be chosen. 
 
 Table 1. Attributes used in the analyses for prediction of online news popularity
 
@@ -43,6 +45,7 @@ Index | Attribute                     | Attribute Information                   
 10    | `num_imgs`                    | Number of images                                       | number
 
 ```{r eval=TRUE}
+library(rmarkdown)
 library(tidyverse)
 library(knitr)
 library(caret)
@@ -51,7 +54,7 @@ library(ggplot2)
 library(gbm)
 library(vip)
 
-allnews <- read_csv("C:/Users/peach/Documents/ST558/ST558_repos/St558-Project-2/_Data/OnlineNewsPopularity.csv", col_names = TRUE)
+allnews <- read_csv("../_Data/OnlineNewsPopularity.csv", col_names = TRUE)
 
 ########KNIT with parameters!!!!!!!!!channels is in quotes!!!!Need to use it with quotes!!!!!!!!!!!!!!!!!!!!!!!!
 channels <- paste0("data_channel_is_", params$channel)
@@ -379,7 +382,7 @@ ggplot(edadata) + geom_qq(aes(sample = log(num_imgs + 1))) + geom_qq_line(aes(sa
 
 Whether it's appropriate to perform a logarithmic transformation on the number of images is somewhat less clear than for the number of shares.
 
-# Modeling
+# Candidate Models
 
 ## Linear Regression
 
@@ -399,57 +402,60 @@ The second linear regression model provided below applies a log transformation t
 
 Table 8. The predictors in linear regression model 1  
   
-Index  | Parameter in Linear Regression 1  
------- | ---------------------------------------------- 
-1      | `kw_avg_avg`                  
-2      | `LDA_02`                      
-3      | `dayweek`                     
-4      | `self_reference_avg_sharess`  
-5      | `average_token_length`        
-6      | `n_tokens_content`            
-7      | `n_tokens_title`              
-8      | `global_subjectivity`        
-9      | `num_imgs`                   
-10     | `I(n_tokens_content^2)`
-11     | `kw_avg_avg:num_imgs`
-12     | `average_token_length:global_subjectivity`
-13     | `dayweek:self_reference_avg_sharess`
+Index  | Predictor in Linear Regression 1              | Predictor Information
+------ | --------------------------------------------- | -------------------------------------------------------------
+1      | `kw_avg_avg`                                  | Average keyword (average shares)
+2      | `LDA_02`                                      | Closeness of current article to a LDA Topic 2
+3      | `dayweek`                                     | Day of a week the article was published 
+4      | `self_reference_avg_sharess`                  | Average shares of earlier popularity news referenced in the article
+5      | `average_token_length`                        | Average length of the words in the content
+6      | `n_tokens_content`                            | Number of words in the content
+7      | `n_tokens_title`                              | Number of words in the title
+8      | `global_subjectivity`                         | Text subjectivity
+9      | `num_imgs`                                    | Number of images
+10     | `I(n_tokens_content^2)`                       | Quadratic term of number of words in the content
+11     | `kw_avg_avg:num_imgs`                         | Interaction term
+12     | `average_token_length:global_subjectivity`    | Interaction term
+13     | `dayweek:self_reference_avg_sharess`          | Interaction term
+
+We standardized both the training set and the test set before we fit the linear regression models. We used the standardized mean and standard deviation values from the training set on the test set so that the predictors on both sets have the same means and standard deviations. Standardizing the variables is very important prior to model fitting so that all the variables are on the same scale. The variables with large values do not look more important than the variables with smaller values. Especially in our data set where some variable values are unbounded, skewed to one side, and some variables are ratios between 0 and 1. 
 
 ```{r eval=TRUE}
-train1$dayweek <- as.factor(train1$dayweek)
-test1$dayweek <- as.factor(test1$dayweek)
+#train1$dayweek <- as.factor(train1$dayweek)
+#test1$dayweek <- as.factor(test1$dayweek)
+train1$dayweek <- cut(train1$dayweek, 7, c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))
+test1$dayweek <- cut(test1$dayweek, 7, c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))
 preProcValues <- preProcess(train1, method = c("center", "scale"))
 trainTransformed1 <- predict(preProcValues, train1)
 testTransformed1 <- predict(preProcValues, test1)
 trainTransformed1
 
-cv_fit3 <- train(log.shares ~ . + I(n_tokens_content^2) + kw_avg_avg:num_imgs + 
+cv_fit1 <- train(log.shares ~ . + I(n_tokens_content^2) + kw_avg_avg:num_imgs + 
                    average_token_length:global_subjectivity + dayweek:self_reference_avg_sharess, 
                  data=trainTransformed1,
                  method = "lm",
                  trControl = trainControl(method = "cv", number = 10))
-summary(cv_fit3)
+summary(cv_fit1)
 
-cv_fit4 <- train(log.shares ~ . - num_imgs - self_reference_avg_sharess + I(log(num_imgs+1)) + I(n_tokens_content^2) +
+cv_fit2 <- train(log.shares ~ . - num_imgs - self_reference_avg_sharess + I(log(num_imgs+1)) + I(n_tokens_content^2) +
                  I(log(self_reference_avg_sharess+1)) + kw_avg_avg:I(log(num_imgs + 1)) +
                  average_token_length:global_subjectivity, 
                  data=trainTransformed1,
                  method = "lm",
                  trControl = trainControl(method = "cv", number = 10))
-summary(cv_fit4)
+summary(cv_fit2)
 
-pred3 <- predict(cv_fit3, newdata = testTransformed1)
-pred4 <- predict(cv_fit4, newdata = testTransformed1)
-cv_rmse3 <- postResample(pred3, obs = testTransformed1$log.shares)
-cv_rmse4 <- postResample(pred4, obs = testTransformed1$log.shares)
-#result2 <- rbind(cv_rmse3, cv_rmse4)
-#row.names(result2) <- c("Model 1","Model 2")
-#kable(result2, digits = 4, caption = "Table ###. Cross Validation - Model Predictions on Test Set")
+pred1 <- predict(cv_fit1, newdata = testTransformed1)
+pred2 <- predict(cv_fit2, newdata = testTransformed1)
+cv_rmse1 <- postResample(pred1, obs = testTransformed1$log.shares)
+cv_rmse2 <- postResample(pred2, obs = testTransformed1$log.shares)
 ```
 
 ## Random Forest 
 
-The bootstrap approach to fitting a tree model involves resampling our data and fitting a tree to each sample, and then averaging the resulting predictions of each of those models. The random forest approach adds an extra step for each of these samples, where only a random subset of the predictor variables is chosen each time, in order to reduce the correlation between each of the trees. We don't have to worry about creating dummy variables for categorical variables, because our data already comes in an entirely numeric form.
+The bootstrap approach to fitting a tree model involves resampling our data and fitting a tree to each sample, and then averaging the resulting predictions of each of those models. The random forest approach adds an extra step for each of these samples, where only a random subset of the predictor variables is chosen each time, in order to reduce the correlation between each of the trees. We don't have to worry about creating dummy variables for categorical variables, because our data already comes in an entirely numeric form. 
+
+Again, we standardized both the training set and the test set before we fit the each of the ensemble models. We used the standardized mean and standard deviation values of the predictors from the training set on the test set so that the predictors on both sets have the same means and standard deviations. 
 
 ```{r eval=TRUE}
 train2 <- train %>% select(-class_shares, -shares, -dayweek, -LDA_00, -LDA_01, -LDA_03, -LDA_04)
@@ -503,7 +509,7 @@ boosted_tree <- train(log.shares ~ . , data = trainTransformed2,
 boosted_tree_predict <- predict(boosted_tree, newdata = select(testTransformed2, -log.shares))
 boost_rmse <- postResample(boosted_tree_predict, obs = testTransformed2$log.shares)
 boosted_tree
-boosted_tree$results
+#boosted_tree$results
 # n.trees = boosted_tree$bestTune[[1]]
 ```
 
@@ -511,12 +517,12 @@ We then used 10 fold cross validation to search all combinations of the tuning p
 
 ## Model Comparisons
 
-The best model fit to predict the number of shares for the `r params$channel` channel can be determined by looking at the Root Mean Square Error, the Mean Absolute Error, or the R-squared value using the test set. Table 9 shows these criteria measures for each candidate model. The approach I've taken below picks whichever model is considered superior by the majority of these three metrics, and if each of the metrics picks a different model, then the one with the lowest RMSE will be chosen.
+The best model fit to predict the number of shares for the `r params$channel` channel can be determined by looking at the Root Mean Squared Error, the Mean Absolute Error, or the R-squared value using the test set. Table 8 shows these criteria measures for each candidate model. The approach I've taken below picks whichever model is considered superior by the majority score of these three metrics, and if each of the metrics picks a different model or the majority score is a tiebreaker, then the one with the lowest RMSE will be chosen. 
 
 ```{r eval=TRUE}
-result2 <- rbind(cv_rmse3, cv_rmse4, rf_rmse, boost_rmse)
+result2 <- rbind(cv_rmse1, cv_rmse1, rf_rmse, boost_rmse)
 row.names(result2) <- c("Linear Regression 1", "Linear Regression 2", "Random Forest", "Boosted Tree")
-kable(result2, digits = 4, caption = "Table 9. Cross Validation - Comparisons of the models in test set")
+kable(result2, digits = 4, caption = "Table 8. Cross Validation - Comparisons of the models in test set")
 
 rmse_best <- names(which.min(result2[,1]))
 rsq_best <- names(which.max(result2[,2]))
@@ -525,14 +531,7 @@ model_best <- table(c(rmse_best, rsq_best, mae_best))
 final_model <- if_else(max(model_best) > 1, names(which.max(model_best)), rmse_best)
 ```
 
-# Final Model Fit with Entire Data
-
-The best model fit to predict the number of shares is the **`r final_model`** model for the `r params$channel` articles.
-
-both training and the test sets have been standardized with same mean and same standard deviation. 
-
-Figure 9. variable importance plot
-
+We built a helper function so that when a final winning model is declared among the candidate models using the test set, we then used the final model to fit the entire data set, both the training and the test sets, from the `r params$channel` channel. A variable importance plot is produced along with a table containing a ranking metrics of the variable importance when fitting the final model with the entire data set of the `r params$channel` articles.
 
 ```{r eval=TRUE}
 linear1 <- function(...){
@@ -598,7 +597,34 @@ boostedt <- function(...){
   return(list(btfit, important, plot_imp))
   
 }
+```
 
+# Final Model Fit with Entire Data
+
+The best model fit to predict the number of shares is the **`r final_model`** model for the `r params$channel` articles. We fit the entire data set, both the training and the test set from the channel in the final chosen model. The values of RMSE, MAE and R-squared are calculated with the entire data set using the final model. A variable importance plot and a table containing a ranking metric of the relative variable importance are produced below. We can examine which predictors contributed the most in predicting the popularity of online news in the final model accordingly. Table 1 containing attribute information from the *Introduction* section is copied below for comparisons of variable importance.
+
+Table 1. Attributes used in the analyses for prediction of online news popularity
+
+Index | Attribute                     | Attribute Information                                  | Type   
+----- | ----------------------------- | ------------------------------------------------------ | --------
+1     | `shares`  (target)            | Number of shares                                       | number
+2     | `kw_avg_avg`                  | Average keyword (average shares)                       | number
+3     | `LDA_02`                      | Closeness of current article to a LDA Topic 2          | ratio
+4.1   | `weekday_is_monday`           | Was the article published on a Monday?                 | boolean
+4.2   | `weekday_is_tuesday`          | Was the article published on a Tuesday?                | boolean
+4.3   | `weekday_is_wednesday`        | Was the article published on a Wednesday?              | boolean
+4.4   | `weekday_is_thursday`         | Was the article published on a Thursday?               | boolean
+4.5   | `weekday_is_friday`           | Was the article published on a Friday?                 | boolean
+4.6   | `weekday_is_saturday`         | Was the article published on a Saturday?               | boolean
+4.7   | `weekday_is_sunday`           | Was the article published on a Sunday?                 | boolean
+5     | `self_reference_avg_sharess`  | Avg. shares of popular news referenced in the articles | number
+6     | `average_token_length`        | Average length of the words in the content             | number
+7     | `n_tokens_content`            | Number of words in the content                         | number
+8     | `n_tokens_title`              | Number of words in the title                           | number
+9     | `global_subjectivity`         | Text subjectivity                                      | ratio
+10    | `num_imgs`                    | Number of images                                       | number
+
+```{r eval=TRUE}
 f_model <- if_else(final_model == "Random Forest", 3, 
            if_else(final_model == "Boosted Tree", 4, 
                    if_else(final_model == "Linear Regression 1", 1, 2)))
@@ -610,16 +636,31 @@ switch(f_model,
        model3 = randomf(),
        model4 = boostedt()
 )
-
 #imp <- varImp(boosted_tree)
 #imp2 <- data.frame(imp[1])
 #first <- rownames(imp2)[order(imp2$Overall, decreasing=TRUE)][1] # most important
 #second <- rownames(imp2)[order(imp2$Overall, decreasing=TRUE)][2] #2nd
 #third <- rownames(imp2)[order(imp2$Overall, decreasing=TRUE)][3] # 3rd
-
 #print(paste0("The most important predictor is ", first, ", the second is ", second))
 ```
 
+# Automation 
 
+To knit with the parameters with this single .Rmd file, we specified the parameters in the YAML header and created a data frame which contains both the output .md file names and the parameters we supplied to the YAML header to automate the reports. Both the names of the parameters and the values of the parameters were saved in a list format in that data frame. Then, we used the render function below to knit with the parameters in R console to generate the reports. The render function is not evaluated with this .Rmd file.
 
+```{r eval=FALSE}
+type <- c("lifestyle", "entertainment", "bus", "socmed", "tech", "world")
+output_file <- paste0(type, ".md")
+params <- lapply(type, FUN = function(x){list(channel = x)})
+reports <- tibble(output_file, params)
+
+apply(reports, MARGIN = 1, 
+      FUN = function(x){
+        render(input = "C:/Users/peach/Documents/ST558/ST558_repos/ST558-Project-2/ST558_project2_test.Rmd",
+               output_format = "github_document", 
+               output_file = paste0("C:/Users/peach/documents/ST558/ST558_repos/ST558-Project-2/", x[[1]]),
+               params = x[[2]],
+               output_options = list(html_preview = FALSE, toc = TRUE, toc_depth = 3, df_print = "tibble"))
+      })
+```
 

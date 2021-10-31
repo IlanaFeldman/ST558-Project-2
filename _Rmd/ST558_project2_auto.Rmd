@@ -418,26 +418,6 @@ Index  | Predictor in Linear Regression 1              | Predictor Information
 12     | `average_token_length:global_subjectivity`    | Interaction term
 13     | `dayweek:self_reference_avg_sharess`          | Interaction term
 
-Table 1. Attributes used in the analyses for prediction of online news popularity
-
-Index | Attribute                     | Attribute Information                                  | Type   
------ | ----------------------------- | ------------------------------------------------------ | --------
-1     | `shares`  (target)            | Number of shares                                       | number
-2     | `kw_avg_avg`                  | Average keyword (average shares)                       | number
-3     | `LDA_02`                      | Closeness of current article to a LDA Topic 2          | ratio
-4.1   | `weekday_is_monday`           | Was the article published on a Monday?                 | boolean
-4.2   | `weekday_is_tuesday`          | Was the article published on a Tuesday?                | boolean
-4.3   | `weekday_is_wednesday`        | Was the article published on a Wednesday?              | boolean
-4.4   | `weekday_is_thursday`         | Was the article published on a Thursday?               | boolean
-4.5   | `weekday_is_friday`           | Was the article published on a Friday?                 | boolean
-4.6   | `weekday_is_saturday`         | Was the article published on a Saturday?               | boolean
-4.7   | `weekday_is_sunday`           | Was the article published on a Sunday?                 | boolean
-5     | `self_reference_avg_sharess`  | Avg. shares of popular news referenced in the articles | number
-6     | `average_token_length`        | Average length of the words in the content             | number
-7     | `n_tokens_content`            | Number of words in the content                         | number
-8     | `n_tokens_title`              | Number of words in the title                           | number
-9     | `global_subjectivity`         | Text subjectivity                                      | ratio
-10    | `num_imgs`                    | Number of images                                       | number
 We standardized both the training set and the test set before we fit the linear regression models. We used the standardized mean and standard deviation values from the training set on the test set so that the predictors on both sets have the same means and standard deviations. Standardizing the variables is very important prior to model fitting so that all the variables are on the same scale. The variables with large values do not look more important than the variables with smaller values. Especially in our data set where some variable values are unbounded, skewed to one side, and some variables are ratios between 0 and 1. 
 
 ```{r eval=TRUE}
@@ -621,7 +601,7 @@ boostedt <- function(...){
 
 # Final Model Fit with Entire Data
 
-The best model fit to predict the number of shares is the **`r final_model`** model for the `r params$channel` articles. We fit the entire data set, both the training and the test set from the channel in the final chosen model. A variable importance plot and a table containing a ranking metric of the relative variable importance are produced below. We can examine which predictors contributed the most in predicting the popularity of online news in the final model accordingly. Table 1 containing attribute information from the *Introduction* section is copied below for comparisons of variable importance.
+The best model fit to predict the number of shares is the **`r final_model`** model for the `r params$channel` articles. We fit the entire data set, both the training and the test set from the channel in the final chosen model. The values of RMSE, MAE and R-squared are calculated with the entire data set using the final model. A variable importance plot and a table containing a ranking metric of the relative variable importance are produced below. We can examine which predictors contributed the most in predicting the popularity of online news in the final model accordingly. Table 1 containing attribute information from the *Introduction* section is copied below for comparisons of variable importance.
 
 Table 1. Attributes used in the analyses for prediction of online news popularity
 
