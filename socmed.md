@@ -3,27 +3,27 @@ Predictive Models for Popularity of Online News
 Jasmine Wang & Ilana Feldman
 10/31/2021
 
--   [Introduction](#introduction)
--   [Data](#data)
--   [Exploratory Data Analysis](#exploratory-data-analysis)
-    -   [Numerical Summaries](#numerical-summaries)
-    -   [Visualizations](#visualizations)
-        -   [Correlation Plot](#correlation-plot)
-        -   [Boxplot](#boxplot)
-        -   [Barplot](#barplot)
-        -   [Line Plot](#line-plot)
-        -   [Scatterplots](#scatterplots)
-        -   [QQ Plots](#qq-plots)
--   [Candidate Models](#candidate-models)
-    -   [Linear Regression](#linear-regression)
-    -   [Random Forest](#random-forest)
-    -   [Boosted Tree](#boosted-tree)
-    -   [Model Comparisons](#model-comparisons)
--   [Final Model Fit with Entire
-    Data](#final-model-fit-with-entire-data)
--   [Automation](#automation)
+-   [1. Introduction](#1-introduction)
+-   [2. Data](#2-data)
+-   [3. Exploratory Data Analysis](#3-exploratory-data-analysis)
+    -   [3.1. Numerical Summaries](#31-numerical-summaries)
+    -   [3.2. Visualizations](#32-visualizations)
+        -   [3.2.1. Correlation Plot](#321-correlation-plot)
+        -   [3.2.2. Boxplot](#322-boxplot)
+        -   [3.2.3. Barplot](#323-barplot)
+        -   [3.2.4. Line Plot](#324-line-plot)
+        -   [3.2.5. Scatterplots](#325-scatterplots)
+        -   [3.2.6. QQ Plots](#326-qq-plots)
+-   [4. Candidate Models](#4-candidate-models)
+    -   [4.1. Linear Regression](#41-linear-regression)
+    -   [4.2. Random Forest](#42-random-forest)
+    -   [4.3. Boosted Tree](#43-boosted-tree)
+    -   [4.4. Model Comparisons](#44-model-comparisons)
+-   [5. Final Model Fit with Entire
+    Data](#5-final-model-fit-with-entire-data)
+-   [6. Automation](#6-automation)
 
-# Introduction
+# 1. Introduction
 
 Due to the expansion of online businesses, people can almost do anything
 online. With the increasing amount of Internet usages, there has been a
@@ -145,18 +145,18 @@ train
 ```
 
     ## # A tibble: 1,628 x 23
-    ##    class_shares shares log.shares dayweek kw_avg_avg LDA_00 LDA_01 LDA_02 LDA_03 LDA_04 weekday_is_monday weekday_is_tues~
-    ##           <dbl>  <dbl>      <dbl>   <dbl>      <dbl>  <dbl>  <dbl>  <dbl>  <dbl>  <dbl>             <dbl>            <dbl>
-    ##  1            1   2600       7.86       1         0  0.439  0.0225 0.0224 0.0233 0.493                  1                0
-    ##  2            0    690       6.54       1         0  0.199  0.248  0.0201 0.513  0.0202                 1                0
-    ##  3            1   4800       8.48       1         0  0.0298 0.194  0.0288 0.718  0.0293                 1                0
-    ##  4            0    851       6.75       1         0  0.0355 0.0338 0.0336 0.863  0.0341                 1                0
-    ##  5            1   4800       8.48       3       832. 0.0231 0.0223 0.0224 0.910  0.0226                 0                0
-    ##  6            1   9200       9.13       3      1072. 0.0356 0.0334 0.619  0.0337 0.279                  0                0
-    ##  7            1   1600       7.38       3      1564. 0.865  0.0334 0.0336 0.0347 0.0336                 0                0
-    ##  8            0    775       6.65       4      1862. 0.509  0.0287 0.0299 0.404  0.0286                 0                0
-    ##  9            1  18200       9.81       5      2210. 0.800  0.0500 0.0502 0.0501 0.0500                 0                0
-    ## 10            1   1600       7.38       5      1398. 0.189  0.0250 0.319  0.0254 0.441                  0                0
+    ##    class_shares shares log.shares dayweek kw_avg_avg LDA_00 LDA_01 LDA_02 LDA_03 LDA_04 weekday_is_monday weekday_is_tuesday
+    ##           <dbl>  <dbl>      <dbl>   <dbl>      <dbl>  <dbl>  <dbl>  <dbl>  <dbl>  <dbl>             <dbl>              <dbl>
+    ##  1            1   2600       7.86       1         0  0.439  0.0225 0.0224 0.0233 0.493                  1                  0
+    ##  2            0    690       6.54       1         0  0.199  0.248  0.0201 0.513  0.0202                 1                  0
+    ##  3            1   4800       8.48       1         0  0.0298 0.194  0.0288 0.718  0.0293                 1                  0
+    ##  4            0    851       6.75       1         0  0.0355 0.0338 0.0336 0.863  0.0341                 1                  0
+    ##  5            1   4800       8.48       3       832. 0.0231 0.0223 0.0224 0.910  0.0226                 0                  0
+    ##  6            1   9200       9.13       3      1072. 0.0356 0.0334 0.619  0.0337 0.279                  0                  0
+    ##  7            1   1600       7.38       3      1564. 0.865  0.0334 0.0336 0.0347 0.0336                 0                  0
+    ##  8            0    775       6.65       4      1862. 0.509  0.0287 0.0299 0.404  0.0286                 0                  0
+    ##  9            1  18200       9.81       5      2210. 0.800  0.0500 0.0502 0.0501 0.0500                 0                  0
+    ## 10            1   1600       7.38       5      1398. 0.189  0.0250 0.319  0.0254 0.441                  0                  0
     ## # ... with 1,618 more rows, and 11 more variables: weekday_is_wednesday <dbl>, weekday_is_thursday <dbl>,
     ## #   weekday_is_friday <dbl>, weekday_is_saturday <dbl>, weekday_is_sunday <dbl>, self_reference_avg_sharess <dbl>,
     ## #   average_token_length <dbl>, n_tokens_content <dbl>, n_tokens_title <dbl>, global_subjectivity <dbl>, num_imgs <dbl>
@@ -169,18 +169,22 @@ train1 <- train %>% select(-class_shares, -shares,
 test1 <- test %>% select(-class_shares, -shares, 
                          -weekday_is_monday, -weekday_is_tuesday, -weekday_is_wednesday, -weekday_is_thursday, 
                          -weekday_is_friday, -weekday_is_saturday, -weekday_is_sunday, -LDA_00, -LDA_01, -LDA_03, -LDA_04)
+
+news_channel <- if_else(params$channel == "bus", "business", 
+                          if_else(params$channel == "socmed", "social media", 
+                                  if_else(params$channel == "tech", "technology", params$channel)))
 ```
 
-# Data
+# 2. Data
 
-When a subset of data is selected for the socmed channel articles which
-contain 2323 articles, the subset of data is then split into a training
-set (70% of the subset data) and a test set (30% of the subset data)
-based on the target variable, the number of shares. There are 1628
+When a subset of data is selected for the social media channel articles
+which contain 2323 articles, the subset of data is then split into a
+training set (70% of the subset data) and a test set (30% of the subset
+data) based on the target variable, the number of shares. There are 1628
 articles in the training set and 695 observations in the test set
-regarding the socmed channel. The `createDataPartition` function from
-the `caret` package is used to split the data into training and test
-sets. We set a seed so that the analyses we implemented are
+regarding the social media channel. The `createDataPartition` function
+from the `caret` package is used to split the data into training and
+test sets. We set a seed so that the analyses we implemented are
 reproducible.
 
 The data donated by the study contains a “day of the week” categorical
@@ -204,32 +208,32 @@ discover may not reflect on what the data really presents because we did
 not use the “complete version” of the information within the data. This
 is purely for data exploratory analysis purpose in the next section.
 
-# Exploratory Data Analysis
+# 3. Exploratory Data Analysis
 
-The socmed channel has 1628 articles collected. Now let us take a look
-at the relationships between our response and the predictors with some
-numerical summaries and plots.
+The social media channel has 1628 articles collected. Now let us take a
+look at the relationships between our response and the predictors with
+some numerical summaries and plots.
 
-## Numerical Summaries
+## 3.1. Numerical Summaries
 
 Table 2 shows the popularity of the news articles on different days of
 the week. We classified the number of shares greater than 1400 in a day
 as “popular” and the number of shares less than 1400 in a day as
-“unpopular”. We can see the number of articles from the socmed channel
-classified into “popular” group or “unpopular” group on different days
-of the week from January 7th, 2013 to January 7th, 2015 when the
-articles were published and retrieved by the study. Note, this table may
-not reflect on the information contained in the data due to
+“unpopular”. We can see the number of articles from the social media
+channel classified into “popular” group or “unpopular” group on
+different days of the week from January 7th, 2013 to January 7th, 2015
+when the articles were published and retrieved by the study. Note, this
+table may not reflect on the information contained in the data due to
 dichotomizing the data.
 
 Table 3 shows the average shares of the articles on different days of
 the week. We can compare and determine which day of the week has the
-most average number of shares for the socmed channel. Here, we can see a
-potential problem for our analysis later. Median shares are all very
-different from the average shares on any day of the week. Recall that
-median is a robust measure for center. It is robust to outliers in the
-data. On the contrary, mean is also a measure of center but it is not
-robust to outliers. Mean measure can be influenced by potential
+most average number of shares for the social media channel. Here, we can
+see a potential problem for our analysis later. Median shares are all
+very different from the average shares on any day of the week. Recall
+that median is a robust measure for center. It is robust to outliers in
+the data. On the contrary, mean is also a measure of center but it is
+not robust to outliers. Mean measure can be influenced by potential
 outliers.
 
 In addition, Table 3 also shows the standard deviation of shares is huge
@@ -242,14 +246,14 @@ log-transformation, which could help us on this matter. Therefore, Table
 are similar to their corresponding median values, and their standard
 deviations are much smaller than before relatively speaking.
 
-Table 4 shows the numerical summaries of *average keywords* from socmed
-channel in mashable.com on different days of the week. This table
+Table 4 shows the numerical summaries of *average keywords* from social
+media channel in mashable.com on different days of the week. This table
 indicates the number of times *average keywords* shown in the articles
 regarding the average number of shares, and the table is showing the
 average number of those *average keywords* calculated for each day of
 the week so that we can compare to see which day of the week, the
 *average keywords* showed up the most or the worst according to the
-average of shares in the socmed channel.
+average of shares in the social media channel.
 
 Table 5 shows the numerical summaries of average shares of referenced
 articles in mashable.com on different days of the week. We calculated
@@ -257,7 +261,7 @@ the average number of shares of those articles that contained the
 earlier popularity of news referenced for each day of the week so that
 we can compare which day has the most or the worst average number of
 shares when there were earlier popularity of news referenced in the
-socmedarticles.
+social mediaarticles.
 
 Table 6 checks the numerical summaries of the `global_subjectivity`
 variable between popular and unpopular articles, to see if there’s any
@@ -380,14 +384,14 @@ edadata %>% group_by(day.week) %>% summarize(
 
 Table 7. Comparing Image Counts by the Day of the Week
 
-## Visualizations
+## 3.2. Visualizations
 
 Graphical presentation is a great tool used to visualize the
 relationships between the predictors and the number of shares (or log
 number of shares). Below we will see some plots that tell us stories
 between those variables.
 
-### Correlation Plot
+### 3.2.1. Correlation Plot
 
 Figure 1 shows the linear relationship between the variables, both the
 response and the predictors, which will be used in the regression models
@@ -419,7 +423,7 @@ corrplot(correlation, type = "lower", method = "number", add = TRUE, diag = FALS
 
 ![](C:/Users/peach/documents/ST558/ST558_repos/ST558-Project-2/socmed_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
 
-### Boxplot
+### 3.2.2. Boxplot
 
 Figure 2 shows the number of shares across different days of the week.
 Here, due to the huge number of large-valued outliers, I capped the
@@ -428,8 +432,8 @@ interquartile ranges clearly for different days of the week.
 
 This is a boxplot with the days of the week on the x-axis and the number
 of shares on the y-axis. We can inspect the trend of shares to see if
-the shares are higher on a Monday, a Friday or a Sunday for the socmed
-articles.
+the shares are higher on a Monday, a Friday or a Sunday for the social
+media articles.
 
 Figure 2 coincides with the findings in Table 3 that the variance of
 shares is huge across days of the week, and the mean values of shares
@@ -486,12 +490,12 @@ ggplot(data = edadata, aes(x = day.week, y = n_tokens_content)) +
 
 ![](C:/Users/peach/documents/ST558/ST558_repos/ST558-Project-2/socmed_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
-### Barplot
+### 3.2.3. Barplot
 
 Figure 4 shows the popularity of the news articles in relations to their
-closeness to a top LDA topic for the socmed channel on any day of the
-week. The Latent Dirichlet Allocation (LDA) is an algorithm applied to
-the Mashable texts of the articles in order to identify the five top
+closeness to a top LDA topic for the social media channel on any day of
+the week. The Latent Dirichlet Allocation (LDA) is an algorithm applied
+to the Mashable texts of the articles in order to identify the five top
 relevant topics and then measure the closeness of the current articles
 to each topic, and there are five topics categories. Thus, each article
 published on Mashable was measured for each of the topic categories.
@@ -535,7 +539,7 @@ ggplot(data = b.plot2, aes(x = day.week, y = avg.LDA, fill = LDA.Topic)) +
 
 ![](C:/Users/peach/documents/ST558/ST558_repos/ST558-Project-2/socmed_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
-### Line Plot
+### 3.2.4. Line Plot
 
 Figure 5 is a line plot that shows the same measurements as in Figure 4
 that we can see the patterns of the mean ratios of a LDA topic vary or
@@ -544,7 +548,7 @@ some mean ratios of LDA topics do not seem to vary across time when the
 corresponding lines are flattened while other mean ratios of LDA topics
 vary across time when their lines are fluctuating. The patterns observed
 in the “popular” group may not reflect on the same trend in the
-“unpopular” group for articles in the socmed channel.
+“unpopular” group for articles in the social media channel.
 
 ``` r
 l.plot1 <- edadata %>% group_by(day.week, class.shares) %>% 
@@ -569,10 +573,10 @@ ggplot(data = l.plot2, aes(x = day.week, y = avg.LDA, group = LDA.Topic)) +
 
 ![](C:/Users/peach/documents/ST558/ST558_repos/ST558-Project-2/socmed_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
-### Scatterplots
+### 3.2.5. Scatterplots
 
 Figure 6 shows the relationship between the average keyword and
-log-transformed shares for articles in the socmed channel across
+log-transformed shares for articles in the social media channel across
 different days of the week. In the news popularity study, it showed
 average keyword was ranked top one predictor in variable importance in
 the optimal predictive model (random forest) they selected that produced
@@ -590,7 +594,7 @@ points are in a downward trend, it indicates a negative relationship
 between the average keyword and log-shares. With an decreasing log
 number of shares, the number of average keywords decreases as well.
 People tend to share the articles less when they see less of these
-average keywords in the articles from the socmed channel.
+average keywords in the articles from the social media channel.
 
 Figure 7 is similar, except it compares the log-transformed number of
 shares to the log-transformed images in the article. As noted
@@ -638,11 +642,11 @@ ggplot(data = edadata, aes(x = log(num_imgs + 1), y = log.shares, color = day.we
 
 ![](C:/Users/peach/documents/ST558/ST558_repos/ST558-Project-2/socmed_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
-### QQ Plots
+### 3.2.6. QQ Plots
 
 To justify the usage of the log transformations for shares and images,
-we’ll show the QQ plot of each over the socmed channel in figures 8a,
-8b, 8c, and 8d. We’re aiming for something close to a straight line,
+we’ll show the QQ plot of each over the social media channel in figures
+8a, 8b, 8c, and 8d. We’re aiming for something close to a straight line,
 which would indicate that the data is approximately normal in its
 distribution and does not need further standardization.
 
@@ -709,9 +713,9 @@ ggplot(edadata) + geom_qq(aes(sample = log(num_imgs + 1))) + geom_qq_line(aes(sa
 Whether it’s appropriate to perform a logarithmic transformation on the
 number of images is somewhat less clear than for the number of shares.
 
-# Candidate Models
+# 4. Candidate Models
 
-## Linear Regression
+## 4.1. Linear Regression
 
 The linear regression process takes a matrix of all of the predictor
 variables we’ve chosen and compares their values to each of the
@@ -800,18 +804,18 @@ trainTransformed1
 ```
 
     ## # A tibble: 1,628 x 10
-    ##    log.shares dayweek   kw_avg_avg LDA_02 self_reference_~ average_token_l~ n_tokens_content n_tokens_title global_subjecti~
-    ##         <dbl> <fct>          <dbl>  <dbl>            <dbl>            <dbl>            <dbl>          <dbl>            <dbl>
-    ##  1      0.103 Monday        -2.17  -0.753          -0.257           0.00414           -0.641         -0.771          -0.633 
-    ##  2     -1.53  Monday        -2.17  -0.762          -0.178          -0.513             -0.711         -0.771           0.660 
-    ##  3      0.857 Monday        -2.17  -0.725          -0.217          -0.620              1.10          -0.294          -0.548 
-    ##  4     -1.27  Monday        -2.17  -0.704          -0.219           0.393              0.907          0.182           0.399 
-    ##  5      0.857 Wednesday     -1.62  -0.753          -0.0763          0.107             -0.801         -0.294           1.89  
-    ##  6      1.66  Wednesday     -1.46   1.82           -0.256          -0.476             -0.923         -0.294          -1.29  
-    ##  7     -0.494 Wednesday     -1.13  -0.704          -0.238          -0.0110             1.76           0.182          -0.0642
-    ##  8     -1.39  Thursday      -0.926 -0.720          -0.193           0.391             -0.173         -1.25            1.47  
-    ##  9      2.50  Friday        -0.692 -0.633           0.0663         -0.977             -0.460         -0.771           0.471 
-    ## 10     -0.494 Friday        -1.24   0.529          -0.264           1.93              -0.460         -1.72            0.349 
+    ##    log.shares dayweek   kw_avg_avg LDA_02 self_reference_av~ average_token_le~ n_tokens_content n_tokens_title global_subjecti~
+    ##         <dbl> <fct>          <dbl>  <dbl>              <dbl>             <dbl>            <dbl>          <dbl>            <dbl>
+    ##  1      0.103 Monday        -2.17  -0.753            -0.257            0.00414           -0.641         -0.771          -0.633 
+    ##  2     -1.53  Monday        -2.17  -0.762            -0.178           -0.513             -0.711         -0.771           0.660 
+    ##  3      0.857 Monday        -2.17  -0.725            -0.217           -0.620              1.10          -0.294          -0.548 
+    ##  4     -1.27  Monday        -2.17  -0.704            -0.219            0.393              0.907          0.182           0.399 
+    ##  5      0.857 Wednesday     -1.62  -0.753            -0.0763           0.107             -0.801         -0.294           1.89  
+    ##  6      1.66  Wednesday     -1.46   1.82             -0.256           -0.476             -0.923         -0.294          -1.29  
+    ##  7     -0.494 Wednesday     -1.13  -0.704            -0.238           -0.0110             1.76           0.182          -0.0642
+    ##  8     -1.39  Thursday      -0.926 -0.720            -0.193            0.391             -0.173         -1.25            1.47  
+    ##  9      2.50  Friday        -0.692 -0.633             0.0663          -0.977             -0.460         -0.771           0.471 
+    ## 10     -0.494 Friday        -1.24   0.529            -0.264            1.93              -0.460         -1.72            0.349 
     ## # ... with 1,618 more rows, and 1 more variable: num_imgs <dbl>
 
 ``` r
@@ -916,7 +920,7 @@ cv_rmse1 <- postResample(pred1, obs = testTransformed1$log.shares)
 cv_rmse2 <- postResample(pred2, obs = testTransformed1$log.shares)
 ```
 
-## Random Forest
+## 4.2. Random Forest
 
 The bootstrap approach to fitting a tree model involves resampling our
 data and fitting a tree to each sample, and then averaging the resulting
@@ -943,18 +947,18 @@ trainTransformed2
 ```
 
     ## # A tibble: 1,628 x 16
-    ##    log.shares kw_avg_avg LDA_02 weekday_is_monday weekday_is_tuesday weekday_is_wednes~ weekday_is_thurs~ weekday_is_frid~
-    ##         <dbl>      <dbl>  <dbl>             <dbl>              <dbl>              <dbl>             <dbl>            <dbl>
-    ##  1      0.103     -2.17  -0.753             2.45              -0.496             -0.472            -0.501           -0.403
-    ##  2     -1.53      -2.17  -0.762             2.45              -0.496             -0.472            -0.501           -0.403
-    ##  3      0.857     -2.17  -0.725             2.45              -0.496             -0.472            -0.501           -0.403
-    ##  4     -1.27      -2.17  -0.704             2.45              -0.496             -0.472            -0.501           -0.403
-    ##  5      0.857     -1.62  -0.753            -0.408             -0.496              2.12             -0.501           -0.403
-    ##  6      1.66      -1.46   1.82             -0.408             -0.496              2.12             -0.501           -0.403
-    ##  7     -0.494     -1.13  -0.704            -0.408             -0.496              2.12             -0.501           -0.403
-    ##  8     -1.39      -0.926 -0.720            -0.408             -0.496             -0.472             1.99            -0.403
-    ##  9      2.50      -0.692 -0.633            -0.408             -0.496             -0.472            -0.501            2.48 
-    ## 10     -0.494     -1.24   0.529            -0.408             -0.496             -0.472            -0.501            2.48 
+    ##    log.shares kw_avg_avg LDA_02 weekday_is_monday weekday_is_tuesday weekday_is_wednesday weekday_is_thursday weekday_is_friday
+    ##         <dbl>      <dbl>  <dbl>             <dbl>              <dbl>                <dbl>               <dbl>             <dbl>
+    ##  1      0.103     -2.17  -0.753             2.45              -0.496               -0.472              -0.501            -0.403
+    ##  2     -1.53      -2.17  -0.762             2.45              -0.496               -0.472              -0.501            -0.403
+    ##  3      0.857     -2.17  -0.725             2.45              -0.496               -0.472              -0.501            -0.403
+    ##  4     -1.27      -2.17  -0.704             2.45              -0.496               -0.472              -0.501            -0.403
+    ##  5      0.857     -1.62  -0.753            -0.408             -0.496                2.12               -0.501            -0.403
+    ##  6      1.66      -1.46   1.82             -0.408             -0.496                2.12               -0.501            -0.403
+    ##  7     -0.494     -1.13  -0.704            -0.408             -0.496                2.12               -0.501            -0.403
+    ##  8     -1.39      -0.926 -0.720            -0.408             -0.496               -0.472               1.99             -0.403
+    ##  9      2.50      -0.692 -0.633            -0.408             -0.496               -0.472              -0.501             2.48 
+    ## 10     -0.494     -1.24   0.529            -0.408             -0.496               -0.472              -0.501             2.48 
     ## # ... with 1,618 more rows, and 8 more variables: weekday_is_saturday <dbl>, weekday_is_sunday <dbl>,
     ## #   self_reference_avg_sharess <dbl>, average_token_length <dbl>, n_tokens_content <dbl>, n_tokens_title <dbl>,
     ## #   global_subjectivity <dbl>, num_imgs <dbl>
@@ -1013,7 +1017,7 @@ The optimal model chosen by cross validation produced the smallest RMSE
 value when mtry = 2 and the lowest RMSE = 0.9450885 when training the
 model on the training set.
 
-## Boosted Tree
+## 4.3. Boosted Tree
 
 Random forest models use bagging technique (bootstrap aggregation) to
 build independent decision trees with different subsets of predictors
@@ -1126,9 +1130,9 @@ value (0.9365609) when n.trees = 125, interaction.depth = 1, shrinkage =
 0.1 and n.minobsinnode = 10 when training the model with the training
 set.
 
-## Model Comparisons
+## 4.4. Model Comparisons
 
-The best model fit to predict the number of shares for the socmed
+The best model fit to predict the number of shares for the social media
 channel can be determined by looking at the Root Mean Squared Error, the
 Mean Absolute Error, or the R-squared value using the test set. Table 8
 shows these criteria measures for each candidate model. The approach
@@ -1163,10 +1167,10 @@ final_model <- if_else(max(model_best) > 1, names(which.max(model_best)), rmse_b
 We built a helper function so that when a final winning model is
 declared among the candidate models using the test set, we then used the
 final model to fit the entire data set, both the training and the test
-sets, from the socmed channel. A variable importance plot is produced
-along with a table containing a ranking metrics of the variable
+sets, from the social media channel. A variable importance plot is
+produced along with a table containing a ranking metrics of the variable
 importance when fitting the final model with the entire data set of the
-socmed articles.
+social media articles.
 
 ``` r
 linear1 <- function(...){
@@ -1234,41 +1238,41 @@ boostedt <- function(...){
 }
 ```
 
-# Final Model Fit with Entire Data
+# 5. Final Model Fit with Entire Data
 
 The best model fit to predict the number of shares is the **Random
-Forest** model for the socmed articles. We fit the entire data set, both
-the training and the test set from the channel in the final chosen
-model. The values of RMSE, MAE and R-squared are calculated with the
-entire data set using the final model. A variable importance plot of the
-top 10 most important variables and a table containing a ranking metric
-of the relative variable importance are produced below. We can examine
-which predictors contributed the most in predicting the popularity of
-online news in the final model accordingly. Table 1 containing attribute
-information from the *Introduction* section is copied below for
-comparisons of variable importance.
+Forest** model for the social media articles. We fit the entire data
+set, both the training and the test set from the channel in the final
+chosen model. The values of RMSE, MAE and R-squared are calculated with
+the entire data set using the final model. A variable importance plot of
+the top 10 most important variables and a table containing a ranking
+metric of the relative variable importance are produced below. We can
+examine which predictors contributed the most in predicting the
+popularity of online news in the final model accordingly. Table 1
+containing attribute information from the *Introduction* section is
+copied below for comparisons of variable importance.
 
 Table 1. Attributes used in the analyses for prediction of online news
 popularity
 
-| Index | Attribute                    | Attribute Information                                  | Type    |
-|-------|------------------------------|--------------------------------------------------------|---------|
-| 1     | `shares` (target)            | Number of shares                                       | number  |
-| 2     | `kw_avg_avg`                 | Average keyword (average shares)                       | number  |
-| 3     | `LDA_02`                     | Closeness of current article to a LDA Topic 2          | ratio   |
-| 4.1   | `weekday_is_monday`          | Was the article published on a Monday?                 | boolean |
-| 4.2   | `weekday_is_tuesday`         | Was the article published on a Tuesday?                | boolean |
-| 4.3   | `weekday_is_wednesday`       | Was the article published on a Wednesday?              | boolean |
-| 4.4   | `weekday_is_thursday`        | Was the article published on a Thursday?               | boolean |
-| 4.5   | `weekday_is_friday`          | Was the article published on a Friday?                 | boolean |
-| 4.6   | `weekday_is_saturday`        | Was the article published on a Saturday?               | boolean |
-| 4.7   | `weekday_is_sunday`          | Was the article published on a Sunday?                 | boolean |
-| 5     | `self_reference_avg_sharess` | Avg. shares of popular news referenced in the articles | number  |
-| 6     | `average_token_length`       | Average length of the words in the content             | number  |
-| 7     | `n_tokens_content`           | Number of words in the content                         | number  |
-| 8     | `n_tokens_title`             | Number of words in the title                           | number  |
-| 9     | `global_subjectivity`        | Text subjectivity                                      | ratio   |
-| 10    | `num_imgs`                   | Number of images                                       | number  |
+| Index | Attribute                    | Attribute Information                                             | Type    |
+|-------|------------------------------|-------------------------------------------------------------------|---------|
+| 1     | `shares` (target)            | Number of shares                                                  | number  |
+| 2     | `kw_avg_avg`                 | Average keyword (average shares)                                  | number  |
+| 3     | `LDA_02`                     | Closeness of current article to a LDA Topic 2                     | ratio   |
+| 4.1   | `weekday_is_monday`          | Was the article published on a Monday?                            | boolean |
+| 4.2   | `weekday_is_tuesday`         | Was the article published on a Tuesday?                           | boolean |
+| 4.3   | `weekday_is_wednesday`       | Was the article published on a Wednesday?                         | boolean |
+| 4.4   | `weekday_is_thursday`        | Was the article published on a Thursday?                          | boolean |
+| 4.5   | `weekday_is_friday`          | Was the article published on a Friday?                            | boolean |
+| 4.6   | `weekday_is_saturday`        | Was the article published on a Saturday?                          | boolean |
+| 4.7   | `weekday_is_sunday`          | Was the article published on a Sunday?                            | boolean |
+| 5     | `self_reference_avg_sharess` | Avg. shares of earlier popularity news referenced in the articles | number  |
+| 6     | `average_token_length`       | Average length of the words in the content                        | number  |
+| 7     | `n_tokens_content`           | Number of words in the content                                    | number  |
+| 8     | `n_tokens_title`             | Number of words in the title                                      | number  |
+| 9     | `global_subjectivity`        | Text subjectivity                                                 | ratio   |
+| 10    | `num_imgs`                   | Number of images                                                  | number  |
 
 ``` r
 f_model <- if_else(final_model == "Random Forest", 3, 
@@ -1333,7 +1337,7 @@ switch(f_model,
 #print(paste0("The most important predictor is ", first, ", the second is ", second))
 ```
 
-# Automation
+# 6. Automation
 
 To knit with the parameters with this single .Rmd file, we specified the
 parameters in the YAML header and created a data frame which contains

@@ -8,7 +8,6 @@ params:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
-
 ```
 
 # 1. Introduction
@@ -98,11 +97,15 @@ train1 <- train %>% select(-class_shares, -shares,
 test1 <- test %>% select(-class_shares, -shares, 
                          -weekday_is_monday, -weekday_is_tuesday, -weekday_is_wednesday, -weekday_is_thursday, 
                          -weekday_is_friday, -weekday_is_saturday, -weekday_is_sunday, -LDA_00, -LDA_01, -LDA_03, -LDA_04)
+
+news_channel <- if_else(params$channel == "bus", "business", 
+                          if_else(params$channel == "socmed", "social media", 
+                                  if_else(params$channel == "tech", "technology", params$channel)))
 ```
 
 # 2. Data
 
-When a subset of data is selected for the `r params$channel` channel articles which contain `r dim(news)[1]` articles, the subset of data is then split into a training set (70% of the subset data) and a test set (30% of the subset data) based on the target variable, the number of shares. There are `r dim(train)[1]` articles in the training set and `r dim(test)[1]` observations in the test set regarding the `r params$channel` channel. The `createDataPartition` function from the `caret` package is used to split the data into training and test sets. We set a seed so that the analyses we implemented are reproducible. 
+When a subset of data is selected for the `r news_channel` channel articles which contain `r dim(news)[1]` articles, the subset of data is then split into a training set (70% of the subset data) and a test set (30% of the subset data) based on the target variable, the number of shares. There are `r dim(train)[1]` articles in the training set and `r dim(test)[1]` observations in the test set regarding the `r news_channel` channel. The `createDataPartition` function from the `caret` package is used to split the data into training and test sets. We set a seed so that the analyses we implemented are reproducible. 
 
 The data donated by the study contains a "day of the week" categorical variable but in a boolean format (dummy variable) asking if the article was published on a day of a week for all seven days which is also shown in Table 1. Thus, we created a new variable called `dayweek` with seven levels to combine these dummy variables for the linear regression models. When `dayweek` = 1, the article was published on a Monday, when `dayweek` = 2, the article was published on a Tuesday, ..., and when `dayweek` = 7, the article was published on a Sunday. 
 
@@ -110,19 +113,19 @@ However, these `dayweek` related variables for each day of the week in boolean f
 
 # 3. Exploratory Data Analysis
 
-The `r params$channel` channel has `r dim(train)[1]` articles collected. Now let us take a look at the relationships between our response and the predictors with some numerical summaries and plots. 
+The `r news_channel` channel has `r dim(train)[1]` articles collected. Now let us take a look at the relationships between our response and the predictors with some numerical summaries and plots. 
 
 ## 3.1. Numerical Summaries
 
-Table 2 shows the popularity of the news articles on different days of the week. We classified the number of shares greater than 1400 in a day as "popular" and the number of shares less than 1400 in a day as "unpopular". We can see the number of articles from the `r params$channel` channel classified into "popular" group or "unpopular" group on different days of the week from January 7th, 2013 to January 7th, 2015 when the articles were published and retrieved by the study. Note, this table may not reflect on the information contained in the data due to dichotomizing the data.
+Table 2 shows the popularity of the news articles on different days of the week. We classified the number of shares greater than 1400 in a day as "popular" and the number of shares less than 1400 in a day as "unpopular". We can see the number of articles from the `r news_channel` channel classified into "popular" group or "unpopular" group on different days of the week from January 7th, 2013 to January 7th, 2015 when the articles were published and retrieved by the study. Note, this table may not reflect on the information contained in the data due to dichotomizing the data.
 
-Table 3 shows the average shares of the articles on different days of the week. We can compare and determine which day of the week has the most average number of shares for the `r params$channel` channel. Here, we can see a potential problem for our analysis later. Median shares are all very different from the average shares on any day of the week. Recall that median is a robust measure for center. It is robust to outliers in the data. On the contrary, mean is also a measure of center but it is not robust to outliers. Mean measure can be influenced by potential outliers. 
+Table 3 shows the average shares of the articles on different days of the week. We can compare and determine which day of the week has the most average number of shares for the `r news_channel` channel. Here, we can see a potential problem for our analysis later. Median shares are all very different from the average shares on any day of the week. Recall that median is a robust measure for center. It is robust to outliers in the data. On the contrary, mean is also a measure of center but it is not robust to outliers. Mean measure can be influenced by potential outliers. 
 
 In addition, Table 3 also shows the standard deviation of shares is huge for any day of the week. They are potentially larger than the average shares. This tells us the variance of shares for any day is huge. We know a common variance stabilizing transformation to deal with increasing variance of the response variable, that is, the log-transformation, which could help us on this matter. Therefore, Table 3 again shows after the log-transformation of shares, the mean values are similar to their corresponding median values, and their standard deviations are much smaller than before relatively speaking.
 
-Table 4 shows the numerical summaries of *average keywords* from `r params$channel` channel in mashable.com on different days of the week. This table indicates the number of times *average keywords* shown in the articles regarding the average number of shares, and the table is showing the average number of those *average keywords* calculated for each day of the week so that we can compare to see which day of the week, the *average keywords* showed up the most or the worst according to the average of shares in the `r params$channel` channel.
+Table 4 shows the numerical summaries of *average keywords* from `r news_channel` channel in mashable.com on different days of the week. This table indicates the number of times *average keywords* shown in the articles regarding the average number of shares, and the table is showing the average number of those *average keywords* calculated for each day of the week so that we can compare to see which day of the week, the *average keywords* showed up the most or the worst according to the average of shares in the `r news_channel` channel.
 
-Table 5 shows the numerical summaries of average shares of referenced articles in mashable.com on different days of the week. We calculated the average number of shares of those articles that contained the earlier popularity of news referenced for each day of the week so that we can compare which day has the most or the worst average number of shares when there were earlier popularity of news referenced in the `r params$channel`articles. 
+Table 5 shows the numerical summaries of average shares of referenced articles in mashable.com on different days of the week. We calculated the average number of shares of those articles that contained the earlier popularity of news referenced for each day of the week so that we can compare which day has the most or the worst average number of shares when there were earlier popularity of news referenced in the `r news_channel`articles. 
 
 Table 6 checks the numerical summaries of the `global_subjectivity` variable between popular and unpopular articles, to see if there's any difference or a higher variation in subjectivity in popular articles. Text subjectivity is a value between 0 and 1, so there isn't any need for transformation.
 
@@ -184,7 +187,7 @@ corrplot(correlation, type = "lower", method = "number", add = TRUE, diag = FALS
 
 Figure 2 shows the number of shares across different days of the week. Here, due to the huge number of large-valued outliers, I capped the number of shares to 8,000 so that we can see the medians and the interquartile ranges clearly for different days of the week.
 
-This is a boxplot with the days of the week on the x-axis and the number of shares on the y-axis. We can inspect the trend of shares to see if the shares are higher on a Monday, a Friday or a Sunday for the `r params$channel` articles. 
+This is a boxplot with the days of the week on the x-axis and the number of shares on the y-axis. We can inspect the trend of shares to see if the shares are higher on a Monday, a Friday or a Sunday for the `r news_channel` articles. 
 
 Figure 2 coincides with the findings in Table 3 that the variance of shares is huge across days of the week, and the mean values of shares across different days are driven by larged-valued outliers. Therefore, those mean values of shares are not close to the median values of shares for each day of the week. 
 
@@ -227,7 +230,7 @@ ggplot(data = edadata, aes(x = day.week, y = n_tokens_content)) +
 
 ### 3.2.3. Barplot
 
-Figure 4 shows the popularity of the news articles in relations to their closeness to a top LDA topic for the `r params$channel` channel on any day of the week. The Latent Dirichlet Allocation (LDA) is an algorithm applied to the Mashable texts of the articles in order to identify the five top relevant topics and then measure the closeness of the current articles to each topic, and there are five topics categories. Thus, each article published on Mashable was measured for each of the topic categories. Together, those LDA measures in ratios are added to 1 for each article. Thus, these LDA topics variables are highly correlated with one another. 
+Figure 4 shows the popularity of the news articles in relations to their closeness to a top LDA topic for the `r news_channel` channel on any day of the week. The Latent Dirichlet Allocation (LDA) is an algorithm applied to the Mashable texts of the articles in order to identify the five top relevant topics and then measure the closeness of the current articles to each topic, and there are five topics categories. Thus, each article published on Mashable was measured for each of the topic categories. Together, those LDA measures in ratios are added to 1 for each article. Thus, these LDA topics variables are highly correlated with one another. 
 
 We calculated the mean ratios of these LDA topics variables for the specific day of the week. These mean ratios are further classified into a "popular" group and an "unpopular" group according to their number of shares (> 1400 or < 1400) which is shown in Figure 4 barplot. Note, the `position = "stack"` not `position = "fill"` in the `geom_bar` function. 
 
@@ -256,7 +259,7 @@ ggplot(data = b.plot2, aes(x = day.week, y = avg.LDA, fill = LDA.Topic)) +
 
 ### 3.2.4. Line Plot
 
-Figure 5 is a line plot that shows the same measurements as in Figure 4 that we can see the patterns of the mean ratios of a LDA topic vary or not vary across time in different popularity groups more clearly. Again, some mean ratios of LDA topics do not seem to vary across time when the corresponding lines are flattened while other mean ratios of LDA topics vary across time when their lines are fluctuating. The patterns observed in the "popular" group may not reflect on the same trend in the "unpopular" group for articles in the `r params$channel` channel.
+Figure 5 is a line plot that shows the same measurements as in Figure 4 that we can see the patterns of the mean ratios of a LDA topic vary or not vary across time in different popularity groups more clearly. Again, some mean ratios of LDA topics do not seem to vary across time when the corresponding lines are flattened while other mean ratios of LDA topics vary across time when their lines are fluctuating. The patterns observed in the "popular" group may not reflect on the same trend in the "unpopular" group for articles in the `r news_channel` channel.
 
 ```{r eval=TRUE}
 l.plot1 <- edadata %>% group_by(day.week, class.shares) %>% 
@@ -282,9 +285,9 @@ ggplot(data = l.plot2, aes(x = day.week, y = avg.LDA, group = LDA.Topic)) +
 
 ### 3.2.5. Scatterplots
 
-Figure 6 shows the relationship between the average keyword and log-transformed shares for articles in the `r params$channel` channel across different days of the week. In the news popularity study, it showed average keyword was ranked top one predictor in variable importance in the optimal predictive model (random forest) they selected that produced the highest accuracy in prediction of popularity online articles. Therefore, we are interested to see how average keyword is related with log shares. The different colored linear regression lines indicate different days of the week. 
+Figure 6 shows the relationship between the average keyword and log-transformed shares for articles in the `r news_channel` channel across different days of the week. In the news popularity study, it showed average keyword was ranked top one predictor in variable importance in the optimal predictive model (random forest) they selected that produced the highest accuracy in prediction of popularity online articles. Therefore, we are interested to see how average keyword is related with log shares. The different colored linear regression lines indicate different days of the week. 
 
-If the points display an upward trend, it indicates a positive relationship between the average keyword and log-shares. With an increasing log number of shares, the number of average keywords also increases, meaning people tend to share the article more when they see more of those average keywords in the article. On the contrary, if the points are in a downward trend, it indicates a negative relationship between the average keyword and log-shares. With an decreasing log number of shares, the number of average keywords decreases as well. People tend to share the articles less when they see less of these average keywords in the articles from the `r params$channel` channel.
+If the points display an upward trend, it indicates a positive relationship between the average keyword and log-shares. With an increasing log number of shares, the number of average keywords also increases, meaning people tend to share the article more when they see more of those average keywords in the article. On the contrary, if the points are in a downward trend, it indicates a negative relationship between the average keyword and log-shares. With an decreasing log number of shares, the number of average keywords decreases as well. People tend to share the articles less when they see less of these average keywords in the articles from the `r news_channel` channel.
 
 Figure 7 is similar, except it compares the log-transformed number of shares to the log-transformed images in the article. As noted previously, both of these variables do not behave properly in a linear model due to the existence of extreme outliers in the data. Here, a negative correlation will indicate that shares sharply decreased for articles containing more images, and a positive correlation will indicate that shares sharply increased for articles containing more images.
 
@@ -325,7 +328,7 @@ ggplot(data = edadata, aes(x = log(num_imgs + 1), y = log.shares, color = day.we
 
 ### 3.2.6. QQ Plots
 
-To justify the usage of the log transformations for shares and images, we'll show the QQ plot of each over the `r params$channel` channel in figures 8a, 8b, 8c, and 8d. We're aiming for something close to a straight line, which would indicate that the data is approximately normal in its distribution and does not need further standardization.
+To justify the usage of the log transformations for shares and images, we'll show the QQ plot of each over the `r news_channel` channel in figures 8a, 8b, 8c, and 8d. We're aiming for something close to a straight line, which would indicate that the data is approximately normal in its distribution and does not need further standardization.
 
 ```{r eval = TRUE}
 ggplot(edadata) + geom_qq(aes(sample = shares)) + geom_qq_line(aes(sample = shares)) + 
@@ -403,21 +406,21 @@ The second linear regression model provided below applies a log transformation t
 
 Table 8. The predictors in linear regression model 1  
   
-Index  | Predictor in Linear Regression 1              | Predictor Information
------- | --------------------------------------------- | -------------------------------------------------------------
-1      | `kw_avg_avg`                                  | Average keyword (average shares)
-2      | `LDA_02`                                      | Closeness of current article to a LDA Topic 2
-3      | `dayweek`                                     | Day of a week the article was published 
-4      | `self_reference_avg_sharess`                  | Average shares of earlier popularity news referenced in the article
-5      | `average_token_length`                        | Average length of the words in the content
-6      | `n_tokens_content`                            | Number of words in the content
-7      | `n_tokens_title`                              | Number of words in the title
-8      | `global_subjectivity`                         | Text subjectivity
-9      | `num_imgs`                                    | Number of images
-10     | `I(n_tokens_content^2)`                       | Quadratic term of number of words in the content
-11     | `kw_avg_avg:num_imgs`                         | Interaction term
-12     | `average_token_length:global_subjectivity`    | Interaction term
-13     | `dayweek:self_reference_avg_sharess`          | Interaction term
+Index  | Predictor in Linear Regression 1            | Predictor Information
+------ | ------------------------------------------- | -------------------------------------------------------------
+1      | `kw_avg_avg`                                | Average keyword (average shares)
+2      | `LDA_02`                                    | Closeness of current article to a LDA Topic 2
+3      | `dayweek`                                   | Day of a week the article was published 
+4      | `self_reference_avg_sharess`                | Average shares of earlier popularity news referenced in the article
+5      | `average_token_length`                      | Average length of the words in the content
+6      | `n_tokens_content`                          | Number of words in the content
+7      | `n_tokens_title`                            | Number of words in the title
+8      | `global_subjectivity`                       | Text subjectivity
+9      | `num_imgs`                                  | Number of images
+10     | `I(n_tokens_content^2)`                     | Quadratic term of number of words in the content
+11     | `kw_avg_avg:num_imgs`                       | Interaction term
+12     | `average_token_length:global_subjectivity`  | Interaction term
+13     | `dayweek:self_reference_avg_sharess`        | Interaction term
 
 We standardized both the training set and the test set before we fit the linear regression models. We used the standardized mean and standard deviation values from the training set on the test set so that the predictors on both sets have the same means and standard deviations. Standardizing the variables is very important prior to model fitting so that all the variables are on the same scale. The variables with large values do not look more important than the variables with smaller values. Especially in our data set where some variable values are unbounded, skewed to one side, and some variables are ratios between 0 and 1. 
 
@@ -518,12 +521,12 @@ We then used 10 fold cross validation to search all combinations of the tuning p
 
 ## 4.4. Model Comparisons
 
-The best model fit to predict the number of shares for the `r params$channel` channel can be determined by looking at the Root Mean Squared Error, the Mean Absolute Error, or the R-squared value using the test set. Table 8 shows these criteria measures for each candidate model. The approach I've taken below picks whichever model is considered superior by the majority score of these three metrics, and if each of the metrics picks a different model or the majority score is a tiebreaker, then the one with the lowest RMSE will be chosen. 
+The best model fit to predict the number of shares for the `r news_channel` channel can be determined by looking at the Root Mean Squared Error, the Mean Absolute Error, or the R-squared value using the test set. Table 9 shows these criteria measures for each candidate model. The approach I've taken below picks whichever model is considered superior by the majority score of these three metrics, and if each of the metrics picks a different model or the majority score is a tiebreaker, then the one with the lowest RMSE will be chosen. 
 
 ```{r eval=TRUE}
 result2 <- rbind(cv_rmse1, cv_rmse1, rf_rmse, boost_rmse)
 row.names(result2) <- c("Linear Regression 1", "Linear Regression 2", "Random Forest", "Boosted Tree")
-kable(result2, digits = 4, caption = "Table 8. Cross Validation - Comparisons of the models in test set")
+kable(result2, digits = 4, caption = "Table 9. Cross Validation - Comparisons of the models in test set")
 
 rmse_best <- names(which.min(result2[,1]))
 rsq_best <- names(which.max(result2[,2]))
@@ -532,7 +535,7 @@ model_best <- table(c(rmse_best, rsq_best, mae_best))
 final_model <- if_else(max(model_best) > 1, names(which.max(model_best)), rmse_best)
 ```
 
-We built a helper function so that when a final winning model is declared among the candidate models using the test set, we then used the final model to fit the entire data set, both the training and the test sets, from the `r params$channel` channel. A variable importance plot is produced along with a table containing a ranking metrics of the variable importance when fitting the final model with the entire data set of the `r params$channel` articles.
+We built a helper function so that when a final winning model is declared among the candidate models using the test set, we then used the final model to fit the entire data set, both the training and the test sets, from the `r news_channel` channel. A variable importance plot is produced along with a table containing a ranking metrics of the variable importance when fitting the final model with the entire data set of the `r news_channel` articles.
 
 ```{r eval=TRUE}
 linear1 <- function(...){
@@ -602,28 +605,28 @@ boostedt <- function(...){
 
 # 5. Final Model Fit with Entire Data
 
-The best model fit to predict the number of shares is the **`r final_model`** model for the `r params$channel` articles. We fit the entire data set, both the training and the test set from the channel in the final chosen model. The values of RMSE, MAE and R-squared are calculated with the entire data set using the final model. A variable importance plot of the top 10 most important variables and a table containing a ranking metric of the relative variable importance are produced below. We can examine which predictors contributed the most in predicting the popularity of online news in the final model accordingly. Table 1 containing attribute information from the *Introduction* section is copied below for comparisons of variable importance.
+The best model fit to predict the number of shares is the **`r final_model`** model for the `r news_channel` articles. We fit the entire data set, both the training and the test set from the channel in the final chosen model. The values of RMSE, MAE and R-squared are calculated with the entire data set using the final model. A variable importance plot of the top 10 most important variables and a table containing a ranking metric of the relative variable importance are produced below. We can examine which predictors contributed the most in predicting the popularity of online news in the final model accordingly. Table 1 containing attribute information from the *Introduction* section is copied below for reference in comparisons of variable importance.
 
 Table 1. Attributes used in the analyses for prediction of online news popularity
 
-Index | Attribute                     | Attribute Information                                  | Type   
------ | ----------------------------- | ------------------------------------------------------ | --------
-1     | `shares`  (target)            | Number of shares                                       | number
-2     | `kw_avg_avg`                  | Average keyword (average shares)                       | number
-3     | `LDA_02`                      | Closeness of current article to a LDA Topic 2          | ratio
-4.1   | `weekday_is_monday`           | Was the article published on a Monday?                 | boolean
-4.2   | `weekday_is_tuesday`          | Was the article published on a Tuesday?                | boolean
-4.3   | `weekday_is_wednesday`        | Was the article published on a Wednesday?              | boolean
-4.4   | `weekday_is_thursday`         | Was the article published on a Thursday?               | boolean
-4.5   | `weekday_is_friday`           | Was the article published on a Friday?                 | boolean
-4.6   | `weekday_is_saturday`         | Was the article published on a Saturday?               | boolean
-4.7   | `weekday_is_sunday`           | Was the article published on a Sunday?                 | boolean
-5     | `self_reference_avg_sharess`  | Avg. shares of popular news referenced in the articles | number
-6     | `average_token_length`        | Average length of the words in the content             | number
-7     | `n_tokens_content`            | Number of words in the content                         | number
-8     | `n_tokens_title`              | Number of words in the title                           | number
-9     | `global_subjectivity`         | Text subjectivity                                      | ratio
-10    | `num_imgs`                    | Number of images                                       | number
+Index | Attribute                     | Attribute Information                                             | Type   
+----- | ----------------------------- | ----------------------------------------------------------------- | --------
+1     | `shares`  (target)            | Number of shares                                                  | number
+2     | `kw_avg_avg`                  | Average keyword (average shares)                                  | number
+3     | `LDA_02`                      | Closeness of current article to a LDA Topic 2                     | ratio
+4.1   | `weekday_is_monday`           | Was the article published on a Monday?                            | boolean
+4.2   | `weekday_is_tuesday`          | Was the article published on a Tuesday?                           | boolean
+4.3   | `weekday_is_wednesday`        | Was the article published on a Wednesday?                         | boolean
+4.4   | `weekday_is_thursday`         | Was the article published on a Thursday?                          | boolean
+4.5   | `weekday_is_friday`           | Was the article published on a Friday?                            | boolean
+4.6   | `weekday_is_saturday`         | Was the article published on a Saturday?                          | boolean
+4.7   | `weekday_is_sunday`           | Was the article published on a Sunday?                            | boolean
+5     | `self_reference_avg_sharess`  | Avg. shares of earlier popularity news referenced in the articles | number
+6     | `average_token_length`        | Average length of the words in the content                        | number
+7     | `n_tokens_content`            | Number of words in the content                                    | number
+8     | `n_tokens_title`              | Number of words in the title                                      | number
+9     | `global_subjectivity`         | Text subjectivity                                                 | ratio
+10    | `num_imgs`                    | Number of images                                                  | number
 
 ```{r eval=TRUE}
 f_model <- if_else(final_model == "Random Forest", 3, 
