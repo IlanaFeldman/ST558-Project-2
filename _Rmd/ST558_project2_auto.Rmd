@@ -183,6 +183,8 @@ This is a boxplot with the days of the week on the x-axis and the number of shar
 
 Figure 2 coincides with the findings in Table 3 that the variance of shares is huge across days of the week, and the mean values of shares across different days are driven by larged-valued outliers. Therefore, those mean values of shares are not close to the median values of shares for each day of the week. 
 
+Figure 3 is a boxplot that compares the word count of the content of each article, grouped by the day of the week and additionally colored by its popularity. Similarly to before, for ease of viewing, the word count is capped at 2,000 since a small number of articles have a much larger word count in some cases. This has the capacity to indicate behavior regarding article length on different days of the week, article popularity based on length, or a cross-section of the two, where articles of some length may be more or less popular on some days of the week than others.
+
 ```{r eval=TRUE}
 ggplot(data = edadata, aes(x = day.week, y = shares)) + 
   geom_boxplot(fill = "white", outlier.shape = NA) + 
@@ -201,9 +203,25 @@ ggplot(data = edadata, aes(x = day.week, y = shares)) +
         title = element_text(size = 14))
 ```
 
+```{r eval = TRUE}
+ggplot(data = edadata, aes(x = day.week, y = n_tokens_content)) +
+  geom_boxplot(fill = "white", outlier.shape = NA) +
+  coord_cartesian(ylim=c(0, 2000)) + 
+  geom_jitter(aes(color = class.shares), size = 1) +
+  labs(x = "Popularity", y = "Word Count of Article", 
+       title = "Figure 3. Word Count of Article by Popularity") + 
+  theme(axis.text.x = element_text(angle = 45, size = 10), 
+        axis.text.y = element_text(size = 10), 
+        axis.title.x = element_text(size = 15), 
+        axis.title.y = element_text(size = 15), 
+        legend.key.size = unit(1, 'cm'), 
+        legend.text = element_text(size = 13), 
+        title = element_text(size = 14))
+```
+
 ### Barplot
 
-Figure 3 shows the popularity of the news articles in relations to their closeness to a top LDA topic for the `r params$channel` channel on any day of the week. The Latent Dirichlet Allocation (LDA) is an algorithm applied to the Mashable texts of the articles in order to identify the five top relevant topics and then measure the closeness of the current articles to each topic, and there are five topics categories. Thus, each article published on Mashable was measured for each of the topic categories. Together, those LDA measures in ratios are added to 1 for each article. Thus, these LDA topics variables are highly correlated with one another. 
+Figure 4 shows the popularity of the news articles in relations to their closeness to a top LDA topic for the `r params$channel` channel on any day of the week. The Latent Dirichlet Allocation (LDA) is an algorithm applied to the Mashable texts of the articles in order to identify the five top relevant topics and then measure the closeness of the current articles to each topic, and there are five topics categories. Thus, each article published on Mashable was measured for each of the topic categories. Together, those LDA measures in ratios are added to 1 for each article. Thus, these LDA topics variables are highly correlated with one another. 
 
 We calculated the mean ratios of these LDA topics variables for the specific day of the week. These mean ratios are further classified into a "popular" group and an "unpopular" group according to their number of shares (> 1400 or < 1400) which is shown in Figure 3 barplot. Note, the `position = "stack"` not `position = "fill"` in the `geom_bar` function. 
 
@@ -232,7 +250,7 @@ ggplot(data = b.plot2, aes(x = day.week, y = avg.LDA, fill = LDA.Topic)) +
 
 ### Line Plot
 
-Figure 4 is a line plot that shows the same measurements as in Figure 3 that we can see the patterns of the mean ratios of a LDA topic vary or not vary across time in different popularity groups more clearly. Again, some mean ratios of LDA topics do not seem to vary across time when the corresponding lines are flattened while other mean ratios of LDA topics vary across time when their lines are fluctuating. The patterns observed in the "popular" group may not reflect on the same trend in the "unpopular" group for articles in the `r params$channel` channel.
+Figure 5 is a line plot that shows the same measurements as in Figure 3 that we can see the patterns of the mean ratios of a LDA topic vary or not vary across time in different popularity groups more clearly. Again, some mean ratios of LDA topics do not seem to vary across time when the corresponding lines are flattened while other mean ratios of LDA topics vary across time when their lines are fluctuating. The patterns observed in the "popular" group may not reflect on the same trend in the "unpopular" group for articles in the `r params$channel` channel.
 
 ```{r eval=TRUE}
 l.plot1 <- edadata %>% group_by(day.week, class.shares) %>% 
@@ -258,11 +276,11 @@ ggplot(data = l.plot2, aes(x = day.week, y = avg.LDA, group = LDA.Topic)) +
 
 ### Scatterplots
 
-Figure 5 shows the relationship between the average keyword and log-transformed shares for articles in the `r params$channel` channel across different days of the week. In the news popularity study, it showed average keyword was ranked top one predictor in variable importance in the optimal predictive model (random forest) they selected that produced the highest accuracy in prediction of popularity online articles. Therefore, we are interested to see how average keyword is related with log shares. The different colored linear regression lines indicate different days of the week. 
+Figure 6 shows the relationship between the average keyword and log-transformed shares for articles in the `r params$channel` channel across different days of the week. In the news popularity study, it showed average keyword was ranked top one predictor in variable importance in the optimal predictive model (random forest) they selected that produced the highest accuracy in prediction of popularity online articles. Therefore, we are interested to see how average keyword is related with log shares. The different colored linear regression lines indicate different days of the week. 
 
 If the points display an upward trend, it indicates a positive relationship between the average keyword and log-shares. With an increasing log number of shares, the number of average keywords also increases, meaning people tend to share the article more when they see more of those average keywords in the article. On the contrary, if the points are in a downward trend, it indicates a negative relationship between the average keyword and log-shares. With an decreasing log number of shares, the number of average keywords decreases as well. People tend to share the articles less when they see less of these average keywords in the articles from the `r params$channel` channel.
 
-Figure 6 is similar, except it compares the log-transformed number of shares to the log-transformed images in the article. As noted previously, both of these variables do not behave properly in a linear model due to the existence of extreme outliers in the data.
+Figure 7 is similar, except it compares the log-transformed number of shares to the log-transformed images in the article. As noted previously, both of these variables do not behave properly in a linear model due to the existence of extreme outliers in the data. Here, a negative correlation will indicate that shares sharply decreased for articles containing more images, and a positive correlation will indicate that shares sharply increased for articles containing more images.
 
 ```{r eval=TRUE}
 ggplot(data = edadata, aes(x = kw_avg_avg, y = log.shares, color = day.week)) + 
@@ -301,7 +319,7 @@ ggplot(data = edadata, aes(x = log(num_imgs + 1), y = log.shares, color = day.we
 
 ### QQ Plots
 
-To justify the usage of the log transformations for shares and images, we'll show the QQ plot of each over the `r params$channel` channel in figures 7a, 7b, 7c, and 7d. We're aiming for something close to a straight line, which would indicate that the data is approximately normal in its distribution and does not need further standardization.
+To justify the usage of the log transformations for shares and images, we'll show the QQ plot of each over the `r params$channel` channel in figures 8a, 8b, 8c, and 8d. We're aiming for something close to a straight line, which would indicate that the data is approximately normal in its distribution and does not need further standardization.
 
 ```{r eval = TRUE}
 ggplot(edadata) + geom_qq(aes(sample = shares)) + geom_qq_line(aes(sample = shares)) + 
@@ -375,6 +393,8 @@ We slowly filtered out predictors, their corresponding second order terms and th
 
 We repeated this process to trim down the number of predictors and eventually selected the ones that seem to be important in predicting the number of shares, and they are not highly correlated with each other. The parameters in the linear regression model 1 were chosen through this process, and they are listed in Table 8 below. The response variable is `log(shares)`.
 
+The other linear regression model provided below applies a log transformation to the variables `num_imgs` and `self_reference_avg_sharess`, which are extremely skewed to the right even after standardization, to see if this accounts for outliers in the data and puts those variables in an appropriate context.
+
 Table 8. The predictors in linear regression model 1  
   
 Index  | Parameter in Model 1  
@@ -407,8 +427,8 @@ cv_fit3 <- train(log.shares ~ . + I(n_tokens_content^2) + kw_avg_avg:num_imgs +
                  trControl = trainControl(method = "cv", number = 10))
 summary(cv_fit3)
 
-cv_fit4 <- train(log.shares ~ . - num_imgs + I(log(num_imgs + 1)) + I(n_tokens_content^2) +
-                 I(self_reference_avg_sharess^2) + kw_avg_avg:I(log(num_imgs + 1)) +
+cv_fit4 <- train(log.shares ~ . - num_imgs - self_reference_avg_sharess + I(log(num_imgs + 1)) + I(n_tokens_content^2) +
+                 I(log(self_reference_avg_sharess+1)) + kw_avg_avg:I(log(num_imgs + 1)) +
                  average_token_length:global_subjectivity, 
                  data=trainTransformed,
                  method = "lm",
@@ -498,15 +518,17 @@ kable(result2, digits = 4, caption = "Cross Validation - Comparisons of the mode
 
 # Model Comparisons
 
-The best model fit to predict the number of shares for the `r params$channel` channel is "need to automate this part".
-
+The best model fit to predict the number of shares for the `r params$channel` channel can be determined by looking at the Root Mean Square Error, the Mean Absolute Error, or the R-squared value. The approach I've taken below picks whichever model is considered superior by the majority of these three metrics, and if each of the metrics picks a different model, then the one with the best RMSE will be chosen.
 
 ```{r eval=TRUE}
-
+rmse_best <- names(which.min(result2[,1]))
+rsq_best <- names(which.max(result2[,2]))
+mae_best <- names(which.min(result2[,3]))
+model_best <- table(c(rmse_best, rsq_best, mae_best))
+final_model <- if_else(max(model_best) > 1, names(which.max(model_best)), rmse_best)
 ```
 
-The best model fit to predict the number of shares
-
+The best model fit to predict the number of shares is the `r final_model` model.
 
 # Final Model
 
