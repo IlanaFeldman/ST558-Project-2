@@ -23,7 +23,7 @@ apply(reports, MARGIN = 1,
 ##### To run 6 reports !!!!!!!!!######### Knit with parameters, automating reports render function
 library(rmarkdown)
 library(tidyverse)
-type <- c("lifestyle") #, "bus", "socmed", "tech", "world") #, "entertainment") #, "bus", "socmed", "tech", "world"
+type <- c("lifestyle", "socmed") #, "bus", "socmed", "tech", "world"
 output_file <- paste0(type, ".md")
 params <- lapply(type, FUN = function(x){list(channel = x)})
 reports <- tibble(output_file, params)

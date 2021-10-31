@@ -14,13 +14,14 @@ Jasmine Wang & Ilana Feldman
         -   [Line Plot](#line-plot)
         -   [Scatterplots](#scatterplots)
         -   [QQ Plots](#qq-plots)
--   [Modeling](#modeling)
+-   [Candidate Models](#candidate-models)
     -   [Linear Regression](#linear-regression)
     -   [Random Forest](#random-forest)
     -   [Boosted Tree](#boosted-tree)
     -   [Model Comparisons](#model-comparisons)
 -   [Final Model Fit with Entire
     Data](#final-model-fit-with-entire-data)
+-   [Automation](#automation)
 
 # Introduction
 
@@ -62,10 +63,15 @@ the predictive models we propose. 
 The purpose of the analyses is to compare different predictive models
 and choose the best model in predicting the popularity of online news
 regarding their features in different channel categories. The methods
-implemented in prediction of shares are linear regression models with
-different inputs, a random forest model and a boosted tree model. The
-optimal model is chosen based on the smallest root MSE value fitting the
-test set. More details are in *Modeling* section.
+implemented in prediction of shares are linear regression models using
+different predictors, a random forest model and a boosted tree model.
+More details are in the *Candidate Models* section.
+
+The optimal model is chosen based on the majority score of the three
+metrics, root Mean Squared Error, Mean Absolute Error, and R-Squared
+values when fitting the candidate models on the test set. If each of the
+metrics picks a different model or the majority score is a tie, the one
+with the lowest RMSE will be chosen.
 
 Table 1. Attributes used in the analyses for prediction of online news
 popularity
@@ -90,6 +96,7 @@ popularity
 | 10    | `num_imgs`                   | Number of images                                       | number  |
 
 ``` r
+library(rmarkdown)
 library(tidyverse)
 library(knitr)
 library(caret)
@@ -98,7 +105,7 @@ library(ggplot2)
 library(gbm)
 library(vip)
 
-allnews <- read_csv("C:/Users/peach/Documents/ST558/ST558_repos/St558-Project-2/_Data/OnlineNewsPopularity.csv", col_names = TRUE)
+allnews <- read_csv("../_Data/OnlineNewsPopularity.csv", col_names = TRUE)
 
 ########KNIT with parameters!!!!!!!!!channels is in quotes!!!!Need to use it with quotes!!!!!!!!!!!!!!!!!!!!!!!!
 channels <- paste0("data_channel_is_", params$channel)
@@ -701,7 +708,7 @@ ggplot(edadata) + geom_qq(aes(sample = log(num_imgs + 1))) + geom_qq_line(aes(sa
 Whether it’s appropriate to perform a logarithmic transformation on the
 number of images is somewhat less clear than for the number of shares.
 
-# Modeling
+# Candidate Models
 
 ## Linear Regression
 
@@ -768,9 +775,22 @@ Table 8. The predictors in linear regression model 1
 | 12    | `average_token_length:global_subjectivity` |
 | 13    | `dayweek:self_reference_avg_sharess`       |
 
+We standardized both the training set and the test set before we fit the
+linear regression models. We used the standardized mean and standard
+deviation values from the training set on the test set so that the
+predictors on both sets have the same means and standard deviations.
+Standardizing the variables is very important prior to model fitting so
+that all the variables are on the same scale. The variables with large
+values do not look more important than the variables with smaller
+values. Especially in our data set where some variable values are
+unbounded, skewed to one side, and some variables are ratios between 0
+and 1.
+
 ``` r
-train1$dayweek <- as.factor(train1$dayweek)
-test1$dayweek <- as.factor(test1$dayweek)
+#train1$dayweek <- as.factor(train1$dayweek)
+#test1$dayweek <- as.factor(test1$dayweek)
+train1$dayweek <- cut(train1$dayweek, 7, c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))
+test1$dayweek <- cut(test1$dayweek, 7, c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))
 preProcValues <- preProcess(train1, method = c("center", "scale"))
 trainTransformed1 <- predict(preProcValues, train1)
 testTransformed1 <- predict(preProcValues, test1)
@@ -778,27 +798,27 @@ trainTransformed1
 ```
 
     ## # A tibble: 1,628 x 10
-    ##    log.shares dayweek kw_avg_avg LDA_02 self_reference_~ average_token_l~ n_tokens_content n_tokens_title global_subjecti~
-    ##         <dbl> <fct>        <dbl>  <dbl>            <dbl>            <dbl>            <dbl>          <dbl>            <dbl>
-    ##  1      0.103 1           -2.17  -0.753          -0.257           0.00414           -0.641         -0.771          -0.633 
-    ##  2     -1.53  1           -2.17  -0.762          -0.178          -0.513             -0.711         -0.771           0.660 
-    ##  3      0.857 1           -2.17  -0.725          -0.217          -0.620              1.10          -0.294          -0.548 
-    ##  4     -1.27  1           -2.17  -0.704          -0.219           0.393              0.907          0.182           0.399 
-    ##  5      0.857 3           -1.62  -0.753          -0.0763          0.107             -0.801         -0.294           1.89  
-    ##  6      1.66  3           -1.46   1.82           -0.256          -0.476             -0.923         -0.294          -1.29  
-    ##  7     -0.494 3           -1.13  -0.704          -0.238          -0.0110             1.76           0.182          -0.0642
-    ##  8     -1.39  4           -0.926 -0.720          -0.193           0.391             -0.173         -1.25            1.47  
-    ##  9      2.50  5           -0.692 -0.633           0.0663         -0.977             -0.460         -0.771           0.471 
-    ## 10     -0.494 5           -1.24   0.529          -0.264           1.93              -0.460         -1.72            0.349 
+    ##    log.shares dayweek   kw_avg_avg LDA_02 self_reference_~ average_token_l~ n_tokens_content n_tokens_title global_subjecti~
+    ##         <dbl> <fct>          <dbl>  <dbl>            <dbl>            <dbl>            <dbl>          <dbl>            <dbl>
+    ##  1      0.103 Monday        -2.17  -0.753          -0.257           0.00414           -0.641         -0.771          -0.633 
+    ##  2     -1.53  Monday        -2.17  -0.762          -0.178          -0.513             -0.711         -0.771           0.660 
+    ##  3      0.857 Monday        -2.17  -0.725          -0.217          -0.620              1.10          -0.294          -0.548 
+    ##  4     -1.27  Monday        -2.17  -0.704          -0.219           0.393              0.907          0.182           0.399 
+    ##  5      0.857 Wednesday     -1.62  -0.753          -0.0763          0.107             -0.801         -0.294           1.89  
+    ##  6      1.66  Wednesday     -1.46   1.82           -0.256          -0.476             -0.923         -0.294          -1.29  
+    ##  7     -0.494 Wednesday     -1.13  -0.704          -0.238          -0.0110             1.76           0.182          -0.0642
+    ##  8     -1.39  Thursday      -0.926 -0.720          -0.193           0.391             -0.173         -1.25            1.47  
+    ##  9      2.50  Friday        -0.692 -0.633           0.0663         -0.977             -0.460         -0.771           0.471 
+    ## 10     -0.494 Friday        -1.24   0.529          -0.264           1.93              -0.460         -1.72            0.349 
     ## # ... with 1,618 more rows, and 1 more variable: num_imgs <dbl>
 
 ``` r
-cv_fit3 <- train(log.shares ~ . + I(n_tokens_content^2) + kw_avg_avg:num_imgs + 
+cv_fit1 <- train(log.shares ~ . + I(n_tokens_content^2) + kw_avg_avg:num_imgs + 
                    average_token_length:global_subjectivity + dayweek:self_reference_avg_sharess, 
                  data=trainTransformed1,
                  method = "lm",
                  trControl = trainControl(method = "cv", number = 10))
-summary(cv_fit3)
+summary(cv_fit1)
 ```
 
     ## 
@@ -810,31 +830,31 @@ summary(cv_fit3)
     ## -6.6957 -0.6157 -0.1277  0.5143  3.9531 
     ## 
     ## Coefficients:
-    ##                                             Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)                                 0.079188   0.065153   1.215 0.224383    
-    ## dayweek2                                   -0.137004   0.083316  -1.644 0.100294    
-    ## dayweek3                                   -0.007969   0.084640  -0.094 0.924998    
-    ## dayweek4                                   -0.157593   0.083051  -1.898 0.057935 .  
-    ## dayweek5                                    0.040191   0.090085   0.446 0.655553    
-    ## dayweek6                                   -0.011488   0.107765  -0.107 0.915119    
-    ## dayweek7                                    0.151702   0.117656   1.289 0.197457    
-    ## kw_avg_avg                                  0.064701   0.027382   2.363 0.018252 *  
-    ## LDA_02                                     -0.084269   0.025509  -3.304 0.000976 ***
-    ## self_reference_avg_sharess                  0.148728   0.062276   2.388 0.017045 *  
-    ## average_token_length                       -0.104051   0.037838  -2.750 0.006028 ** 
-    ## n_tokens_content                            0.171385   0.040622   4.219 2.59e-05 ***
-    ## n_tokens_title                              0.002267   0.024159   0.094 0.925253    
-    ## global_subjectivity                        -0.082864   0.025626  -3.234 0.001248 ** 
-    ## num_imgs                                   -0.101080   0.029512  -3.425 0.000630 ***
-    ## `I(n_tokens_content^2)`                    -0.025940   0.014412  -1.800 0.072062 .  
-    ## `kw_avg_avg:num_imgs`                       0.097221   0.029417   3.305 0.000971 ***
-    ## `average_token_length:global_subjectivity` -0.027615   0.010158  -2.719 0.006628 ** 
-    ## `dayweek2:self_reference_avg_sharess`      -0.002023   0.086880  -0.023 0.981422    
-    ## `dayweek3:self_reference_avg_sharess`       0.253414   0.130376   1.944 0.052105 .  
-    ## `dayweek4:self_reference_avg_sharess`       0.229694   0.107796   2.131 0.033255 *  
-    ## `dayweek5:self_reference_avg_sharess`      -0.086426   0.089489  -0.966 0.334299    
-    ## `dayweek6:self_reference_avg_sharess`      -0.047515   0.163018  -0.291 0.770728    
-    ## `dayweek7:self_reference_avg_sharess`      -0.163242   0.072865  -2.240 0.025205 *  
+    ##                                                Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)                                    0.079188   0.065153   1.215 0.224383    
+    ## dayweekTuesday                                -0.137004   0.083316  -1.644 0.100294    
+    ## dayweekWednesday                              -0.007969   0.084640  -0.094 0.924998    
+    ## dayweekThursday                               -0.157593   0.083051  -1.898 0.057935 .  
+    ## dayweekFriday                                  0.040191   0.090085   0.446 0.655553    
+    ## dayweekSaturday                               -0.011488   0.107765  -0.107 0.915119    
+    ## dayweekSunday                                  0.151702   0.117656   1.289 0.197457    
+    ## kw_avg_avg                                     0.064701   0.027382   2.363 0.018252 *  
+    ## LDA_02                                        -0.084269   0.025509  -3.304 0.000976 ***
+    ## self_reference_avg_sharess                     0.148728   0.062276   2.388 0.017045 *  
+    ## average_token_length                          -0.104051   0.037838  -2.750 0.006028 ** 
+    ## n_tokens_content                               0.171385   0.040622   4.219 2.59e-05 ***
+    ## n_tokens_title                                 0.002267   0.024159   0.094 0.925253    
+    ## global_subjectivity                           -0.082864   0.025626  -3.234 0.001248 ** 
+    ## num_imgs                                      -0.101080   0.029512  -3.425 0.000630 ***
+    ## `I(n_tokens_content^2)`                       -0.025940   0.014412  -1.800 0.072062 .  
+    ## `kw_avg_avg:num_imgs`                          0.097221   0.029417   3.305 0.000971 ***
+    ## `average_token_length:global_subjectivity`    -0.027615   0.010158  -2.719 0.006628 ** 
+    ## `dayweekTuesday:self_reference_avg_sharess`   -0.002023   0.086880  -0.023 0.981422    
+    ## `dayweekWednesday:self_reference_avg_sharess`  0.253414   0.130376   1.944 0.052105 .  
+    ## `dayweekThursday:self_reference_avg_sharess`   0.229694   0.107796   2.131 0.033255 *  
+    ## `dayweekFriday:self_reference_avg_sharess`    -0.086426   0.089489  -0.966 0.334299    
+    ## `dayweekSaturday:self_reference_avg_sharess`  -0.047515   0.163018  -0.291 0.770728    
+    ## `dayweekSunday:self_reference_avg_sharess`    -0.163242   0.072865  -2.240 0.025205 *  
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
@@ -843,13 +863,13 @@ summary(cv_fit3)
     ## F-statistic:  6.55 on 23 and 1604 DF,  p-value: < 2.2e-16
 
 ``` r
-cv_fit4 <- train(log.shares ~ . - num_imgs - self_reference_avg_sharess + I(log(num_imgs+1)) + I(n_tokens_content^2) +
+cv_fit2 <- train(log.shares ~ . - num_imgs - self_reference_avg_sharess + I(log(num_imgs+1)) + I(n_tokens_content^2) +
                  I(log(self_reference_avg_sharess+1)) + kw_avg_avg:I(log(num_imgs + 1)) +
                  average_token_length:global_subjectivity, 
                  data=trainTransformed1,
                  method = "lm",
                  trControl = trainControl(method = "cv", number = 10))
-summary(cv_fit4)
+summary(cv_fit2)
 ```
 
     ## 
@@ -863,12 +883,12 @@ summary(cv_fit4)
     ## Coefficients:
     ##                                            Estimate Std. Error t value Pr(>|t|)    
     ## (Intercept)                                 0.11574    0.06567   1.762 0.078204 .  
-    ## dayweek2                                   -0.14385    0.08250  -1.744 0.081399 .  
-    ## dayweek3                                   -0.02550    0.08375  -0.305 0.760778    
-    ## dayweek4                                   -0.17077    0.08216  -2.079 0.037819 *  
-    ## dayweek5                                    0.04669    0.08922   0.523 0.600789    
-    ## dayweek6                                   -0.01709    0.10684  -0.160 0.872949    
-    ## dayweek7                                    0.18727    0.11655   1.607 0.108280    
+    ## dayweekTuesday                             -0.14385    0.08250  -1.744 0.081399 .  
+    ## dayweekWednesday                           -0.02550    0.08375  -0.305 0.760778    
+    ## dayweekThursday                            -0.17077    0.08216  -2.079 0.037819 *  
+    ## dayweekFriday                               0.04669    0.08922   0.523 0.600789    
+    ## dayweekSaturday                            -0.01709    0.10684  -0.160 0.872949    
+    ## dayweekSunday                               0.18727    0.11655   1.607 0.108280    
     ## kw_avg_avg                                  0.07169    0.02490   2.879 0.004039 ** 
     ## LDA_02                                     -0.08974    0.02492  -3.602 0.000326 ***
     ## average_token_length                       -0.09978    0.03750  -2.661 0.007873 ** 
@@ -888,13 +908,10 @@ summary(cv_fit4)
     ## F-statistic: 10.39 on 17 and 1610 DF,  p-value: < 2.2e-16
 
 ``` r
-pred3 <- predict(cv_fit3, newdata = testTransformed1)
-pred4 <- predict(cv_fit4, newdata = testTransformed1)
-cv_rmse3 <- postResample(pred3, obs = testTransformed1$log.shares)
-cv_rmse4 <- postResample(pred4, obs = testTransformed1$log.shares)
-#result2 <- rbind(cv_rmse3, cv_rmse4)
-#row.names(result2) <- c("Model 1","Model 2")
-#kable(result2, digits = 4, caption = "Table ###. Cross Validation - Model Predictions on Test Set")
+pred1 <- predict(cv_fit1, newdata = testTransformed1)
+pred2 <- predict(cv_fit2, newdata = testTransformed1)
+cv_rmse1 <- postResample(pred1, obs = testTransformed1$log.shares)
+cv_rmse2 <- postResample(pred2, obs = testTransformed1$log.shares)
 ```
 
 ## Random Forest
@@ -907,6 +924,12 @@ predictor variables is chosen each time, in order to reduce the
 correlation between each of the trees. We don’t have to worry about
 creating dummy variables for categorical variables, because our data
 already comes in an entirely numeric form.
+
+Again, we standardized both the training set and the test set before we
+fit the each of the ensemble models. We used the standardized mean and
+standard deviation values of the predictors from the training set on the
+test set so that the predictors on both sets have the same means and
+standard deviations.
 
 ``` r
 train2 <- train %>% select(-class_shares, -shares, -dayweek, -LDA_00, -LDA_01, -LDA_03, -LDA_04)
@@ -1089,25 +1112,7 @@ boosted_tree
     ## The final values used for the model were n.trees = 125, interaction.depth = 1, shrinkage = 0.1 and n.minobsinnode = 10.
 
 ``` r
-boosted_tree$results
-```
-
-    ## # A tibble: 25 x 10
-    ##    shrinkage interaction.depth n.minobsinnode n.trees  RMSE Rsquared   MAE RMSESD RsquaredSD  MAESD
-    ##        <dbl>             <int>          <dbl>   <dbl> <dbl>    <dbl> <dbl>  <dbl>      <dbl>  <dbl>
-    ##  1       0.1                 1             10      25 0.958    0.100 0.733 0.0887     0.0676 0.0456
-    ##  2       0.1                 2             10      25 0.945    0.120 0.719 0.0904     0.0721 0.0452
-    ##  3       0.1                 3             10      25 0.946    0.114 0.717 0.0870     0.0672 0.0428
-    ##  4       0.1                 4             10      25 0.945    0.112 0.716 0.0853     0.0654 0.0409
-    ##  5       0.1                 5             10      25 0.943    0.114 0.716 0.0896     0.0658 0.0446
-    ##  6       0.1                 1             10      50 0.945    0.118 0.718 0.0901     0.0771 0.0476
-    ##  7       0.1                 2             10      50 0.939    0.123 0.710 0.0902     0.0679 0.0472
-    ##  8       0.1                 3             10      50 0.941    0.122 0.708 0.0926     0.0728 0.0469
-    ##  9       0.1                 4             10      50 0.946    0.111 0.715 0.0835     0.0615 0.0441
-    ## 10       0.1                 5             10      50 0.945    0.114 0.714 0.0891     0.0644 0.0486
-    ## # ... with 15 more rows
-
-``` r
+#boosted_tree$results
 # n.trees = boosted_tree$bestTune[[1]]
 ```
 
@@ -1122,27 +1127,28 @@ set.
 ## Model Comparisons
 
 The best model fit to predict the number of shares for the socmed
-channel can be determined by looking at the Root Mean Square Error, the
-Mean Absolute Error, or the R-squared value using the test set. Table 9
+channel can be determined by looking at the Root Mean Squared Error, the
+Mean Absolute Error, or the R-squared value using the test set. Table 8
 shows these criteria measures for each candidate model. The approach
 I’ve taken below picks whichever model is considered superior by the
-majority of these three metrics, and if each of the metrics picks a
-different model, then the one with the lowest RMSE will be chosen.
+majority score of these three metrics, and if each of the metrics picks
+a different model or the majority score is a tiebreaker, then the one
+with the lowest RMSE will be chosen.
 
 ``` r
-result2 <- rbind(cv_rmse3, cv_rmse4, rf_rmse, boost_rmse)
+result2 <- rbind(cv_rmse1, cv_rmse1, rf_rmse, boost_rmse)
 row.names(result2) <- c("Linear Regression 1", "Linear Regression 2", "Random Forest", "Boosted Tree")
-kable(result2, digits = 4, caption = "Table 9. Cross Validation - Comparisons of the models in test set")
+kable(result2, digits = 4, caption = "Table 8. Cross Validation - Comparisons of the models in test set")
 ```
 
 |                     |   RMSE | Rsquared |    MAE |
 |:--------------------|-------:|---------:|-------:|
 | Linear Regression 1 | 1.0782 |   0.0587 | 0.7904 |
-| Linear Regression 2 | 1.0580 |   0.0947 | 0.7763 |
+| Linear Regression 2 | 1.0782 |   0.0587 | 0.7904 |
 | Random Forest       | 1.0398 |   0.1360 | 0.7523 |
 | Boosted Tree        | 1.0426 |   0.1218 | 0.7603 |
 
-Table 9. Cross Validation - Comparisons of the models in test set
+Table 8. Cross Validation - Comparisons of the models in test set
 
 ``` r
 rmse_best <- names(which.min(result2[,1]))
@@ -1152,15 +1158,13 @@ model_best <- table(c(rmse_best, rsq_best, mae_best))
 final_model <- if_else(max(model_best) > 1, names(which.max(model_best)), rmse_best)
 ```
 
-# Final Model Fit with Entire Data
-
-The best model fit to predict the number of shares is the **Random
-Forest** model for the socmed articles.
-
-both training and the test sets have been standardized with same mean
-and same standard deviation.
-
-Figure 9. variable importance plot
+We built a helper function so that when a final winning model is
+declared among the candidate models using the test set, we then used the
+final model to fit the entire data set, both the training and the test
+sets, from the socmed channel. A variable importance plot is produced
+along with a table containing a ranking metrics of the variable
+importance when fitting the final model with the entire data set of the
+socmed articles.
 
 ``` r
 linear1 <- function(...){
@@ -1226,7 +1230,19 @@ boostedt <- function(...){
   return(list(btfit, important, plot_imp))
   
 }
+```
 
+# Final Model Fit with Entire Data
+
+The best model fit to predict the number of shares is the **Random
+Forest** model for the socmed articles. We fit the entire data set, both
+the training and the test set from the channel in the final chosen
+model. A variable importance plot and a table containing a ranking
+metric of the relative variable importance are produced below. We can
+examine which predictors contributed the most in predicting the
+popularity of online news in the final model accordingly.
+
+``` r
 f_model <- if_else(final_model == "Random Forest", 3, 
            if_else(final_model == "Boosted Tree", 4, 
                    if_else(final_model == "Linear Regression 1", 1, 2)))
@@ -1278,7 +1294,7 @@ switch(f_model,
     ## 
     ## [[3]]
 
-![](C:/Users/peach/documents/ST558/ST558_repos/ST558-Project-2/socmed_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+![](C:/Users/peach/documents/ST558/ST558_repos/ST558-Project-2/socmed_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
 
 ``` r
 #imp <- varImp(boosted_tree)
@@ -1286,6 +1302,32 @@ switch(f_model,
 #first <- rownames(imp2)[order(imp2$Overall, decreasing=TRUE)][1] # most important
 #second <- rownames(imp2)[order(imp2$Overall, decreasing=TRUE)][2] #2nd
 #third <- rownames(imp2)[order(imp2$Overall, decreasing=TRUE)][3] # 3rd
-
 #print(paste0("The most important predictor is ", first, ", the second is ", second))
+```
+
+# Automation
+
+To knit with the parameters with this single .Rmd file, we specified the
+parameters in the YAML header and created a data frame which contains
+both the output .md file names and the parameters we supplied to the
+YAML header to automate the reports. Both the names of the parameters
+and the values of the parameters were saved in a list format in that
+data frame. Then, we used the render function below to knit with the
+parameters in R console to generate the reports. The render function is
+not evaluated with this .Rmd file.
+
+``` r
+type <- c("lifestyle", "entertainment", "bus", "socmed", "tech", "world")
+output_file <- paste0(type, ".md")
+params <- lapply(type, FUN = function(x){list(channel = x)})
+reports <- tibble(output_file, params)
+
+apply(reports, MARGIN = 1, 
+      FUN = function(x){
+        render(input = "C:/Users/peach/Documents/ST558/ST558_repos/ST558-Project-2/_Rmd/ST558_project2_auto.Rmd",
+               output_format = "github_document", 
+               output_file = paste0("C:/Users/peach/documents/ST558/ST558_repos/ST558-Project-2/", x[[1]]),
+               params = x[[2]],
+               output_options = list(html_preview = FALSE, toc = TRUE, toc_depth = 3, df_print = "tibble"))
+      })
 ```
