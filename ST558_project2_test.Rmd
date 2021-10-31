@@ -19,11 +19,11 @@ The study collected a total of 39,000 news articles from six data channel catego
 
 Table 1 shows the list of variables we used in the analysis and their descriptions. The study shows after the best predictive model was selected using a test set, these variables that we are interested in are among the top ranked features according to their importance in the final predictive model using the entire data set. Thus, we are going to investigate their importance in predicting the number of shares using the predictive models we propose. 
 
-The purpose of the analyses is to compare different predictive models and choose the best model in predicting the popularity of online news regarding their features in different channel categories. The methods implemented in prediction of shares are linear regression models with different inputs, a random forest model and a boosted tree model. The optimal model is chosen based on the smallest root MSE value fitting the test set. More details are in *Modeling* section.
+The purpose of the analyses is to compare different predictive models and choose the best model in predicting the popularity of online news regarding their features in different channel categories. The methods implemented in prediction of shares are linear regression models with different inputs, a random forest model and a boosted tree model. The optimal model is chosen based on the smallest root MSE value fitting the test set. More details are in *Candidate Models* section.
 
 Table 1. Attributes used in the analyses for prediction of online news popularity
 
-Index | Attribute                     | Attribute Information                              | Type   
+Index | Attribute                     | Attribute Information                                  | Type   
 ----- | ----------------------------- | ------------------------------------------------------ | --------
 1     | `shares`  (target)            | Number of shares                                       | number
 2     | `kw_avg_avg`                  | Average keyword (average shares)                       | number
