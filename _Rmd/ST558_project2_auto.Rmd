@@ -49,6 +49,7 @@ library(caret)
 library(corrplot)
 library(ggplot2)
 library(gbm)
+library(vip)
 
 allnews <- read_csv("../_Data/OnlineNewsPopularity.csv", col_names = TRUE)
 
@@ -85,11 +86,11 @@ set.seed(388588)
 sharesIndex <- createDataPartition(sel_data$shares, p = 0.7, list = FALSE)
 train <- sel_data[sharesIndex, ]
 test <- sel_data[-sharesIndex, ]
-
+train
 train1 <- train %>% select(-class_shares, -shares, 
                            -weekday_is_monday, -weekday_is_tuesday, -weekday_is_wednesday, -weekday_is_thursday, 
                            -weekday_is_friday, -weekday_is_saturday, -weekday_is_sunday, -LDA_00, -LDA_01, -LDA_03, -LDA_04)
-train1
+
 test1 <- test %>% select(-class_shares, -shares, 
                          -weekday_is_monday, -weekday_is_tuesday, -weekday_is_wednesday, -weekday_is_thursday, 
                          -weekday_is_friday, -weekday_is_saturday, -weekday_is_sunday, -LDA_00, -LDA_01, -LDA_03, -LDA_04)
@@ -183,6 +184,8 @@ This is a boxplot with the days of the week on the x-axis and the number of shar
 
 Figure 2 coincides with the findings in Table 3 that the variance of shares is huge across days of the week, and the mean values of shares across different days are driven by larged-valued outliers. Therefore, those mean values of shares are not close to the median values of shares for each day of the week. 
 
+Figure 3 is a boxplot that compares the word count of the content of each article, grouped by the day of the week and additionally colored by its popularity. Similarly to before, for ease of viewing, the word count is capped at 2,000 since a small number of articles have a much larger word count in some cases. This has the capacity to indicate behavior regarding article length on different days of the week, article popularity based on length, or a cross-section of the two, where articles of some length may be more or less popular on some days of the week than others.
+
 ```{r eval=TRUE}
 ggplot(data = edadata, aes(x = day.week, y = shares)) + 
   geom_boxplot(fill = "white", outlier.shape = NA) + 
@@ -201,9 +204,25 @@ ggplot(data = edadata, aes(x = day.week, y = shares)) +
         title = element_text(size = 14))
 ```
 
+```{r eval = TRUE}
+ggplot(data = edadata, aes(x = day.week, y = n_tokens_content)) +
+  geom_boxplot(fill = "white", outlier.shape = NA) +
+  coord_cartesian(ylim=c(0, 2000)) + 
+  geom_jitter(aes(color = class.shares), size = 1) +
+  labs(x = "Popularity", y = "Word Count of Article", 
+       title = "Figure 3. Word Count of Article by Popularity") + 
+  theme(axis.text.x = element_text(angle = 45, size = 10), 
+        axis.text.y = element_text(size = 10), 
+        axis.title.x = element_text(size = 15), 
+        axis.title.y = element_text(size = 15), 
+        legend.key.size = unit(1, 'cm'), 
+        legend.text = element_text(size = 13), 
+        title = element_text(size = 14))
+```
+
 ### Barplot
 
-Figure 3 shows the popularity of the news articles in relations to their closeness to a top LDA topic for the `r params$channel` channel on any day of the week. The Latent Dirichlet Allocation (LDA) is an algorithm applied to the Mashable texts of the articles in order to identify the five top relevant topics and then measure the closeness of the current articles to each topic, and there are five topics categories. Thus, each article published on Mashable was measured for each of the topic categories. Together, those LDA measures in ratios are added to 1 for each article. Thus, these LDA topics variables are highly correlated with one another. 
+Figure 4 shows the popularity of the news articles in relations to their closeness to a top LDA topic for the `r params$channel` channel on any day of the week. The Latent Dirichlet Allocation (LDA) is an algorithm applied to the Mashable texts of the articles in order to identify the five top relevant topics and then measure the closeness of the current articles to each topic, and there are five topics categories. Thus, each article published on Mashable was measured for each of the topic categories. Together, those LDA measures in ratios are added to 1 for each article. Thus, these LDA topics variables are highly correlated with one another. 
 
 We calculated the mean ratios of these LDA topics variables for the specific day of the week. These mean ratios are further classified into a "popular" group and an "unpopular" group according to their number of shares (> 1400 or < 1400) which is shown in Figure 3 barplot. Note, the `position = "stack"` not `position = "fill"` in the `geom_bar` function. 
 
@@ -232,7 +251,7 @@ ggplot(data = b.plot2, aes(x = day.week, y = avg.LDA, fill = LDA.Topic)) +
 
 ### Line Plot
 
-Figure 4 is a line plot that shows the same measurements as in Figure 3 that we can see the patterns of the mean ratios of a LDA topic vary or not vary across time in different popularity groups more clearly. Again, some mean ratios of LDA topics do not seem to vary across time when the corresponding lines are flattened while other mean ratios of LDA topics vary across time when their lines are fluctuating. The patterns observed in the "popular" group may not reflect on the same trend in the "unpopular" group for articles in the `r params$channel` channel.
+Figure 5 is a line plot that shows the same measurements as in Figure 3 that we can see the patterns of the mean ratios of a LDA topic vary or not vary across time in different popularity groups more clearly. Again, some mean ratios of LDA topics do not seem to vary across time when the corresponding lines are flattened while other mean ratios of LDA topics vary across time when their lines are fluctuating. The patterns observed in the "popular" group may not reflect on the same trend in the "unpopular" group for articles in the `r params$channel` channel.
 
 ```{r eval=TRUE}
 l.plot1 <- edadata %>% group_by(day.week, class.shares) %>% 
@@ -258,11 +277,11 @@ ggplot(data = l.plot2, aes(x = day.week, y = avg.LDA, group = LDA.Topic)) +
 
 ### Scatterplots
 
-Figure 5 shows the relationship between the average keyword and log-transformed shares for articles in the `r params$channel` channel across different days of the week. In the news popularity study, it showed average keyword was ranked top one predictor in variable importance in the optimal predictive model (random forest) they selected that produced the highest accuracy in prediction of popularity online articles. Therefore, we are interested to see how average keyword is related with log shares. The different colored linear regression lines indicate different days of the week. 
+Figure 6 shows the relationship between the average keyword and log-transformed shares for articles in the `r params$channel` channel across different days of the week. In the news popularity study, it showed average keyword was ranked top one predictor in variable importance in the optimal predictive model (random forest) they selected that produced the highest accuracy in prediction of popularity online articles. Therefore, we are interested to see how average keyword is related with log shares. The different colored linear regression lines indicate different days of the week. 
 
 If the points display an upward trend, it indicates a positive relationship between the average keyword and log-shares. With an increasing log number of shares, the number of average keywords also increases, meaning people tend to share the article more when they see more of those average keywords in the article. On the contrary, if the points are in a downward trend, it indicates a negative relationship between the average keyword and log-shares. With an decreasing log number of shares, the number of average keywords decreases as well. People tend to share the articles less when they see less of these average keywords in the articles from the `r params$channel` channel.
 
-Figure 6 is similar, except it compares the log-transformed number of shares to the log-transformed images in the article. As noted previously, both of these variables do not behave properly in a linear model due to the existence of extreme outliers in the data.
+Figure 7 is similar, except it compares the log-transformed number of shares to the log-transformed images in the article. As noted previously, both of these variables do not behave properly in a linear model due to the existence of extreme outliers in the data. Here, a negative correlation will indicate that shares sharply decreased for articles containing more images, and a positive correlation will indicate that shares sharply increased for articles containing more images.
 
 ```{r eval=TRUE}
 ggplot(data = edadata, aes(x = kw_avg_avg, y = log.shares, color = day.week)) + 
@@ -301,7 +320,7 @@ ggplot(data = edadata, aes(x = log(num_imgs + 1), y = log.shares, color = day.we
 
 ### QQ Plots
 
-To justify the usage of the log transformations for shares and images, we'll show the QQ plot of each over the `r params$channel` channel in figures 7a, 7b, 7c, and 7d. We're aiming for something close to a straight line, which would indicate that the data is approximately normal in its distribution and does not need further standardization.
+To justify the usage of the log transformations for shares and images, we'll show the QQ plot of each over the `r params$channel` channel in figures 8a, 8b, 8c, and 8d. We're aiming for something close to a straight line, which would indicate that the data is approximately normal in its distribution and does not need further standardization.
 
 ```{r eval = TRUE}
 ggplot(edadata) + geom_qq(aes(sample = shares)) + geom_qq_line(aes(sample = shares)) + 
@@ -375,6 +394,8 @@ We slowly filtered out predictors, their corresponding second order terms and th
 
 We repeated this process to trim down the number of predictors and eventually selected the ones that seem to be important in predicting the number of shares, and they are not highly correlated with each other. The parameters in the linear regression model 1 were chosen through this process, and they are listed in Table 8 below. The response variable is `log(shares)`.
 
+The second linear regression model provided below applies a log transformation to the variables `num_imgs` and `self_reference_avg_sharess`, which are extremely skewed to the right even after standardization, to see if this accounts for outliers in the data and puts those variables in an appropriate context.
+
 Table 8. The predictors in linear regression model 1  
   
 Index  | Parameter in Model 1  
@@ -397,28 +418,29 @@ Index  | Parameter in Model 1
 train1$dayweek <- as.factor(train1$dayweek)
 test1$dayweek <- as.factor(test1$dayweek)
 preProcValues <- preProcess(train1, method = c("center", "scale"))
-trainTransformed <- predict(preProcValues, train1)
-testTransformed <- predict(preProcValues, test1)
+trainTransformed1 <- predict(preProcValues, train1)
+testTransformed1 <- predict(preProcValues, test1)
+trainTransformed1
 
 cv_fit3 <- train(log.shares ~ . + I(n_tokens_content^2) + kw_avg_avg:num_imgs + 
                    average_token_length:global_subjectivity + dayweek:self_reference_avg_sharess, 
-                 data=trainTransformed,
+                 data=trainTransformed1,
                  method = "lm",
                  trControl = trainControl(method = "cv", number = 10))
 summary(cv_fit3)
 
-cv_fit4 <- train(log.shares ~ . - num_imgs + I(log(num_imgs + 1)) + I(n_tokens_content^2) +
-                 I(self_reference_avg_sharess^2) + kw_avg_avg:I(log(num_imgs + 1)) +
+cv_fit4 <- train(log.shares ~ . - num_imgs - self_reference_avg_sharess + I(log(num_imgs+1)) + I(n_tokens_content^2) +
+                 I(log(self_reference_avg_sharess+1)) + kw_avg_avg:I(log(num_imgs + 1)) +
                  average_token_length:global_subjectivity, 
-                 data=trainTransformed,
+                 data=trainTransformed1,
                  method = "lm",
                  trControl = trainControl(method = "cv", number = 10))
 summary(cv_fit4)
 
-pred3 <- predict(cv_fit3, newdata = testTransformed)
-pred4 <- predict(cv_fit4, newdata = testTransformed)
-cv_rmse3 <- postResample(pred3, obs = testTransformed$log.shares)
-cv_rmse4 <- postResample(pred4, obs = testTransformed$log.shares)
+pred3 <- predict(cv_fit3, newdata = testTransformed1)
+pred4 <- predict(cv_fit4, newdata = testTransformed1)
+cv_rmse3 <- postResample(pred3, obs = testTransformed1$log.shares)
+cv_rmse4 <- postResample(pred4, obs = testTransformed1$log.shares)
 #result2 <- rbind(cv_rmse3, cv_rmse4)
 #row.names(result2) <- c("Model 1","Model 2")
 #kable(result2, digits = 4, caption = "Table ###. Cross Validation - Model Predictions on Test Set")
@@ -431,20 +453,24 @@ The bootstrap approach to fitting a tree model involves resampling our data and 
 ```{r eval=TRUE}
 train2 <- train %>% select(-class_shares, -shares, -dayweek, -LDA_00, -LDA_01, -LDA_03, -LDA_04)
 test2 <- test %>% select(-class_shares, -shares, -dayweek, -LDA_00, -LDA_01, -LDA_03, -LDA_04)
-train2
-preProcValues <- preProcess(train2, method = c("center", "scale"))
-trainTransformed <- predict(preProcValues, train2)
-testTransformed <- predict(preProcValues, test2)
+preProcValues2 <- preProcess(train2, method = c("center", "scale"))
+trainTransformed2 <- predict(preProcValues2, train2)
+testTransformed2 <- predict(preProcValues2, test2)
+trainTransformed2
 
-random_forest <- train(log.shares ~ ., data = trainTransformed,
+random_forest <- train(log.shares ~ ., data = trainTransformed2,
     method = "rf",
     trControl = trainControl(method = "cv", number = 5),
-    tuneGrid = data.frame(mtry = 1:5))
+    tuneGrid = data.frame(mtry = 1:5), importance = TRUE)
 
-random_forest_predict <- predict(random_forest, newdata = testTransformed)
-rf_rmse <- postResample(random_forest_predict, obs = testTransformed$log.shares)
+random_forest_predict <- predict(random_forest, newdata = testTransformed2)
+rf_rmse <- postResample(random_forest_predict, obs = testTransformed2$log.shares)
 random_forest
+random_forest$results
+# mtry = random_forest$bestTune[[1]]
 ```
+
+We then used 5 fold cross validation to search for the tuning parameter value ranging from 1 to 5 that produces the optimal random forest model. The optimal model chosen by cross validation produced the smallest RMSE value when mtry = `r random_forest$bestTune[[1]]` and the lowest RMSE = `r min(random_forest$results[, 2])`.  
 
 ## Boosted Tree
 
@@ -464,61 +490,132 @@ Here, we use the `caret` package and the `gbm` package to run the boosted tree m
 * `interaction.depth` = 1, 2, 3, 4, 5  
 * `n.minobsinnode` = 10  
 
-We then use 10 fold cross validation to search all combinations of the tuning parameters values using the `expand.grid` function to choose an optimal model with the desired tuning parameters values. The optimal model chosen by cross validation across all combinations of tuning parameters values produces the lowest root mean squared error (RMSE). 
+We then used 10 fold cross validation to search all combinations of the tuning parameters values using the `expand.grid` function to choose an optimal model with the desired tuning parameters values. The optimal model chosen by cross validation across all combinations of tuning parameters values produces the lowest root mean squared error (RMSE). 
 
 ```{r eval=TRUE}
 #expand.grid(n.trees = c(25, 50, 75, 100, 125), interaction.depth = 1:5, shrinkage = 0.1, n.minobsinnode = 10)
-boosted_tree <- train(log.shares ~ . , data = trainTransformed,
+boosted_tree <- train(log.shares ~ . , data = trainTransformed2,
       method = "gbm", 
       trControl = trainControl(method = "cv", number = 10), #method="repeatedcv", repeats=5
       tuneGrid = expand.grid(n.trees = c(25, 50, 75, 100, 125), interaction.depth = 1:5, shrinkage = 0.1, n.minobsinnode = 10),
       verbose = FALSE)
+boosted_tree_predict <- predict(boosted_tree, newdata = select(testTransformed2, -log.shares))
+boost_rmse <- postResample(boosted_tree_predict, obs = testTransformed2$log.shares)
 boosted_tree
-boosted_tree_predict <- predict(boosted_tree, newdata = select(testTransformed, -log.shares))
-
-boost_rmse <- postResample(boosted_tree_predict, obs = testTransformed$log.shares)
-
-result2 <- rbind(cv_rmse3, cv_rmse4, rf_rmse, boost_rmse)
-row.names(result2) <- c("Linear Model 1", "Linear Model 2", "Random Forest Model", "Boosted Tree Model")
-kable(result2, digits = 4, caption = "Table 9. Cross Validation - Comparisons of the models in test set")
+boosted_tree$results
+# n.trees = boosted_tree$bestTune[[1]]
 ```
 
-# Model Comparisons
+We then used 10 fold cross validation to search all combinations of the tuning parameters values using the `expand.grid` function to choose an optimal model with the desired tuning parameters values. The optimal boosted tree model chosen by cross validation produced the smallest RMSE value (`r min(boosted_tree$results[, 5])`) when n.trees = `r boosted_tree$bestTune[[1]]`, interaction.depth = `r boosted_tree$bestTune[[2]]`, shrinkage = `r boosted_tree$bestTune[[3]]` and n.minobsinnode = `r boosted_tree$bestTune[[4]]`. 
 
-The best model fit to predict the number of shares for the `r params$channel` channel is "need to automate this part".
+## Model Comparisons
+
+The best model fit to predict the number of shares for the `r params$channel` channel can be determined by looking at the Root Mean Square Error, the Mean Absolute Error, or the R-squared value. The approach I've taken below picks whichever model is considered superior by the majority of these three metrics, and if each of the metrics picks a different model, then the one with the lowest RMSE will be chosen.
 
 ```{r eval=TRUE}
+result2 <- rbind(cv_rmse3, cv_rmse4, rf_rmse, boost_rmse)
+row.names(result2) <- c("Linear Regression 1", "Linear Regression 2", "Random Forest", "Boosted Tree")
+kable(result2, digits = 4, caption = "Table 9. Cross Validation - Comparisons of the models in test set")
 
+rmse_best <- names(which.min(result2[,1]))
+rsq_best <- names(which.max(result2[,2]))
+mae_best <- names(which.min(result2[,3]))
+model_best <- table(c(rmse_best, rsq_best, mae_best))
+final_model <- if_else(max(model_best) > 1, names(which.max(model_best)), rmse_best)
 ```
-
-The best model fit to predict the number of shares
 
 # Final Model Fit with Entire Data
 
+The best model fit to predict the number of shares is the `r final_model` model for the `r params$channel` articles.
+
+both training and the test sets have been standardized with same mean and same standard deviation. 
+
 ```{r eval=TRUE}
-#data2comb <- rbind(trainTransformed, testTransformed)
-#ntrees <- boosted_tree$bestTune[[1]] #n.trees
-#nsplits <- boosted_tree$bestTune[[2]] #interaction.depth
+linear1 <- function(...){
+  
+  data1comb <- rbind(trainTransformed1, testTransformed1, ...)
+  linearfit1 <- train(log.shares ~ . + I(n_tokens_content^2) + kw_avg_avg:num_imgs + 
+                        average_token_length:global_subjectivity + dayweek:self_reference_avg_sharess, 
+                      data=data1comb, 
+                      method = "lm", ...)
+  pred <- predict(linearfit1, newdata = data1comb, ...)
+  linear.rmse <- postResample(pred, obs = data1comb$log.shares, ...)
+  #colnames(linear.rmse) <- "Linear Regression 1"
+  linear_rmse <- kable(linear.rmse, digits = 4, caption = "10. Final model fit on entire data", ...)
+  summary <- summary(linearfit1)
+  important <- varImp(linearfit1, ...)
+  plot_imp <- vip(linearfit1, ...)
+  return(list(linear_rmse, summary, important, plot_imp))
+  
+}
 
-#final_boosted_tree <- train(log.shares ~ . , data = trainTransformed,
-#      method = "gbm", 
-#      trControl = trainControl(method = "cv", number = 10), #method="repeatedcv", repeats=5
-#      tuneGrid = data.frame(n.trees = ntrees, interaction.depth = nsplits, shrinkage = 0.1, n.minobsinnode = 10),
-#      importance = TRUE,
-#      verbose = FALSE)
+linear2 <- function(...){
+  
+  data1comb <- rbind(trainTransformed1, testTransformed1, ...)
+  linearfit2 <- train(log.shares ~ . - num_imgs - self_reference_avg_sharess + I(n_tokens_content^2) + 
+                        I(log(num_imgs + 1)) + I(log(self_reference_avg_sharess+1)) + 
+                        kw_avg_avg:I(log(num_imgs + 1)) + average_token_length:global_subjectivity, 
+                      data=data1comb, 
+                      method = "lm", ...)
+  pred <- predict(linearfit2, newdata = data1comb, ...)
+  linear.rmse <- postResample(pred, obs = data1comb$log.shares, ...)
+  #row.names(linear.rmse) <- "Linear Regression 2"
+  linear_rmse <- kable(linear.rmse, digits = 4, caption = "10. Final model fit on entire data", ...)
+  summary <- summary(linearfit2)
+  return(list(linear_rmse, summary, important, plot_imp))
+  
+}
 
-#varImp(boosted_tree)
+randomf <- function(...){
+  
+  data2comb <- rbind(trainTransformed2, testTransformed2, ...)
+  rffit <- train(log.shares ~ . , data = data2comb, 
+                 method = "rf", 
+                 tuneGrid = data.frame(mtry = random_forest$bestTune[[1]]), 
+                 importance = TRUE, ...)
+  important <- varImp(rffit , ...)
+  plot_imp <- vip(rffit, ...)
+  return(list(rffit, important, plot_imp))
+  
+}
 
-imp <- varImp(boosted_tree)
-imp2 <- data.frame(imp[1])
-first <- rownames(imp2)[order(imp2$Overall, decreasing=TRUE)][1] # most important
-second <- rownames(imp2)[order(imp2$Overall, decreasing=TRUE)][2] #2nd
-third <- rownames(imp2)[order(imp2$Overall, decreasing=TRUE)][3] # 3rd
-#final_boosted_tree
+boostedt <- function(...){
+  
+  data2comb <- rbind(trainTransformed2, testTransformed2, ...)
+  btfit <- train(log.shares ~ . , data = data2comb, 
+                 method = "gbm", 
+                 tuneGrid = data.frame(n.trees = boosted_tree$bestTune[[1]], 
+                                       interaction.depth = boosted_tree$bestTune[[2]], 
+                                       shrinkage = boosted_tree$bestTune[[3]], 
+                                       n.minobsinnode = boosted_tree$bestTune[[4]]), 
+                 verbose = FALSE, ...)
+  important <- varImp(btfit, ...)
+  plot_imp <- vip(btfit, ...)
+  return(list(btfit, important, plot_imp))
+  
+}
 
-print(paste0("the winnder is ", first, ", second is ", second ))
+f_model <- if_else(final_model == "Random Forest", 3, 
+           if_else(final_model == "Boosted Tree", 4, 
+                   if_else(final_model == "Linear Regression 1", 1, 2)))
+
+switch(f_model,
+       
+       modell = linear1(),
+       model2 = linear2(),
+       model3 = randomf(),
+       model4 = boostedt()
+)
+
+#imp <- varImp(boosted_tree)
+#imp2 <- data.frame(imp[1])
+#first <- rownames(imp2)[order(imp2$Overall, decreasing=TRUE)][1] # most important
+#second <- rownames(imp2)[order(imp2$Overall, decreasing=TRUE)][2] #2nd
+#third <- rownames(imp2)[order(imp2$Overall, decreasing=TRUE)][3] # 3rd
+
+#print(paste0("The most important predictor is ", first, ", the second is ", second))
 ```
 
 
-T
+
 
