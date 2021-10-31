@@ -7,6 +7,7 @@ The purpose of the repo is to use supervised machine learning methods (linear re
   
 ## A list of R packages used to generate the analyses
 
+   * rmarkdown
    * tidyverse
    * knitr
    * caret
