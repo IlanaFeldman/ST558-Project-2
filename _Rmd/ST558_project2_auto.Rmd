@@ -415,24 +415,13 @@ cv_fit4 <- train(log.shares ~ . - num_imgs + I(log(num_imgs + 1)) + I(n_tokens_c
                  trControl = trainControl(method = "cv", number = 10))
 summary(cv_fit4)
 
-#result_tab <- data.frame(t(cv_fit3$results), t(cv_fit4$results))
-#colnames(result_tab) <- c("Model 1","Model 2")
-#rownames(result_tab) <- c("intercept", "RMSE", "Rsquared", "MAE", "RMSESD", "RsquaredSD", "MAESD")
-
-#kable(result_tab, digits = 4, caption = "Cross Validation - Comparisons of the models in training set")
-
-#pred1 <- predict(cv_fit1, newdata = testTransformed)
-#pred2 <- predict(cv_fit2, newdata = testTransformed)
 pred3 <- predict(cv_fit3, newdata = testTransformed)
 pred4 <- predict(cv_fit4, newdata = testTransformed)
-#cv_rmse1 <- postResample(pred1, obs = testTransformed$log.shares)
-#cv_rmse2 <- postResample(pred2, obs = testTransformed$log.shares)
 cv_rmse3 <- postResample(pred3, obs = testTransformed$log.shares)
 cv_rmse4 <- postResample(pred4, obs = testTransformed$log.shares)
 #result2 <- rbind(cv_rmse3, cv_rmse4)
 #row.names(result2) <- c("Model 1","Model 2")
 #kable(result2, digits = 4, caption = "Table ###. Cross Validation - Model Predictions on Test Set")
-
 ```
 
 ## Random Forest 
@@ -455,7 +444,6 @@ random_forest <- train(log.shares ~ ., data = trainTransformed,
 random_forest_predict <- predict(random_forest, newdata = testTransformed)
 rf_rmse <- postResample(random_forest_predict, obs = testTransformed$log.shares)
 random_forest
-
 ```
 
 ## Boosted Tree
@@ -479,7 +467,7 @@ Here, we use the `caret` package and the `gbm` package to run the boosted tree m
 We then use 10 fold cross validation to search all combinations of the tuning parameters values using the `expand.grid` function to choose an optimal model with the desired tuning parameters values. The optimal model chosen by cross validation across all combinations of tuning parameters values produces the lowest root mean squared error (RMSE). 
 
 ```{r eval=TRUE}
-#expand.grid(n.trees = c(25, 50, 100, 150, 200), interaction.depth = 1:4, shrinkage = 0.1, n.minobsinnode = 10)
+#expand.grid(n.trees = c(25, 50, 75, 100, 125), interaction.depth = 1:5, shrinkage = 0.1, n.minobsinnode = 10)
 boosted_tree <- train(log.shares ~ . , data = trainTransformed,
       method = "gbm", 
       trControl = trainControl(method = "cv", number = 10), #method="repeatedcv", repeats=5
@@ -492,14 +480,12 @@ boost_rmse <- postResample(boosted_tree_predict, obs = testTransformed$log.share
 
 result2 <- rbind(cv_rmse3, cv_rmse4, rf_rmse, boost_rmse)
 row.names(result2) <- c("Linear Model 1", "Linear Model 2", "Random Forest Model", "Boosted Tree Model")
-kable(result2, digits = 4, caption = "Cross Validation - Comparisons of the models in test set")
-
+kable(result2, digits = 4, caption = "Table 9. Cross Validation - Comparisons of the models in test set")
 ```
 
 # Model Comparisons
 
 The best model fit to predict the number of shares for the `r params$channel` channel is "need to automate this part".
-
 
 ```{r eval=TRUE}
 
@@ -507,9 +493,32 @@ The best model fit to predict the number of shares for the `r params$channel` ch
 
 The best model fit to predict the number of shares
 
+# Final Model Fit with Entire Data
 
-# Final Model
+```{r eval=TRUE}
+#data2comb <- rbind(trainTransformed, testTransformed)
+#ntrees <- boosted_tree$bestTune[[1]] #n.trees
+#nsplits <- boosted_tree$bestTune[[2]] #interaction.depth
 
-Automation is done with the modifications of the YAML header and the render function. 
+#final_boosted_tree <- train(log.shares ~ . , data = trainTransformed,
+#      method = "gbm", 
+#      trControl = trainControl(method = "cv", number = 10), #method="repeatedcv", repeats=5
+#      tuneGrid = data.frame(n.trees = ntrees, interaction.depth = nsplits, shrinkage = 0.1, n.minobsinnode = 10),
+#      importance = TRUE,
+#      verbose = FALSE)
 
+#varImp(boosted_tree)
+
+imp <- varImp(boosted_tree)
+imp2 <- data.frame(imp[1])
+first <- rownames(imp2)[order(imp2$Overall, decreasing=TRUE)][1] # most important
+second <- rownames(imp2)[order(imp2$Overall, decreasing=TRUE)][2] #2nd
+third <- rownames(imp2)[order(imp2$Overall, decreasing=TRUE)][3] # 3rd
+#final_boosted_tree
+
+print(paste0("the winnder is ", first, ", second is ", second ))
+```
+
+
+T
 
