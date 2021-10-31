@@ -27,7 +27,7 @@ The purpose of the repo is to use supervised machine learning methods (linear re
 
 ## 4. The render function used to create 6 analyses for the channels
 
-```{r eval=FALSE}  
+```markdown  
   library(rmarkdown)  
   library(tidyverse)  
   type <- c("lifestyle", "entertainment", "bus", "socmed", "tech", "world")  
