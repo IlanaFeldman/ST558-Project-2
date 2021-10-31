@@ -24,23 +24,23 @@ The purpose of the analyses is to compare different predictive models and choose
 Table 1. Attributes used in the analyses for prediction of online news popularity
 
 Index | Attribute                     | Attribute Information                              | Type   
------ | ----------------------------- | -------------------------------------------------- | --------
-1     | `shares`  (target)            | Number of shares                                   | number
-2     | `kw_avg_avg`                  | Average keyword (average shares)                   | number
-3     | `LDA_02`                      | Closeness to LDA topic 2                           | ratio
-4.1   | `weekday_is_monday`           | Was the article published on a Monday?             | boolean
-4.2   | `weekday_is_tuesday`          | Was the article published on a Tuesday?            | boolean
-4.3   | `weekday_is_wednesday`        | Was the article published on a Wednesday?          | boolean
-4.4   | `weekday_is_thursday`         | Was the article published on a Thursday?           | boolean
-4.5   | `weekday_is_friday`           | Was the article published on a Friday?             | boolean
-4.6   | `weekday_is_saturday`         | Was the article published on a Saturday?           | boolean
-4.7   | `weekday_is_sunday`           | Was the article published on a Sunday?             | boolean
-5     | `self_reference_avg_sharess`  | Average shares of referenced articles in Mashable  | number
-6     | `average_token_length`        | Average length of the words in the content         | number
-7     | `n_tokens_content`            | Number of words in the content                     | number
-8     | `n_tokens_title`              | Number of words in the title                       | number
-9     | `global_subjectivity`         | Text subjectivity                                  | ratio
-10    | `num_imgs`                    | Number of images                                   | number
+----- | ----------------------------- | ------------------------------------------------------ | --------
+1     | `shares`  (target)            | Number of shares                                       | number
+2     | `kw_avg_avg`                  | Average keyword (average shares)                       | number
+3     | `LDA_02`                      | Closeness of current article to a LDA Topic 2          | ratio
+4.1   | `weekday_is_monday`           | Was the article published on a Monday?                 | boolean
+4.2   | `weekday_is_tuesday`          | Was the article published on a Tuesday?                | boolean
+4.3   | `weekday_is_wednesday`        | Was the article published on a Wednesday?              | boolean
+4.4   | `weekday_is_thursday`         | Was the article published on a Thursday?               | boolean
+4.5   | `weekday_is_friday`           | Was the article published on a Friday?                 | boolean
+4.6   | `weekday_is_saturday`         | Was the article published on a Saturday?               | boolean
+4.7   | `weekday_is_sunday`           | Was the article published on a Sunday?                 | boolean
+5     | `self_reference_avg_sharess`  | Avg. shares of popular news referenced in the articles | number
+6     | `average_token_length`        | Average length of the words in the content             | number
+7     | `n_tokens_content`            | Number of words in the content                         | number
+8     | `n_tokens_title`              | Number of words in the title                           | number
+9     | `global_subjectivity`         | Text subjectivity                                      | ratio
+10    | `num_imgs`                    | Number of images                                       | number
 
 ```{r eval=TRUE}
 library(tidyverse)
@@ -177,7 +177,7 @@ corrplot(correlation, type = "lower", method = "number", add = TRUE, diag = FALS
 
 ### Boxplot 
 
-Figure 2 shows the number of shares across different days of the week. Here, due to the huge number of large-valued outliers, I capped the number of shares to 10,000 so that we can see the medians and the interquartile ranges clearly for different days of the week.
+Figure 2 shows the number of shares across different days of the week. Here, due to the huge number of large-valued outliers, I capped the number of shares to 8,000 so that we can see the medians and the interquartile ranges clearly for different days of the week.
 
 This is a boxplot with the days of the week on the x-axis and the number of shares on the y-axis. We can inspect the trend of shares to see if the shares are higher on a Monday, a Friday or a Sunday for the `r params$channel` articles. 
 
@@ -186,7 +186,7 @@ Figure 2 coincides with the findings in Table 3 that the variance of shares is h
 ```{r eval=TRUE}
 ggplot(data = edadata, aes(x = day.week, y = shares)) + 
   geom_boxplot(fill = "white", outlier.shape = NA) + 
-  coord_cartesian(ylim=c(0, 10000)) + 
+  coord_cartesian(ylim=c(0, 8000)) + 
   geom_jitter(aes(color = day.week), size = 1) + 
   guides(color = guide_legend(override.aes = list(size = 8))) + 
   labs(x = "Day of the Week", y = "Number of Shares", 
@@ -376,8 +376,9 @@ We slowly filtered out predictors, their corresponding second order terms and th
 We repeated this process to trim down the number of predictors and eventually selected the ones that seem to be important in predicting the number of shares, and they are not highly correlated with each other. The parameters in the linear regression model 1 were chosen through this process, and they are listed in Table 8 below. The response variable is `log(shares)`.
 
 Table 8. The predictors in linear regression model 1  
-Index  | Parameter in Model 1
------- | ----------------------------- 
+  
+Index  | Parameter in Model 1  
+------ | ---------------------------------------------- 
 1      | `kw_avg_avg`                  
 2      | `LDA_02`                      
 3      | `dayweek`                     
@@ -391,8 +392,6 @@ Index  | Parameter in Model 1
 11     | `kw_avg_avg:num_imgs`
 12     | `average_token_length:global_subjectivity`
 13     | `dayweek:self_reference_avg_sharess`
-
-
 
 ```{r eval=TRUE}
 train1$dayweek <- as.factor(train1$dayweek)
@@ -430,9 +429,9 @@ pred4 <- predict(cv_fit4, newdata = testTransformed)
 #cv_rmse2 <- postResample(pred2, obs = testTransformed$log.shares)
 cv_rmse3 <- postResample(pred3, obs = testTransformed$log.shares)
 cv_rmse4 <- postResample(pred4, obs = testTransformed$log.shares)
-result2 <- rbind(cv_rmse3, cv_rmse4)
-row.names(result2) <- c("Model 1","Model 2")
-kable(result2, digits = 4, caption = "Table ###. Cross Validation - Model Predictions on Test Set")
+#result2 <- rbind(cv_rmse3, cv_rmse4)
+#row.names(result2) <- c("Model 1","Model 2")
+#kable(result2, digits = 4, caption = "Table ###. Cross Validation - Model Predictions on Test Set")
 
 ```
 
