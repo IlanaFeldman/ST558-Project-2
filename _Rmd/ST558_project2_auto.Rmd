@@ -208,7 +208,8 @@ ggplot(data = edadata, aes(x = day.week, y = shares)) +
 ggplot(data = edadata, aes(x = day.week, y = n_tokens_content)) +
   geom_boxplot(fill = "white", outlier.shape = NA) +
   coord_cartesian(ylim=c(0, 2000)) + 
-  geom_jitter(aes(color = class.shares), size = 1) +
+  geom_jitter(aes(color = class.shares), size = 1) + 
+  guides(color = guide_legend(override.aes = list(size = 8))) + 
   labs(x = "Popularity", y = "Word Count of Article", 
        title = "Figure 3. Word Count of Article by Popularity") + 
   theme(axis.text.x = element_text(angle = 45, size = 10), 
@@ -224,7 +225,7 @@ ggplot(data = edadata, aes(x = day.week, y = n_tokens_content)) +
 
 Figure 4 shows the popularity of the news articles in relations to their closeness to a top LDA topic for the `r params$channel` channel on any day of the week. The Latent Dirichlet Allocation (LDA) is an algorithm applied to the Mashable texts of the articles in order to identify the five top relevant topics and then measure the closeness of the current articles to each topic, and there are five topics categories. Thus, each article published on Mashable was measured for each of the topic categories. Together, those LDA measures in ratios are added to 1 for each article. Thus, these LDA topics variables are highly correlated with one another. 
 
-We calculated the mean ratios of these LDA topics variables for the specific day of the week. These mean ratios are further classified into a "popular" group and an "unpopular" group according to their number of shares (> 1400 or < 1400) which is shown in Figure 3 barplot. Note, the `position = "stack"` not `position = "fill"` in the `geom_bar` function. 
+We calculated the mean ratios of these LDA topics variables for the specific day of the week. These mean ratios are further classified into a "popular" group and an "unpopular" group according to their number of shares (> 1400 or < 1400) which is shown in Figure 4 barplot. Note, the `position = "stack"` not `position = "fill"` in the `geom_bar` function. 
 
 Some mean ratios of a LDA topic do not seem to vary over the days of a week while other mean ratios of the LDA topics vary across different days of the week. Recall, when we dichotomize a continuous variable into different groups, we lose information about that variable. Here, I just want to show you whether or not the mean ratios of a LDA topic differ across time for different categories of shares. 
 
@@ -237,7 +238,7 @@ b.plot2 <- b.plot1 %>% pivot_longer(cols = 3:7, names_to = "LDA.Topic", values_t
 ggplot(data = b.plot2, aes(x = day.week, y = avg.LDA, fill = LDA.Topic)) + 
   geom_bar(stat = "identity", position = "stack") + 
   labs(x = "Day of the Week", y = "Closeness to Top LDA Topic", 
-       title = "Figure 3. Popularity of Top LDA Topic on Day of the Week") + 
+       title = "Figure 4. Popularity of Top LDA Topic on Day of the Week") + 
   scale_fill_discrete(name = "LDA Topic") + 
   theme(axis.text.x = element_text(angle = 45, size = 10), 
         axis.text.y = element_text(size = 10), 
@@ -251,7 +252,7 @@ ggplot(data = b.plot2, aes(x = day.week, y = avg.LDA, fill = LDA.Topic)) +
 
 ### Line Plot
 
-Figure 5 is a line plot that shows the same measurements as in Figure 3 that we can see the patterns of the mean ratios of a LDA topic vary or not vary across time in different popularity groups more clearly. Again, some mean ratios of LDA topics do not seem to vary across time when the corresponding lines are flattened while other mean ratios of LDA topics vary across time when their lines are fluctuating. The patterns observed in the "popular" group may not reflect on the same trend in the "unpopular" group for articles in the `r params$channel` channel.
+Figure 5 is a line plot that shows the same measurements as in Figure 4 that we can see the patterns of the mean ratios of a LDA topic vary or not vary across time in different popularity groups more clearly. Again, some mean ratios of LDA topics do not seem to vary across time when the corresponding lines are flattened while other mean ratios of LDA topics vary across time when their lines are fluctuating. The patterns observed in the "popular" group may not reflect on the same trend in the "unpopular" group for articles in the `r params$channel` channel.
 
 ```{r eval=TRUE}
 l.plot1 <- edadata %>% group_by(day.week, class.shares) %>% 
@@ -262,7 +263,7 @@ l.plot2 <- l.plot1 %>% pivot_longer(cols = 3:7, names_to = "LDA.Topic", values_t
 ggplot(data = l.plot2, aes(x = day.week, y = avg.LDA, group = LDA.Topic)) + 
   geom_line(aes(color = LDA.Topic), lwd = 2) + 
   labs(x = "Day of the Week", y = "Closeness to LDA Topic", 
-       title = "Figure 4. Popularity of LDA Topic on Day of the Week") + 
+       title = "Figure 5. Popularity of LDA Topic on Day of the Week") + 
   scale_color_discrete(name = "LDA Topic") +
   theme(axis.text.x = element_text(angle = 45, size = 10), 
         axis.text.y = element_text(size = 10), 
@@ -290,7 +291,7 @@ ggplot(data = edadata, aes(x = kw_avg_avg, y = log.shares, color = day.week)) +
   coord_cartesian(xlim=c(0, 10000)) +
   geom_smooth(method = "lm", lwd = 2) + 
   labs(x = "Average Keywords", y = "log(number of shares)", 
-       title = "Figure 5. Average Keywords vs Log Number of Shares") + 
+       title = "Figure 6. Average Keywords vs Log Number of Shares") + 
   theme(axis.text.x = element_text(size = 10), 
         axis.text.y = element_text(size = 10), 
         axis.title.x = element_text(size = 15), 
@@ -307,7 +308,7 @@ ggplot(data = edadata, aes(x = log(num_imgs + 1), y = log.shares, color = day.we
   scale_color_discrete(name = "Day of the Week") + 
   geom_smooth(method = "lm", lwd = 2) + 
   labs(x = "log(number of images)", y = "log(number of shares)", 
-       title = "Figure 5. Log Number of Images vs Log Number of Shares") + 
+       title = "Figure 7. Log Number of Images vs Log Number of Shares") + 
   theme(axis.text.x = element_text(size = 10), 
         axis.text.y = element_text(size = 10), 
         axis.title.x = element_text(size = 15), 
@@ -325,7 +326,7 @@ To justify the usage of the log transformations for shares and images, we'll sho
 ```{r eval = TRUE}
 ggplot(edadata) + geom_qq(aes(sample = shares)) + geom_qq_line(aes(sample = shares)) + 
   labs(x = "Theoretical Quantiles", y = "Share Numbers", 
-       title = "Figure 7a. QQ Plot for Non-Transformed Shares") +
+       title = "Figure 8a. QQ Plot for Non-Transformed Shares") +
     theme(axis.text.x = element_text(size = 10), 
         axis.text.y = element_text(size = 10), 
         axis.title.x = element_text(size = 15), 
@@ -339,7 +340,7 @@ ggplot(edadata) + geom_qq(aes(sample = shares)) + geom_qq_line(aes(sample = shar
 ```{r eval = TRUE}
 ggplot(edadata) + geom_qq(aes(sample = log(shares))) + geom_qq_line(aes(sample = log(shares))) +
     labs(x = "Theoretical Quantiles", y = "Log(Share Numbers)", 
-       title = "Figure 7b. QQ Plot for Log-Transformed Shares") +
+       title = "Figure 8b. QQ Plot for Log-Transformed Shares") +
     theme(axis.text.x = element_text(size = 10), 
         axis.text.y = element_text(size = 10), 
         axis.title.x = element_text(size = 15), 
@@ -353,7 +354,7 @@ ggplot(edadata) + geom_qq(aes(sample = log(shares))) + geom_qq_line(aes(sample =
 ```{r eval = TRUE}
 ggplot(edadata) + geom_qq(aes(sample = num_imgs)) + geom_qq_line(aes(sample = num_imgs)) + 
   labs(x = "Theoretical Quantiles", y = "Image Numbers", 
-       title = "Figure 7c. QQ Plot for Non-Transformed Image Numbers") +
+       title = "Figure 8c. QQ Plot for Non-Transformed Image Numbers") +
     theme(axis.text.x = element_text(size = 10), 
         axis.text.y = element_text(size = 10), 
         axis.title.x = element_text(size = 15), 
@@ -366,7 +367,7 @@ ggplot(edadata) + geom_qq(aes(sample = num_imgs)) + geom_qq_line(aes(sample = nu
 ```{r eval = TRUE}
 ggplot(edadata) + geom_qq(aes(sample = log(num_imgs + 1))) + geom_qq_line(aes(sample = log(num_imgs + 1))) +
     labs(x = "Theoretical Quantiles", y = "Log(Image Numbers)", 
-       title = "Figure 7d. QQ Plot for Log-Transformed Image Numbers") +
+       title = "Figure 8d. QQ Plot for Log-Transformed Image Numbers") +
     theme(axis.text.x = element_text(size = 10), 
         axis.text.y = element_text(size = 10), 
         axis.title.x = element_text(size = 15), 
@@ -398,7 +399,7 @@ The second linear regression model provided below applies a log transformation t
 
 Table 8. The predictors in linear regression model 1  
   
-Index  | Parameter in Model 1  
+Index  | Parameter in Linear Regression 1  
 ------ | ---------------------------------------------- 
 1      | `kw_avg_avg`                  
 2      | `LDA_02`                      
@@ -470,7 +471,7 @@ random_forest$results
 # mtry = random_forest$bestTune[[1]]
 ```
 
-We then used 5 fold cross validation to search for the tuning parameter value ranging from 1 to 5 that produces the optimal random forest model. The optimal model chosen by cross validation produced the smallest RMSE value when mtry = `r random_forest$bestTune[[1]]` and the lowest RMSE = `r min(random_forest$results[, 2])`.  
+We then used 5 fold cross validation to search for the tuning parameter value ranging from 1 to 5 that produces the optimal random forest model. The optimal model chosen by cross validation produced the smallest RMSE value when mtry = `r random_forest$bestTune[[1]]` and the lowest RMSE = `r min(random_forest$results[, 2])` when training the model on the training set.  
 
 ## Boosted Tree
 
@@ -506,11 +507,11 @@ boosted_tree$results
 # n.trees = boosted_tree$bestTune[[1]]
 ```
 
-We then used 10 fold cross validation to search all combinations of the tuning parameters values using the `expand.grid` function to choose an optimal model with the desired tuning parameters values. The optimal boosted tree model chosen by cross validation produced the smallest RMSE value (`r min(boosted_tree$results[, 5])`) when n.trees = `r boosted_tree$bestTune[[1]]`, interaction.depth = `r boosted_tree$bestTune[[2]]`, shrinkage = `r boosted_tree$bestTune[[3]]` and n.minobsinnode = `r boosted_tree$bestTune[[4]]`. 
+We then used 10 fold cross validation to search all combinations of the tuning parameters values using the `expand.grid` function to choose an optimal model with the desired tuning parameters values. The optimal boosted tree model chosen by cross validation produced the smallest RMSE value (`r min(boosted_tree$results[, 5])`) when n.trees = `r boosted_tree$bestTune[[1]]`, interaction.depth = `r boosted_tree$bestTune[[2]]`, shrinkage = `r boosted_tree$bestTune[[3]]` and n.minobsinnode = `r boosted_tree$bestTune[[4]]` when training the model with the training set. 
 
 ## Model Comparisons
 
-The best model fit to predict the number of shares for the `r params$channel` channel can be determined by looking at the Root Mean Square Error, the Mean Absolute Error, or the R-squared value. The approach I've taken below picks whichever model is considered superior by the majority of these three metrics, and if each of the metrics picks a different model, then the one with the lowest RMSE will be chosen.
+The best model fit to predict the number of shares for the `r params$channel` channel can be determined by looking at the Root Mean Square Error, the Mean Absolute Error, or the R-squared value using the test set. Table 9 shows these criteria measures for each candidate model. The approach I've taken below picks whichever model is considered superior by the majority of these three metrics, and if each of the metrics picks a different model, then the one with the lowest RMSE will be chosen.
 
 ```{r eval=TRUE}
 result2 <- rbind(cv_rmse3, cv_rmse4, rf_rmse, boost_rmse)
@@ -526,9 +527,12 @@ final_model <- if_else(max(model_best) > 1, names(which.max(model_best)), rmse_b
 
 # Final Model Fit with Entire Data
 
-The best model fit to predict the number of shares is the `r final_model` model for the `r params$channel` articles.
+The best model fit to predict the number of shares is the **`r final_model`** model for the `r params$channel` articles.
 
 both training and the test sets have been standardized with same mean and same standard deviation. 
+
+Figure 9. variable importance plot
+
 
 ```{r eval=TRUE}
 linear1 <- function(...){
