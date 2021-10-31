@@ -76,24 +76,24 @@ with the lowest RMSE will be chosen.
 Table 1. Attributes used in the analyses for prediction of online news
 popularity
 
-| Index | Attribute                    | Attribute Information                                  | Type    |
-|-------|------------------------------|--------------------------------------------------------|---------|
-| 1     | `shares` (target)            | Number of shares                                       | number  |
-| 2     | `kw_avg_avg`                 | Average keyword (average shares)                       | number  |
-| 3     | `LDA_02`                     | Closeness of current article to a LDA Topic 2          | ratio   |
-| 4.1   | `weekday_is_monday`          | Was the article published on a Monday?                 | boolean |
-| 4.2   | `weekday_is_tuesday`         | Was the article published on a Tuesday?                | boolean |
-| 4.3   | `weekday_is_wednesday`       | Was the article published on a Wednesday?              | boolean |
-| 4.4   | `weekday_is_thursday`        | Was the article published on a Thursday?               | boolean |
-| 4.5   | `weekday_is_friday`          | Was the article published on a Friday?                 | boolean |
-| 4.6   | `weekday_is_saturday`        | Was the article published on a Saturday?               | boolean |
-| 4.7   | `weekday_is_sunday`          | Was the article published on a Sunday?                 | boolean |
-| 5     | `self_reference_avg_sharess` | Avg. shares of popular news referenced in the articles | number  |
-| 6     | `average_token_length`       | Average length of the words in the content             | number  |
-| 7     | `n_tokens_content`           | Number of words in the content                         | number  |
-| 8     | `n_tokens_title`             | Number of words in the title                           | number  |
-| 9     | `global_subjectivity`        | Text subjectivity                                      | ratio   |
-| 10    | `num_imgs`                   | Number of images                                       | number  |
+| Index | Attribute                    | Attribute Information                                            | Type    |
+|-------|------------------------------|------------------------------------------------------------------|---------|
+| 1     | `shares` (target)            | Number of shares                                                 | number  |
+| 2     | `kw_avg_avg`                 | Average keyword (average shares)                                 | number  |
+| 3     | `LDA_02`                     | Closeness of current article to a LDA Topic 2                    | ratio   |
+| 4.1   | `weekday_is_monday`          | Was the article published on a Monday?                           | boolean |
+| 4.2   | `weekday_is_tuesday`         | Was the article published on a Tuesday?                          | boolean |
+| 4.3   | `weekday_is_wednesday`       | Was the article published on a Wednesday?                        | boolean |
+| 4.4   | `weekday_is_thursday`        | Was the article published on a Thursday?                         | boolean |
+| 4.5   | `weekday_is_friday`          | Was the article published on a Friday?                           | boolean |
+| 4.6   | `weekday_is_saturday`        | Was the article published on a Saturday?                         | boolean |
+| 4.7   | `weekday_is_sunday`          | Was the article published on a Sunday?                           | boolean |
+| 5     | `self_reference_avg_sharess` | Avg. shares of earlier popularity news referenced in the article | number  |
+| 6     | `average_token_length`       | Average length of the words in the content                       | number  |
+| 7     | `n_tokens_content`           | Number of words in the content                                   | number  |
+| 8     | `n_tokens_title`             | Number of words in the title                                     | number  |
+| 9     | `global_subjectivity`        | Text subjectivity                                                | ratio   |
+| 10    | `num_imgs`                   | Number of images                                                 | number  |
 
 ``` r
 library(rmarkdown)
@@ -755,8 +755,8 @@ process, and they are listed in Table 8 below. The response variable is
 The second linear regression model provided below applies a log
 transformation to the variables `num_imgs` and
 `self_reference_avg_sharess`, which are extremely skewed to the right
-even after standardization, to see if this accounts for outliers in the
-data and puts those variables in an appropriate context.
+even after standardization, to see if this accounts for the outliers in
+the data and puts those variables in an appropriate context.
 
 Table 8. The predictors in linear regression model 1
 
@@ -1239,13 +1239,13 @@ The best model fit to predict the number of shares is the **Random
 Forest** model for the lifestyle articles. We fit the entire data set,
 both the training and the test set from the channel in the final chosen
 model. The values of RMSE, MAE and R-squared are calculated with the
-entire data set using the final model. A variable importance plot and a
-table containing a ranking metric of the relative variable importance
-are produced below. We can examine which predictors contributed the most
-in predicting the popularity of online news in the final model
-accordingly. Table 1 containing attribute information from the
-*Introduction* section is copied below for comparisons of variable
-importance.
+entire data set using the final model. A variable importance plot of the
+top 10 most important variables and a table containing a ranking metric
+of the relative variable importance are produced below. We can examine
+which predictors contributed the most in predicting the popularity of
+online news in the final model accordingly. Table 1 containing attribute
+information from the *Introduction* section is copied below for
+comparisons of variable importance.
 
 Table 1. Attributes used in the analyses for prediction of online news
 popularity
@@ -1351,7 +1351,7 @@ reports <- tibble(output_file, params)
 
 apply(reports, MARGIN = 1, 
       FUN = function(x){
-        render(input = "C:/Users/peach/Documents/ST558/ST558_repos/ST558-Project-2/ST558_project2_test.Rmd",
+        render(input = "C:/Users/peach/Documents/ST558/ST558_repos/ST558-Project-2/ST558_project2_auto.Rmd",
                output_format = "github_document", 
                output_file = paste0("C:/Users/peach/documents/ST558/ST558_repos/ST558-Project-2/", x[[1]]),
                params = x[[2]],
