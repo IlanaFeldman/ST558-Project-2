@@ -37,9 +37,9 @@ The purpose of the repo is to use supervised machine learning methods (linear re
   
   apply(reports, MARGIN = 1,  
         FUN = function(x){  
-          render(input = "C:/Users/peach/Documents/ST558/ST558_repos/ST558-Project-2/_Rmd/ST558_project2_auto.Rmd",  
+          render(input = "ST558_project2_auto.Rmd",  
                  output_format = "github_document",  
-                 output_file = paste0("C:/Users/peach/documents/ST558/ST558_repos/ST558-Project-2/", x[[1]]),  
+                 output_file = x[[1]],  
                  params = x[[2]],  
                  output_options = list(html_preview = FALSE, toc = TRUE, toc_depth = 3, df_print = "tibble"))  
         })  
