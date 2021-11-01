@@ -16,13 +16,13 @@ Due to the expansion of online businesses, people can almost do anything online.
 
 The study collected a total of 39,000 news articles from six data channel categories such as lifestyle, entertainment, business, social media, technology and world. In addition, the features contained in the articles were also measured to help predict the popularity of the news contents. Such features include digital media content (number of images or videos), earlier popularity of news referenced in the article; average number of shares of keywords, natural language features (title popularity or Latent Dirichlet Allocation topics) and many others. The study included 58 predictive attributes, 2 non-predictive attributes and 1 goal field which is the number of shares of the articles. The collected data was donated by the study to the [UCI Machine Learning repository](https://archive.ics.uci.edu/ml/datasets/online+news+popularity) where we downloaded the data.
 
-Table 1 shows the list of variables we used in the analysis and their descriptions. The study shows after the best predictive model was selected using a test set, these variables that we are interested in are among the top ranked features according to their importance in the final predictive model using the entire data set. Thus, we are going to investigate their importance in predicting the number of shares using the predictive models we propose. 
+The articles from the `r params$channel` channel will be our focus in this analysis to predict their popularity. Table 1 shows the list of variables we used in the analysis and their descriptions for the articles in `r params$channel` channel. The study shows after the best predictive model was selected using a test set, these variables that we are interested in are among the top ranked features according to their importance in the final predictive model using the entire data set. Thus, we are going to investigate their importance in predicting the number of shares using the predictive models we propose. 
 
-The purpose of the analyses is to compare different predictive models and choose the best model in predicting the popularity of online news regarding their features in different channel categories. The methods implemented in prediction of shares are linear regression models using different predictors, a random forest model and a boosted tree model. More details are in the *Candidate Models* section. 
+The purpose of the analyses is to compare different predictive models and choose the best model in predicting the popularity of online news regarding their features in the `r params$channel` channel. The methods implemented in prediction of shares are linear regression models using different predictors, a random forest model and a boosted tree model. More details are in the *Candidate Models* section. 
 
 The optimal model is chosen based on the majority score of the three metrics, root Mean Squared Error, Mean Absolute Error, and R-Squared values when fitting the candidate models on the test set. If each of the metrics picks a different model or the majority score is a tie, the one with the lowest RMSE will be chosen. 
 
-Table 1. Attributes used in the analyses for prediction of online news popularity
+Table 1. Attributes used in prediction of online news popularity for `r params$channel` channel
 
 Index | Attribute                     | Attribute Information                                            | Type   
 ----- | ----------------------------- | ---------------------------------------------------------------- | --------
@@ -103,7 +103,7 @@ news_channel <- if_else(params$channel == "bus", "business",
                                   if_else(params$channel == "tech", "technology", params$channel)))
 ```
 
-# 2. Data
+# 2. Data - Articles in `r str_to_title(news_channel)` Channel
 
 When a subset of data is selected for the `r news_channel` channel articles which contain `r dim(news)[1]` articles, the subset of data is then split into a training set (70% of the subset data) and a test set (30% of the subset data) based on the target variable, the number of shares. There are `r dim(train)[1]` articles in the training set and `r dim(test)[1]` observations in the test set regarding the `r news_channel` channel. The `createDataPartition` function from the `caret` package is used to split the data into training and test sets. We set a seed so that the analyses we implemented are reproducible. 
 
@@ -115,7 +115,7 @@ However, these `dayweek` related variables for each day of the week in boolean f
 
 The `r news_channel` channel has `r dim(train)[1]` articles collected. Now let us take a look at the relationships between our response and the predictors with some numerical summaries and plots. 
 
-## 3.1. Numerical Summaries
+## 3.1. Numerical Summaries of Popularity Features in `r str_to_title(news_channel)` News
 
 Table 2 shows the popularity of the news articles on different days of the week. We classified the number of shares greater than 1400 in a day as "popular" and the number of shares less than 1400 in a day as "unpopular". We can see the number of articles from the `r news_channel` channel classified into "popular" group or "unpopular" group on different days of the week from January 7th, 2013 to January 7th, 2015 when the articles were published and retrieved by the study. Note, this table may not reflect on the information contained in the data due to dichotomizing the data.
 
@@ -164,7 +164,7 @@ edadata %>% group_by(day.week) %>% summarize(
 
 ```
 
-## 3.2. Visualizations
+## 3.2. Visualizing the Features of `r str_to_title(news_channel)` Articles
 
 Graphical presentation is a great tool used to visualize the relationships between the predictors and the number of shares (or log number of shares). Below we will see some plots that tell us stories between those variables.
 
@@ -386,7 +386,7 @@ ggplot(edadata) + geom_qq(aes(sample = log(num_imgs + 1))) + geom_qq_line(aes(sa
 
 Whether it's appropriate to perform a logarithmic transformation on the number of images is somewhat less clear than for the number of shares.
 
-# 4. Candidate Models
+# 4. Candidate Models for Predicting Popularity of `r str_to_title(news_channel)` News
 
 ## 4.1. Linear Regression
 
@@ -603,9 +603,9 @@ boostedt <- function(...){
 }
 ```
 
-# 5. Final Model Fit with Entire Data
+# 5. Final Model Fit with Entire `r str_to_title(news_channel)` Articles
 
-The best model fit to predict the number of shares is the **`r final_model`** model for the `r news_channel` articles. We fit the entire data set, both the training and the test set from the channel in the final chosen model. The values of RMSE, MAE and R-squared are calculated with the entire data set using the final model. A variable importance plot of the top 10 most important variables and a table containing a ranking metric of the relative variable importance are produced below. We can examine which predictors contributed the most in predicting the popularity of online news in the final model accordingly. Table 1 containing attribute information from the *Introduction* section is copied below for reference in comparisons of variable importance.
+The best model fit to predict the number of shares is the **`r final_model`** model for the `r news_channel` articles. We fit the entire data set, both the training and the test set from the channel in the final chosen model. The values of RMSE, MAE and R-squared are calculated with the entire data set using the final model. A variable importance plot of the top 10 most important variables and a table containing a ranking metric of the relative variable importance are produced below. We can examine which predictors contributed the most in predicting the popularity of online news in the final model accordingly for the `r news_channel` channel. Table 1 containing attribute information from the *Introduction* section is copied below for reference in comparisons of variable importance.
 
 Table 1. Attributes used in the analyses for prediction of online news popularity
 
@@ -648,7 +648,7 @@ switch(f_model,
 #print(paste0("The most important predictor is ", first, ", the second is ", second))
 ```
 
-# 6. Automation 
+# 6. R Markdown Automation 
 
 To knit with the parameters with this single .Rmd file, we specified the parameters in the YAML header and created a data frame which contains both the output .md file names and the parameters we supplied to the YAML header to automate the reports. Both the names of the parameters and the values of the parameters were saved in a list format in that data frame. Then, we used the render function below to knit with the parameters in R console to generate the reports. The render function is not evaluated with this .Rmd file.
 
