@@ -4,24 +4,28 @@ Jasmine Wang & Ilana Feldman
 10/31/2021
 
 -   [1. Introduction](#1-introduction)
--   [2. Data](#2-data)
+-   [2. Data - Articles in Business
+    Channel](#2-data---articles-in-business-channel)
 -   [3. Exploratory Data Analysis](#3-exploratory-data-analysis)
-    -   [3.1. Numerical Summaries](#31-numerical-summaries)
-    -   [3.2. Visualizations](#32-visualizations)
+    -   [3.1. Numerical Summaries of Popularity Features in Business
+        News](#31-numerical-summaries-of-popularity-features-in-business-news)
+    -   [3.2. Visualizing the Features of Business
+        Articles](#32-visualizing-the-features-of-business-articles)
         -   [3.2.1. Correlation Plot](#321-correlation-plot)
         -   [3.2.2. Boxplot](#322-boxplot)
         -   [3.2.3. Barplot](#323-barplot)
         -   [3.2.4. Line Plot](#324-line-plot)
         -   [3.2.5. Scatterplots](#325-scatterplots)
         -   [3.2.6. QQ Plots](#326-qq-plots)
--   [4. Candidate Models](#4-candidate-models)
+-   [4. Candidate Models for Predicting Popularity of Business
+    News](#4-candidate-models-for-predicting-popularity-of-business-news)
     -   [4.1. Linear Regression](#41-linear-regression)
     -   [4.2. Random Forest](#42-random-forest)
     -   [4.3. Boosted Tree](#43-boosted-tree)
     -   [4.4. Model Comparisons](#44-model-comparisons)
--   [5. Final Model Fit with Entire
-    Data](#5-final-model-fit-with-entire-data)
--   [6. Automation](#6-automation)
+-   [5. Final Model Fit with Entire Business
+    Articles](#5-final-model-fit-with-entire-business-articles)
+-   [6. R Markdown Automation](#6-r-markdown-automation)
 
 # 1. Introduction
 
@@ -52,20 +56,22 @@ collected data was donated by the study to the [UCI Machine Learning
 repository](https://archive.ics.uci.edu/ml/datasets/online+news+popularity)
 where we downloaded the data.
 
-Table 1 shows the list of variables we used in the analysis and their
-descriptions. The study shows after the best predictive model was
-selected using a test set, these variables that we are interested in are
-among the top ranked features according to their importance in the final
-predictive model using the entire data set. Thus, we are going to
-investigate their importance in predicting the number of shares using
-the predictive models we propose. 
+The articles from the bus channel will be our focus in this analysis to
+predict their popularity. Table 1 shows the list of variables we used in
+the analysis and their descriptions for the articles in bus channel. The
+study shows after the best predictive model was selected using a test
+set, these variables that we are interested in are among the top ranked
+features according to their importance in the final predictive model
+using the entire data set. Thus, we are going to investigate their
+importance in predicting the number of shares using the predictive
+models we propose. 
 
 The purpose of the analyses is to compare different predictive models
 and choose the best model in predicting the popularity of online news
-regarding their features in different channel categories. The methods
-implemented in prediction of shares are linear regression models using
-different predictors, a random forest model and a boosted tree model.
-More details are in the *Candidate Models* section.
+regarding their features in the bus channel. The methods implemented in
+prediction of shares are linear regression models using different
+predictors, a random forest model and a boosted tree model. More details
+are in the *Candidate Models* section.
 
 The optimal model is chosen based on the majority score of the three
 metrics, root Mean Squared Error, Mean Absolute Error, and R-Squared
@@ -73,8 +79,8 @@ values when fitting the candidate models on the test set. If each of the
 metrics picks a different model or the majority score is a tie, the one
 with the lowest RMSE will be chosen.
 
-Table 1. Attributes used in the analyses for prediction of online news
-popularity
+Table 1. Attributes used in prediction of online news popularity for bus
+channel
 
 | Index | Attribute                    | Attribute Information                                            | Type    |
 |-------|------------------------------|------------------------------------------------------------------|---------|
@@ -175,7 +181,7 @@ news_channel <- if_else(params$channel == "bus", "business",
                                   if_else(params$channel == "tech", "technology", params$channel)))
 ```
 
-# 2. Data
+# 2. Data - Articles in Business Channel
 
 When a subset of data is selected for the business channel articles
 which contain 6258 articles, the subset of data is then split into a
@@ -214,7 +220,7 @@ The business channel has 4382 articles collected. Now let us take a look
 at the relationships between our response and the predictors with some
 numerical summaries and plots.
 
-## 3.1. Numerical Summaries
+## 3.1. Numerical Summaries of Popularity Features in Business News
 
 Table 2 shows the popularity of the news articles on different days of
 the week. We classified the number of shares greater than 1400 in a day
@@ -384,7 +390,7 @@ edadata %>% group_by(day.week) %>% summarize(
 
 Table 7. Comparing Image Counts by the Day of the Week
 
-## 3.2. Visualizations
+## 3.2. Visualizing the Features of Business Articles
 
 Graphical presentation is a great tool used to visualize the
 relationships between the predictors and the number of shares (or log
@@ -713,7 +719,7 @@ ggplot(edadata) + geom_qq(aes(sample = log(num_imgs + 1))) + geom_qq_line(aes(sa
 Whether it’s appropriate to perform a logarithmic transformation on the
 number of images is somewhat less clear than for the number of shares.
 
-# 4. Candidate Models
+# 4. Candidate Models for Predicting Popularity of Business News
 
 ## 4.1. Linear Regression
 
@@ -1238,7 +1244,7 @@ boostedt <- function(...){
 }
 ```
 
-# 5. Final Model Fit with Entire Data
+# 5. Final Model Fit with Entire Business Articles
 
 The best model fit to predict the number of shares is the **Random
 Forest** model for the business articles. We fit the entire data set,
@@ -1248,9 +1254,9 @@ entire data set using the final model. A variable importance plot of the
 top 10 most important variables and a table containing a ranking metric
 of the relative variable importance are produced below. We can examine
 which predictors contributed the most in predicting the popularity of
-online news in the final model accordingly. Table 1 containing attribute
-information from the *Introduction* section is copied below for
-reference in comparisons of variable importance.
+online news in the final model accordingly for the business channel.
+Table 1 containing attribute information from the *Introduction* section
+is copied below for reference in comparisons of variable importance.
 
 Table 1. Attributes used in the analyses for prediction of online news
 popularity
@@ -1337,7 +1343,7 @@ switch(f_model,
 #print(paste0("The most important predictor is ", first, ", the second is ", second))
 ```
 
-# 6. Automation
+# 6. R Markdown Automation
 
 To knit with the parameters with this single .Rmd file, we specified the
 parameters in the YAML header and created a data frame which contains
