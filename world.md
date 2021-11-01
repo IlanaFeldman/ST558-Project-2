@@ -105,7 +105,7 @@ library(ggplot2)
 library(gbm)
 library(vip)
 
-allnews <- read_csv("C:/Users/peach/Documents/ST558/ST558_repos/ST558-Project-2/_Data/OnlineNewsPopularity.csv",
+allnews <- read_csv("_Data/OnlineNewsPopularity.csv",
                     col_names = TRUE)
 
 ########KNIT with parameters!!!!!!!!!channels is in quotes!!!!Need to use it with quotes!!!!!!!!!!!!!!!!!!!!!!!!
@@ -420,7 +420,7 @@ corrplot(correlation, type = "upper", tl.pos = "lt",
 corrplot(correlation, type = "lower", method = "number", add = TRUE, diag = FALSE, tl.pos = "n")
 ```
 
-![](C:/Users/peach/documents/ST558/ST558_repos/ST558-Project-2/world_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+![](world_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
 
 ### 3.2.2. Boxplot
 
@@ -468,7 +468,7 @@ ggplot(data = edadata, aes(x = day.week, y = shares)) +
         title = element_text(size = 14))
 ```
 
-![](C:/Users/peach/documents/ST558/ST558_repos/ST558-Project-2/world_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+![](world_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
 
 ``` r
 ggplot(data = edadata, aes(x = day.week, y = n_tokens_content)) +
@@ -487,7 +487,7 @@ ggplot(data = edadata, aes(x = day.week, y = n_tokens_content)) +
         title = element_text(size = 14))
 ```
 
-![](C:/Users/peach/documents/ST558/ST558_repos/ST558-Project-2/world_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+![](world_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
 ### 3.2.3. Barplot
 
@@ -536,7 +536,7 @@ ggplot(data = b.plot2, aes(x = day.week, y = avg.LDA, fill = LDA.Topic)) +
   facet_wrap(~ class.shares)
 ```
 
-![](C:/Users/peach/documents/ST558/ST558_repos/ST558-Project-2/world_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+![](world_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
 ### 3.2.4. Line Plot
 
@@ -570,7 +570,7 @@ ggplot(data = l.plot2, aes(x = day.week, y = avg.LDA, group = LDA.Topic)) +
   facet_wrap(~ class.shares)
 ```
 
-![](C:/Users/peach/documents/ST558/ST558_repos/ST558-Project-2/world_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](world_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 ### 3.2.5. Scatterplots
 
@@ -621,7 +621,7 @@ ggplot(data = edadata, aes(x = kw_avg_avg, y = log.shares, color = day.week)) +
         title = element_text(size = 13))
 ```
 
-![](C:/Users/peach/documents/ST558/ST558_repos/ST558-Project-2/world_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+![](world_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 ``` r
 ggplot(data = edadata, aes(x = log(num_imgs + 1), y = log.shares, color = day.week)) + 
@@ -639,7 +639,7 @@ ggplot(data = edadata, aes(x = log(num_imgs + 1), y = log.shares, color = day.we
         title = element_text(size = 13))
 ```
 
-![](C:/Users/peach/documents/ST558/ST558_repos/ST558-Project-2/world_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+![](world_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
 ### 3.2.6. QQ Plots
 
@@ -662,7 +662,7 @@ ggplot(edadata) + geom_qq(aes(sample = shares)) + geom_qq_line(aes(sample = shar
         title = element_text(size = 13))
 ```
 
-![](C:/Users/peach/documents/ST558/ST558_repos/ST558-Project-2/world_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+![](world_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
 ``` r
 ggplot(edadata) + geom_qq(aes(sample = log(shares))) + geom_qq_line(aes(sample = log(shares))) +
@@ -677,7 +677,7 @@ ggplot(edadata) + geom_qq(aes(sample = log(shares))) + geom_qq_line(aes(sample =
         title = element_text(size = 13))
 ```
 
-![](C:/Users/peach/documents/ST558/ST558_repos/ST558-Project-2/world_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+![](world_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
 ``` r
 ggplot(edadata) + geom_qq(aes(sample = num_imgs)) + geom_qq_line(aes(sample = num_imgs)) + 
@@ -692,7 +692,7 @@ ggplot(edadata) + geom_qq(aes(sample = num_imgs)) + geom_qq_line(aes(sample = nu
         title = element_text(size = 13))
 ```
 
-![](C:/Users/peach/documents/ST558/ST558_repos/ST558-Project-2/world_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+![](world_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
 
 ``` r
 ggplot(edadata) + geom_qq(aes(sample = log(num_imgs + 1))) + geom_qq_line(aes(sample = log(num_imgs + 1))) +
@@ -707,7 +707,7 @@ ggplot(edadata) + geom_qq(aes(sample = log(num_imgs + 1))) + geom_qq_line(aes(sa
         title = element_text(size = 13))
 ```
 
-![](C:/Users/peach/documents/ST558/ST558_repos/ST558-Project-2/world_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+![](world_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
 Whether it’s appropriate to perform a logarithmic transformation on the
 number of images is somewhat less clear than for the number of shares.
@@ -1330,7 +1330,7 @@ switch(f_model,
     ## 
     ## [[3]]
 
-![](C:/Users/peach/documents/ST558/ST558_repos/ST558-Project-2/world_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
+![](world_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
 
 ``` r
 #imp <- varImp(boosted_tree)
@@ -1353,6 +1353,7 @@ parameters in R console to generate the reports. The render function is
 not evaluated with this .Rmd file.
 
 ``` r
+########################### Relative PATH!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 type <- c("lifestyle", "entertainment", "bus", "socmed", "tech", "world")
 output_file <- paste0(type, ".md")
 params <- lapply(type, FUN = function(x){list(channel = x)})
@@ -1360,9 +1361,9 @@ reports <- tibble(output_file, params)
 
 apply(reports, MARGIN = 1, 
       FUN = function(x){
-        render(input = "C:/Users/peach/Documents/ST558/ST558_repos/ST558-Project-2/ST558_project2_auto.Rmd",
+        render(input = "ST558_project2_auto.Rmd",
                output_format = "github_document", 
-               output_file = paste0("C:/Users/peach/documents/ST558/ST558_repos/ST558-Project-2/", x[[1]]),
+               output_file = x[[1]],
                params = x[[2]],
                output_options = list(html_preview = FALSE, toc = TRUE, toc_depth = 3, df_print = "tibble"))
       })

@@ -653,6 +653,7 @@ switch(f_model,
 To knit with the parameters with this single .Rmd file, we specified the parameters in the YAML header and created a data frame which contains both the output .md file names and the parameters we supplied to the YAML header to automate the reports. Both the names of the parameters and the values of the parameters were saved in a list format in that data frame. Then, we used the render function below to knit with the parameters in R console to generate the reports. The render function is not evaluated with this .Rmd file.
 
 ```{r eval=FALSE}
+########################### Relative PATH!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 type <- c("lifestyle", "entertainment", "bus", "socmed", "tech", "world")
 output_file <- paste0(type, ".md")
 params <- lapply(type, FUN = function(x){list(channel = x)})
