@@ -8,6 +8,10 @@ params:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+
+news_channel <- if_else(params$channel == "bus", "business", 
+                          if_else(params$channel == "socmed", "social media", 
+                                  if_else(params$channel == "tech", "technology", params$channel)))
 ```
 
 # 1. Introduction
@@ -125,7 +129,7 @@ In addition, Table 3 also shows the standard deviation of shares is huge for any
 
 Table 4 shows the numerical summaries of *average keywords* from `r news_channel` channel in mashable.com on different days of the week. This table indicates the number of times *average keywords* shown in the articles regarding the average number of shares, and the table is showing the average number of those *average keywords* calculated for each day of the week so that we can compare to see which day of the week, the *average keywords* showed up the most or the worst according to the average of shares in the `r news_channel` channel.
 
-Table 5 shows the numerical summaries of average shares of referenced articles in mashable.com on different days of the week. We calculated the average number of shares of those articles that contained the earlier popularity of news referenced for each day of the week so that we can compare which day has the most or the worst average number of shares when there were earlier popularity of news referenced in the `r news_channel`articles. 
+Table 5 shows the numerical summaries of average shares of referenced articles in mashable.com on different days of the week. We calculated the average number of shares of those articles that contained the earlier popularity of news referenced for each day of the week so that we can compare which day has the most or the worst average number of shares when there were earlier popularity of news referenced in the `r news_channel` articles. 
 
 Table 6 checks the numerical summaries of the `global_subjectivity` variable between popular and unpopular articles, to see if there's any difference or a higher variation in subjectivity in popular articles. Text subjectivity is a value between 0 and 1, so there isn't any need for transformation.
 
@@ -524,7 +528,7 @@ We then used 10 fold cross validation to search all combinations of the tuning p
 The best model fit to predict the number of shares for the `r news_channel` channel can be determined by looking at the Root Mean Squared Error, the Mean Absolute Error, or the R-squared value using the test set. Table 9 shows these criteria measures for each candidate model. The approach I've taken below picks whichever model is considered superior by the majority score of these three metrics, and if each of the metrics picks a different model or the majority score is a tiebreaker, then the one with the lowest RMSE will be chosen. 
 
 ```{r eval=TRUE}
-result2 <- rbind(cv_rmse1, cv_rmse1, rf_rmse, boost_rmse)
+result2 <- rbind(cv_rmse1, cv_rmse2, rf_rmse, boost_rmse)
 row.names(result2) <- c("Linear Regression 1", "Linear Regression 2", "Random Forest", "Boosted Tree")
 kable(result2, digits = 4, caption = "Table 9. Cross Validation - Comparisons of the models in test set")
 

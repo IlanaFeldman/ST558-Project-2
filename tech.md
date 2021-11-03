@@ -151,21 +151,21 @@ train
 ```
 
     ## # A tibble: 5,145 x 23
-    ##    class_shares shares log.shares dayweek kw_avg_avg LDA_00 LDA_01 LDA_02 LDA_03 LDA_04 weekday_is_monday weekday_is_tuesday
-    ##           <dbl>  <dbl>      <dbl>   <dbl>      <dbl>  <dbl>  <dbl>  <dbl>  <dbl>  <dbl>             <dbl>              <dbl>
-    ##  1            0    505       6.22       1          0 0.0286 0.0288 0.0286 0.0286  0.885                 1                  0
-    ##  2            0    855       6.75       1          0 0.0222 0.307  0.0222 0.0222  0.627                 1                  0
-    ##  3            1  17100       9.75       1          0 0.0250 0.0252 0.0250 0.0250  0.900                 1                  0
-    ##  4            1   2800       7.94       1          0 0.0201 0.0200 0.0200 0.0200  0.920                 1                  0
-    ##  5            0    445       6.10       1          0 0.312  0.233  0.0286 0.0286  0.398                 1                  0
-    ##  6            0    783       6.66       1          0 0.0200 0.367  0.0202 0.0200  0.572                 1                  0
-    ##  7            1   1500       7.31       1          0 0.0222 0.0226 0.133  0.133   0.689                 1                  0
-    ##  8            1   1800       7.50       1          0 0.0223 0.362  0.0222 0.0223  0.571                 1                  0
-    ##  9            1   3900       8.27       1          0 0.0286 0.200  0.0286 0.0287  0.714                 1                  0
-    ## 10            1   7700       8.95       1          0 0.0200 0.115  0.0200 0.0200  0.825                 1                  0
-    ## # ... with 5,135 more rows, and 11 more variables: weekday_is_wednesday <dbl>, weekday_is_thursday <dbl>,
-    ## #   weekday_is_friday <dbl>, weekday_is_saturday <dbl>, weekday_is_sunday <dbl>, self_reference_avg_sharess <dbl>,
-    ## #   average_token_length <dbl>, n_tokens_content <dbl>, n_tokens_title <dbl>, global_subjectivity <dbl>, num_imgs <dbl>
+    ##    class_shares shares log.shares dayweek kw_avg_avg LDA_00 LDA_01 LDA_02 LDA_03 LDA_04 weekday_is_monday weekday_is_tuesday weekday_is_wednesd~
+    ##           <dbl>  <dbl>      <dbl>   <dbl>      <dbl>  <dbl>  <dbl>  <dbl>  <dbl>  <dbl>             <dbl>              <dbl>               <dbl>
+    ##  1            0    505       6.22       1          0 0.0286 0.0288 0.0286 0.0286  0.885                 1                  0                   0
+    ##  2            0    855       6.75       1          0 0.0222 0.307  0.0222 0.0222  0.627                 1                  0                   0
+    ##  3            1  17100       9.75       1          0 0.0250 0.0252 0.0250 0.0250  0.900                 1                  0                   0
+    ##  4            1   2800       7.94       1          0 0.0201 0.0200 0.0200 0.0200  0.920                 1                  0                   0
+    ##  5            0    445       6.10       1          0 0.312  0.233  0.0286 0.0286  0.398                 1                  0                   0
+    ##  6            0    783       6.66       1          0 0.0200 0.367  0.0202 0.0200  0.572                 1                  0                   0
+    ##  7            1   1500       7.31       1          0 0.0222 0.0226 0.133  0.133   0.689                 1                  0                   0
+    ##  8            1   1800       7.50       1          0 0.0223 0.362  0.0222 0.0223  0.571                 1                  0                   0
+    ##  9            1   3900       8.27       1          0 0.0286 0.200  0.0286 0.0287  0.714                 1                  0                   0
+    ## 10            1   7700       8.95       1          0 0.0200 0.115  0.0200 0.0200  0.825                 1                  0                   0
+    ## # ... with 5,135 more rows, and 10 more variables: weekday_is_thursday <dbl>, weekday_is_friday <dbl>, weekday_is_saturday <dbl>,
+    ## #   weekday_is_sunday <dbl>, self_reference_avg_sharess <dbl>, average_token_length <dbl>, n_tokens_content <dbl>, n_tokens_title <dbl>,
+    ## #   global_subjectivity <dbl>, num_imgs <dbl>
 
 ``` r
 train1 <- train %>% select(-class_shares, -shares, 
@@ -267,7 +267,7 @@ the average number of shares of those articles that contained the
 earlier popularity of news referenced for each day of the week so that
 we can compare which day has the most or the worst average number of
 shares when there were earlier popularity of news referenced in the
-technologyarticles.
+technology articles.
 
 Table 6 checks the numerical summaries of the `global_subjectivity`
 variable between popular and unpopular articles, to see if there’s any
@@ -810,19 +810,19 @@ trainTransformed1
 ```
 
     ## # A tibble: 5,145 x 10
-    ##    log.shares dayweek kw_avg_avg LDA_02 self_reference_avg~ average_token_len~ n_tokens_content n_tokens_title global_subjecti~
-    ##         <dbl> <fct>        <dbl>  <dbl>               <dbl>              <dbl>            <dbl>          <dbl>            <dbl>
-    ##  1     -1.65  Monday       -3.72 -0.569             -0.120               0.289            0.999         1.33              0.762
-    ##  2     -1.01  Monday       -3.72 -0.613              0.0408             -0.699           -0.411        -0.0917           -0.253
-    ##  3      2.63  Monday       -3.72 -0.594             -0.130               0.392            1.27         -1.04              1.11 
-    ##  4      0.432 Monday       -3.72 -0.628             -0.120               0.300            1.35          1.33              0.669
-    ##  5     -1.80  Monday       -3.72 -0.569             -0.120               0.127            1.16          0.382             1.03 
-    ##  6     -1.11  Monday       -3.72 -0.627             -0.188              -1.00            -0.620        -1.04             -1.91 
-    ##  7     -0.325 Monday       -3.72  0.161             -0.140               0.593           -0.490        -1.04              1.39 
-    ##  8     -0.104 Monday       -3.72 -0.613             -0.124               0.145            1.31          0.855             0.326
-    ##  9      0.834 Monday       -3.72 -0.569             -0.216               1.21             0.117        -0.0917            1.01 
-    ## 10      1.66  Monday       -3.72 -0.629             -0.104               0.501            1.34         -0.0917            0.738
-    ## # ... with 5,135 more rows, and 1 more variable: num_imgs <dbl>
+    ##    log.shares dayweek kw_avg_avg LDA_02 self_reference_avg_shar~ average_token_leng~ n_tokens_content n_tokens_title global_subjectivi~ num_imgs
+    ##         <dbl> <fct>        <dbl>  <dbl>                    <dbl>               <dbl>            <dbl>          <dbl>              <dbl>    <dbl>
+    ##  1     -1.65  Monday       -3.72 -0.569                  -0.120                0.289            0.999         1.33                0.762    2.17 
+    ##  2     -1.01  Monday       -3.72 -0.613                   0.0408              -0.699           -0.411        -0.0917             -0.253   -0.626
+    ##  3      2.63  Monday       -3.72 -0.594                  -0.130                0.392            1.27         -1.04                1.11     5.25 
+    ##  4      0.432 Monday       -3.72 -0.628                  -0.120                0.300            1.35          1.33                0.669    2.17 
+    ##  5     -1.80  Monday       -3.72 -0.569                  -0.120                0.127            1.16          0.382               1.03     2.17 
+    ##  6     -1.11  Monday       -3.72 -0.627                  -0.188               -1.00            -0.620        -1.04               -1.91    -0.486
+    ##  7     -0.325 Monday       -3.72  0.161                  -0.140                0.593           -0.490        -1.04                1.39    -0.486
+    ##  8     -0.104 Monday       -3.72 -0.613                  -0.124                0.145            1.31          0.855               0.326    3.29 
+    ##  9      0.834 Monday       -3.72 -0.569                  -0.216                1.21             0.117        -0.0917              1.01     2.03 
+    ## 10      1.66  Monday       -3.72 -0.629                  -0.104                0.501            1.34         -0.0917              0.738    2.17 
+    ## # ... with 5,135 more rows
 
 ``` r
 cv_fit1 <- train(log.shares ~ . + I(n_tokens_content^2) + kw_avg_avg:num_imgs + 
@@ -953,21 +953,20 @@ trainTransformed2
 ```
 
     ## # A tibble: 5,145 x 16
-    ##    log.shares kw_avg_avg LDA_02 weekday_is_monday weekday_is_tuesday weekday_is_wednesday weekday_is_thursday weekday_is_friday
-    ##         <dbl>      <dbl>  <dbl>             <dbl>              <dbl>                <dbl>               <dbl>             <dbl>
-    ##  1     -1.65       -3.72 -0.569              2.28             -0.499               -0.502              -0.459            -0.394
-    ##  2     -1.01       -3.72 -0.613              2.28             -0.499               -0.502              -0.459            -0.394
-    ##  3      2.63       -3.72 -0.594              2.28             -0.499               -0.502              -0.459            -0.394
-    ##  4      0.432      -3.72 -0.628              2.28             -0.499               -0.502              -0.459            -0.394
-    ##  5     -1.80       -3.72 -0.569              2.28             -0.499               -0.502              -0.459            -0.394
-    ##  6     -1.11       -3.72 -0.627              2.28             -0.499               -0.502              -0.459            -0.394
-    ##  7     -0.325      -3.72  0.161              2.28             -0.499               -0.502              -0.459            -0.394
-    ##  8     -0.104      -3.72 -0.613              2.28             -0.499               -0.502              -0.459            -0.394
-    ##  9      0.834      -3.72 -0.569              2.28             -0.499               -0.502              -0.459            -0.394
-    ## 10      1.66       -3.72 -0.629              2.28             -0.499               -0.502              -0.459            -0.394
-    ## # ... with 5,135 more rows, and 8 more variables: weekday_is_saturday <dbl>, weekday_is_sunday <dbl>,
-    ## #   self_reference_avg_sharess <dbl>, average_token_length <dbl>, n_tokens_content <dbl>, n_tokens_title <dbl>,
-    ## #   global_subjectivity <dbl>, num_imgs <dbl>
+    ##    log.shares kw_avg_avg LDA_02 weekday_is_monday weekday_is_tuesday weekday_is_wednesday weekday_is_thursday weekday_is_friday weekday_is_satu~
+    ##         <dbl>      <dbl>  <dbl>             <dbl>              <dbl>                <dbl>               <dbl>             <dbl>            <dbl>
+    ##  1     -1.65       -3.72 -0.569              2.28             -0.499               -0.502              -0.459            -0.394           -0.283
+    ##  2     -1.01       -3.72 -0.613              2.28             -0.499               -0.502              -0.459            -0.394           -0.283
+    ##  3      2.63       -3.72 -0.594              2.28             -0.499               -0.502              -0.459            -0.394           -0.283
+    ##  4      0.432      -3.72 -0.628              2.28             -0.499               -0.502              -0.459            -0.394           -0.283
+    ##  5     -1.80       -3.72 -0.569              2.28             -0.499               -0.502              -0.459            -0.394           -0.283
+    ##  6     -1.11       -3.72 -0.627              2.28             -0.499               -0.502              -0.459            -0.394           -0.283
+    ##  7     -0.325      -3.72  0.161              2.28             -0.499               -0.502              -0.459            -0.394           -0.283
+    ##  8     -0.104      -3.72 -0.613              2.28             -0.499               -0.502              -0.459            -0.394           -0.283
+    ##  9      0.834      -3.72 -0.569              2.28             -0.499               -0.502              -0.459            -0.394           -0.283
+    ## 10      1.66       -3.72 -0.629              2.28             -0.499               -0.502              -0.459            -0.394           -0.283
+    ## # ... with 5,135 more rows, and 7 more variables: weekday_is_sunday <dbl>, self_reference_avg_sharess <dbl>, average_token_length <dbl>,
+    ## #   n_tokens_content <dbl>, n_tokens_title <dbl>, global_subjectivity <dbl>, num_imgs <dbl>
 
 ``` r
 random_forest <- train(log.shares ~ ., data = trainTransformed2,
@@ -1118,8 +1117,7 @@ boosted_tree
     ##   5                  125      0.9558907  0.09098614  0.7262094
     ## 
     ## Tuning parameter 'shrinkage' was held constant at a value of 0.1
-    ## Tuning parameter 'n.minobsinnode' was held constant at
-    ##  a value of 10
+    ## Tuning parameter 'n.minobsinnode' was held constant at a value of 10
     ## RMSE was used to select the optimal model using the smallest value.
     ## The final values used for the model were n.trees = 50, interaction.depth = 5, shrinkage = 0.1 and n.minobsinnode = 10.
 
@@ -1148,7 +1146,7 @@ a different model or the majority score is a tiebreaker, then the one
 with the lowest RMSE will be chosen.
 
 ``` r
-result2 <- rbind(cv_rmse1, cv_rmse1, rf_rmse, boost_rmse)
+result2 <- rbind(cv_rmse1, cv_rmse2, rf_rmse, boost_rmse)
 row.names(result2) <- c("Linear Regression 1", "Linear Regression 2", "Random Forest", "Boosted Tree")
 kable(result2, digits = 4, caption = "Table 9. Cross Validation - Comparisons of the models in test set")
 ```
@@ -1156,7 +1154,7 @@ kable(result2, digits = 4, caption = "Table 9. Cross Validation - Comparisons of
 |                     |   RMSE | Rsquared |    MAE |
 |:--------------------|-------:|---------:|-------:|
 | Linear Regression 1 | 1.0369 |   0.0146 | 0.7317 |
-| Linear Regression 2 | 1.0369 |   0.0146 | 0.7317 |
+| Linear Regression 2 | 0.9306 |   0.0477 | 0.7209 |
 | Random Forest       | 0.9087 |   0.0842 | 0.7068 |
 | Boosted Tree        | 0.9164 |   0.0728 | 0.7099 |
 
